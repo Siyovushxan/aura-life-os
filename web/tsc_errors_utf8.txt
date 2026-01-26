@@ -1,0 +1,9 @@
+﻿src/app/dashboard/food/page.tsx(85,36): error TS2339: Property 'join' does not exist on type '{}'.
+src/app/dashboard/food/page.tsx(96,21): error TS2322: Type '{}' is not assignable to type '"Breakfast" | "Lunch" | "Dinner" | "Snack"'.
+src/app/dashboard/mind/MindContent.tsx(93,47): error TS2367: This comparison appears to be unintentional because the types '"log"' and '"start"' have no overlap.
+src/app/dashboard/mind/MindContent.tsx(376,25): error TS2322: Type '(command: { action: string; data: any; }) => Promise<void>' is not assignable to type '(data: AICommandResponse) => void'.
+  Types of parameters 'command' and 'data' are incompatible.
+    Type 'AICommandResponse' is not assignable to type '{ action: string; data: any; }'.
+      Types of property 'action' are incompatible.
+        Type 'string | undefined' is not assignable to type 'string'.
+          Type 'undefined' is not assignable to type 'string'.

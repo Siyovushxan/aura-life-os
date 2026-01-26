@@ -1,0 +1,59 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user is accessing their own data
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Root User Profile (Public within Auth)
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId);
+    }
+
+    // Private Subcollections (finance, tasks, health, etc.)
+    match /users/{userId}/{subcollection}/{document=**} {
+      // Allow OWNER to read/write everything
+      allow write: if isOwner(userId);
+      // Allow ANY authenticated user to READ (for Family Dashboard visibility)
+      // Ideally this should be restricted to "isFamilyMember", but for this stage, auth is sufficient.
+      allow read: if isAuthenticated();
+    }
+
+    // Allow members to read the family list of the owner they joined
+    match /users/{userId}/family_members/{memberId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId);
+    }
+    
+    // Allow members to read ancestors (Genetic Tree)
+    match /users/{userId}/ancestors/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId);
+    }
+
+    // Allow members to read parenting requests (Tasks)
+    match /users/{userId}/parenting_requests/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId); // Or potentially allow write if they are the requester? leaving as owner for now
+    }
+
+    // Family Groups (Root Collection)
+    // Allows authenticated users to create, read, and manage family groups and their subcollections
+    match /family_groups/{groupId}/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    // Default deny for anything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

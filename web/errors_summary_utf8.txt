@@ -1,0 +1,504 @@
+﻿Error Counts by File:
+{
+  "D:\\AURA\\web\\scripts\\parse-errors.js": 1,
+  "D:\\AURA\\web\\scripts\\verify-ui.js": 1,
+  "src/app\\dashboard\\focus\\page.tsx": 2,
+  "src/app\\dashboard\\health\\page.tsx": 2,
+  "src/app\\dashboard\\interests\\page.tsx": 4,
+  "src/app\\dashboard\\mind\\MindContent.tsx": 1,
+  "src/app\\dashboard\\tasks\\page.tsx": 1,
+  "src/app\\login\\page.tsx": 3,
+  "src/app\\register\\page.tsx": 3,
+  "src/components\\CalendarModal.tsx": 1,
+  "src/components\\CommandPalette.tsx": 1,
+  "src/components\\FamilyInvite.tsx": 2,
+  "src/components\\MoneyInput.tsx": 2,
+  "src/components\\SmartTree.tsx": 8,
+  "src/components\\dashboard\\AiInsightSection.tsx": 1,
+  "src/components\\dashboard\\AudioReport.tsx": 3,
+  "src/components\\dashboard\\NavSidebar.tsx": 1,
+  "src/components\\family\\MemberNode.tsx": 12,
+  "src/components\\landing\\ProductModals.tsx": 5,
+  "src/context\\FocusContext.tsx": 1,
+  "src/context\\LanguageContext.tsx": 1,
+  "src/context\\NotificationContext.tsx": 2,
+  "src/hooks\\useFinance.ts": 4,
+  "src/hooks\\useVoiceCommand.ts": 1,
+  "src/lib\\cloudFunctions.ts": 1,
+  "src/lib\\familyUtils.ts": 2,
+  "src/services\\aiPersistenceService.ts": 3,
+  "src/services\\correlationService.ts": 8,
+  "src/services\\focusService.ts": 1
+}
+
+Detailed Error List:
+[
+  {
+    "file": "D:\\AURA\\web\\scripts\\parse-errors.js",
+    "line": 1,
+    "ruleId": "@typescript-eslint/no-require-imports",
+    "message": "A `require()` style import is forbidden."
+  },
+  {
+    "file": "D:\\AURA\\web\\scripts\\verify-ui.js",
+    "line": 2,
+    "ruleId": "@typescript-eslint/no-require-imports",
+    "message": "A `require()` style import is forbidden."
+  },
+  {
+    "file": "src/app\\dashboard\\focus\\page.tsx",
+    "line": 351,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+  },
+  {
+    "file": "src/app\\dashboard\\focus\\page.tsx",
+    "line": 379,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+  },
+  {
+    "file": "src/app\\dashboard\\health\\page.tsx",
+    "line": 135,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/app\\dashboard\\health\\page.tsx",
+    "line": 144,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/app\\dashboard\\interests\\page.tsx",
+    "line": 124,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/app\\dashboard\\interests\\page.tsx",
+    "line": 158,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/app\\dashboard\\interests\\page.tsx",
+    "line": 518,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`."
+  },
+  {
+    "file": "src/app\\dashboard\\interests\\page.tsx",
+    "line": 518,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`."
+  },
+  {
+    "file": "src/app\\dashboard\\mind\\MindContent.tsx",
+    "line": 65,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/app\\dashboard\\tasks\\page.tsx",
+    "line": 1219,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+  },
+  {
+    "file": "src/app\\login\\page.tsx",
+    "line": 23,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/app\\login\\page.tsx",
+    "line": 48,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/app\\login\\page.tsx",
+    "line": 122,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+  },
+  {
+    "file": "src/app\\register\\page.tsx",
+    "line": 43,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/app\\register\\page.tsx",
+    "line": 67,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/app\\register\\page.tsx",
+    "line": 96,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+  },
+  {
+    "file": "src/components\\CalendarModal.tsx",
+    "line": 16,
+    "ruleId": "react-hooks/purity",
+    "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\nD:\\AURA\\web\\src\\components\\CalendarModal.tsx:16:71\n  14 | export default function CalendarModal({ isOpen, onClose, onDateSelect, selectedDate }: CalendarModalProps) {\n  15 |     const { t } = useLanguage();\n> 16 |     const [viewDate, setViewDate] = useState(new Date(selectedDate || Date.now()));\n     |                                                                       ^^^^^^^^^^ Cannot call impure function\n  17 |\n  18 |     const currentMonth = viewDate.getMonth();\n  19 |     const currentYear = viewDate.getFullYear();"
+  },
+  {
+    "file": "src/components\\CommandPalette.tsx",
+    "line": 33,
+    "ruleId": "react-hooks/set-state-in-effect",
+    "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nD:\\AURA\\web\\src\\components\\CommandPalette.tsx:33:13\n  31 |             if (inputRef.current) inputRef.current.focus();\n  32 |         } else {\n> 33 |             setQuery('');\n     |             ^^^^^^^^ Avoid calling setState() directly within an effect\n  34 |             setResult(null);\n  35 |         }\n  36 |     }, [isOpen]);"
+  },
+  {
+    "file": "src/components\\FamilyInvite.tsx",
+    "line": 15,
+    "ruleId": "react-hooks/purity",
+    "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\nD:\\AURA\\web\\src\\components\\FamilyInvite.tsx:15:51\n  13 |\n  14 |     // Generate invite link (simplified - in production use Firebase Dynamic Links)\n> 15 |     const inviteCode = user ? btoa(`${user.uid}_${Date.now()}`).slice(0, 12) : 'DEMO123';\n     |                                                   ^^^^^^^^^^ Cannot call impure function\n  16 |     const inviteLink = `https://aura-life-os.web.app/join?code=${inviteCode}`;\n  17 |\n  18 |     // Simple QR code using Google Charts API (no dependency)"
+  },
+  {
+    "file": "src/components\\FamilyInvite.tsx",
+    "line": 36,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+  },
+  {
+    "file": "src/components\\MoneyInput.tsx",
+    "line": 17,
+    "ruleId": "react-hooks/immutability",
+    "message": "Error: Cannot access variable before it is declared\n\n`parseNumber` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nD:\\AURA\\web\\src\\components\\MoneyInput.tsx:17:13\n  15 |     useEffect(() => {\n  16 |         if (value === 0 && displayValue === '') return; // Don't overwrite empty state with 0 initially if desired\n> 17 |         if (parseNumber(displayValue) !== value) {\n     |             ^^^^^^^^^^^ `parseNumber` accessed before it is declared\n  18 |             setDisplayValue(formatNumber(value));\n  19 |         }\n  20 |     }, [value]);\n\nD:\\AURA\\web\\src\\components\\MoneyInput.tsx:27:5\n  25 |     };\n  26 |\n> 27 |     const parseNumber = (str: string): number => {\n     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 28 |         return Number(str.replace(/\\s/g, \"\"));\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 29 |     };\n     | ^^^^^^^ `parseNumber` is declared here\n  30 |\n  31 |     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {\n  32 |         const raw = e.target.value;"
+  },
+  {
+    "file": "src/components\\MoneyInput.tsx",
+    "line": 18,
+    "ruleId": "react-hooks/immutability",
+    "message": "Error: Cannot access variable before it is declared\n\n`formatNumber` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nD:\\AURA\\web\\src\\components\\MoneyInput.tsx:18:29\n  16 |         if (value === 0 && displayValue === '') return; // Don't overwrite empty state with 0 initially if desired\n  17 |         if (parseNumber(displayValue) !== value) {\n> 18 |             setDisplayValue(formatNumber(value));\n     |                             ^^^^^^^^^^^^ `formatNumber` accessed before it is declared\n  19 |         }\n  20 |     }, [value]);\n  21 |\n\nD:\\AURA\\web\\src\\components\\MoneyInput.tsx:22:5\n  20 |     }, [value]);\n  21 |\n> 22 |     const formatNumber = (num: number): string => {\n     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 23 |         if (!num) return '';\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 24 |         return num.toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g, \" \");\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 25 |     };\n     | ^^^^^^^ `formatNumber` is declared here\n  26 |\n  27 |     const parseNumber = (str: string): number => {\n  28 |         return Number(str.replace(/\\s/g, \"\"));"
+  },
+  {
+    "file": "src/components\\SmartTree.tsx",
+    "line": 8,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\SmartTree.tsx",
+    "line": 13,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\SmartTree.tsx",
+    "line": 13,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\SmartTree.tsx",
+    "line": 60,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\SmartTree.tsx",
+    "line": 97,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\SmartTree.tsx",
+    "line": 97,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\SmartTree.tsx",
+    "line": 98,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\SmartTree.tsx",
+    "line": 158,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+  },
+  {
+    "file": "src/components\\dashboard\\AiInsightSection.tsx",
+    "line": 8,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\dashboard\\AudioReport.tsx",
+    "line": 43,
+    "ruleId": "react-hooks/set-state-in-effect",
+    "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nD:\\AURA\\web\\src\\components\\dashboard\\AudioReport.tsx:43:9\n  41 |         u.onerror = () => setIsPlaying(false);\n  42 |\n> 43 |         setUtterance(u);\n     |         ^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  44 |\n  45 |         if (autoPlay) {\n  46 |             synth.speak(u);"
+  },
+  {
+    "file": "src/components\\dashboard\\AudioReport.tsx",
+    "line": 72,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`."
+  },
+  {
+    "file": "src/components\\dashboard\\AudioReport.tsx",
+    "line": 72,
+    "ruleId": "react/no-unescaped-entities",
+    "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`."
+  },
+  {
+    "file": "src/components\\dashboard\\NavSidebar.tsx",
+    "line": 51,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 16,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 39,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 40,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 53,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 54,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 55,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 67,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 67,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 67,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 67,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 68,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\family\\MemberNode.tsx",
+    "line": 68,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\landing\\ProductModals.tsx",
+    "line": 8,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\landing\\ProductModals.tsx",
+    "line": 27,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\landing\\ProductModals.tsx",
+    "line": 46,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\landing\\ProductModals.tsx",
+    "line": 80,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/components\\landing\\ProductModals.tsx",
+    "line": 112,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/context\\FocusContext.tsx",
+    "line": 42,
+    "ruleId": "react-hooks/immutability",
+    "message": "Error: Cannot access variable before it is declared\n\n`handleComplete` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nD:\\AURA\\web\\src\\context\\FocusContext.tsx:42:13\n  40 |             }, 1000);\n  41 |         } else if (timeLeft === 0 && isActive) {\n> 42 |             handleComplete();\n     |             ^^^^^^^^^^^^^^ `handleComplete` accessed before it is declared\n  43 |         }\n  44 |\n  45 |         return () => {\n\nD:\\AURA\\web\\src\\context\\FocusContext.tsx:50:5\n  48 |     }, [isActive, isPaused, timeLeft]);\n  49 |\n> 50 |     const handleComplete = async () => {\n     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 51 |         if (user && sessionId) {\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 52 |             // Play completion sound\n     ╤В╨Р╨╢\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 59 |         }\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 60 |     };\n     | ^^^^^^^ `handleComplete` is declared here\n  61 |\n  62 |     const startSession = async (mins: number, tId?: string, tName?: string) => {\n  63 |         if (!user) return;"
+  },
+  {
+    "file": "src/context\\LanguageContext.tsx",
+    "line": 2829,
+    "ruleId": "react-hooks/set-state-in-effect",
+    "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nD:\\AURA\\web\\src\\context\\LanguageContext.tsx:2829:13\n  2827 |         const saved = localStorage.getItem('aura-lang') as Language;\n  2828 |         if (saved && ['en', 'uz', 'ru'].includes(saved)) {\n> 2829 |             setLanguage(saved);\n       |             ^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  2830 |         }\n  2831 |     }, []);\n  2832 |"
+  },
+  {
+    "file": "src/context\\NotificationContext.tsx",
+    "line": 93,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/context\\NotificationContext.tsx",
+    "line": 156,
+    "ruleId": "@typescript-eslint/no-require-imports",
+    "message": "A `require()` style import is forbidden."
+  },
+  {
+    "file": "src/hooks\\useFinance.ts",
+    "line": 33,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/hooks\\useFinance.ts",
+    "line": 39,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/hooks\\useFinance.ts",
+    "line": 39,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/hooks\\useFinance.ts",
+    "line": 40,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/hooks\\useVoiceCommand.ts",
+    "line": 31,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/lib\\cloudFunctions.ts",
+    "line": 142,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/lib\\familyUtils.ts",
+    "line": 127,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/lib\\familyUtils.ts",
+    "line": 127,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\aiPersistenceService.ts",
+    "line": 19,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\aiPersistenceService.ts",
+    "line": 36,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\aiPersistenceService.ts",
+    "line": 60,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\correlationService.ts",
+    "line": 63,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\correlationService.ts",
+    "line": 64,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\correlationService.ts",
+    "line": 65,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\correlationService.ts",
+    "line": 66,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\correlationService.ts",
+    "line": 116,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\correlationService.ts",
+    "line": 221,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\correlationService.ts",
+    "line": 323,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\correlationService.ts",
+    "line": 336,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  },
+  {
+    "file": "src/services\\focusService.ts",
+    "line": 23,
+    "ruleId": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type."
+  }
+]

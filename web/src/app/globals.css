@@ -1,0 +1,298 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050505;
+  --foreground: #ffffff;
+
+  /* Aura Colors */
+  --aura-cyan: #00F0FF;
+  --aura-purple: #7000FF;
+  --aura-green: #00FF94;
+  --aura-gold: #FFD600;
+  --aura-red: #FF2E2E;
+  --aura-blue: #2E8FFF;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-aura-cyan: var(--aura-cyan);
+  --color-aura-purple: var(--aura-purple);
+  --color-aura-green: var(--aura-green);
+  --color-aura-gold: var(--aura-gold);
+  --color-aura-red: var(--aura-red);
+  --color-aura-blue: var(--aura-blue);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space-grotesk);
+}
+
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  height: 100%;
+}
+
+.scroll-container {
+  width: 100%;
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+section {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* --- Landing Page Specific Styles --- */
+.living-sphere {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(0, 240, 255, 0.1) 0%, rgba(112, 0, 255, 0.2) 40%, rgba(112, 0, 255, 0.1) 60%, transparent 80%);
+  box-shadow:
+    0 0 80px rgba(0, 240, 255, 0.3),
+    inset 0 0 60px rgba(112, 0, 255, 0.4);
+  position: relative;
+  backdrop-filter: blur(2px);
+  overflow: visible;
+  animation: sphere-pulse 8s ease-in-out infinite alternate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .living-sphere {
+    width: 400px;
+    height: 400px;
+  }
+}
+
+.mini-sphere {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 240, 255, 0.9), rgba(112, 0, 255, 0.6), rgba(0, 0, 0, 0.9));
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-sphere::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  background: radial-gradient(circle, transparent 20%, rgba(0, 240, 255, 0.4) 60%, transparent 80%);
+  animation: fluid-move 5s linear infinite;
+}
+
+.living-sphere::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  background: radial-gradient(circle, transparent 20%, rgba(0, 240, 255, 0.2) 60%, transparent 80%);
+  animation: fluid-move 10s linear infinite;
+}
+
+.footer-glow {
+  animation: subtle-glow 10s infinite ease-in-out;
+}
+
+.living-sphere::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 20%);
+  mix-blend-mode: overlay;
+}
+
+.navbar-glow-border {
+  position: relative;
+}
+
+.navbar-glow-border::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(0, 240, 255, 0) 20%,
+      rgba(0, 240, 255, 1) 45%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(112, 0, 255, 1) 55%,
+      rgba(112, 0, 255, 0) 80%,
+      transparent 100%);
+  background-size: 200% 100%;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.5), 0 0 30px rgba(112, 0, 255, 0.3);
+  animation: neon-flow 3s linear infinite;
+}
+
+.scroll-container {
+  width: 100%;
+  height: 100vh;
+}
+
+/* Already handled in top section */
+
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #00F0FF;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.8);
+  border: 4px solid #fff;
+  transition: all 0.3s ease;
+}
+
+.slider:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 1);
+}
+
+@keyframes fluid-move {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes sphere-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 60px rgba(0, 240, 255, 0.4);
+  }
+
+  100% {
+    transform: scale(1.05);
+    box-shadow: 0 0 80px rgba(0, 240, 255, 0.6);
+  }
+}
+
+@keyframes neon-flow {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes subtle-glow {
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+}
+
+
+/* Custom Scrollbar for the container */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+/* React Flow Overrides */
+.react-flow__controls-button {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  fill: #fff !important;
+}
+
+.react-flow__controls-button:hover {
+  background: rgba(0, 240, 255, 0.2) !important;
+}
+
+.react-flow__attribution {
+  display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scan {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
