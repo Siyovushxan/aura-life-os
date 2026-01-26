@@ -79,7 +79,11 @@ export const getScheduledInsight = async (
             case 'mind': rawResult = await getMindInsight(language, userContext); break;
             case 'tasks': {
                 const taskRes = await getDailyTaskInsight(language, userContext);
-                rawResult = { title: taskRes.title, insight: taskRes.suggestion, emoji: "✅" };
+                rawResult = {
+                    title: taskRes.title || "Kundalik Vazifalar",
+                    insight: taskRes.suggestion || "Bugungi kun uchun vazifalar.",
+                    emoji: "✅"
+                };
                 break;
             }
             default: return null;

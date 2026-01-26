@@ -1,7 +1,7 @@
 
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBdVpVPYSB4MTJIRT__ti7pvxTbVHZE18s",
@@ -18,4 +18,13 @@ export const auth = getAuth(app);
 export const db = initializeFirestore(app, {
     localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
 });
+
+if (process.env.NODE_ENV === 'development') {
+    try {
+        connectFirestoreEmulator(db, 'localhost', 8080);
+        console.log("🔥 Connected to Firestore Emulator");
+    } catch (e) {
+        // ignore if already connected
+    }
+}
 

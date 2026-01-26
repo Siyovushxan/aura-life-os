@@ -1,5 +1,11 @@
 
 const { chromium } = require('playwright');
+const os = require('os');
+
+// Fix for Windows: Playwright expects HOME to be set, but often it's USERPROFILE on Windows
+if (os.platform() === 'win32' && !process.env.HOME) {
+    process.env.HOME = process.env.USERPROFILE;
+}
 
 (async () => {
     try {
