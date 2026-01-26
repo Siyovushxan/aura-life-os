@@ -172,9 +172,7 @@ export default function GenealogyPage() {
                                 <input
                                     id="gen-edu"
                                     className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-aura-gold outline-none"
-                                    // @ts-expect-error - Ancestor type might be missing education
                                     value={editingAncestor.education || ''}
-                                    // @ts-expect-error - Ancestor type missing education
                                     onChange={e => setEditingAncestor({ ...editingAncestor, education: e.target.value })}
                                 />
                             </div>
@@ -217,8 +215,8 @@ export default function GenealogyPage() {
                                 <textarea
                                     id="gen-bio"
                                     className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:border-aura-gold outline-none h-20 resize-none"
-                                    value={(editingAncestor as Ancestor).bio || ''}
-                                    onChange={e => setEditingAncestor(prev => ({ ...prev, bio: e.target.value } as Partial<Ancestor>))}
+                                    value={editingAncestor.bio || ''}
+                                    onChange={e => setEditingAncestor({ ...editingAncestor, bio: e.target.value })}
                                 />
                             </div>
 

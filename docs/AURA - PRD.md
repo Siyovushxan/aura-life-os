@@ -7,11 +7,11 @@ Ushbu yangilash joriy web implementatsiyasini to'liq hujjatlashtiradi va backend
 AURA — MAHSULOT TALABLARI HUJJATI (PRD v2.3)
 
 **Loyiha Nomi:** AURA (AI-Powered Life Operating System)  
-**Versiya:** 2.5 (Localization Complete & Advanced Features)  
-**Holat:** Web Platform - ✅ Production Ready (100% Localized) | Backend & Mobile - 🚧 Pending  
+**Versiya:** 2.6 (Verification & Polish Phase)  
+**Holat:** Web Platform - ✅ Production Ready (System Verified) | Backend & Mobile - 🚧 Pending  
 **Platformalar:** Web Dashboard (100%), iOS/Android Mobile App (Planned)  
 **Muallif:** Siyovush Abdullayev  
-**Oxirgi Yangilanish:** 2026-01-20
+**Oxirgi Yangilanish:** 2026-01-26
 
 --------------------------------------------------------------------------------
 
@@ -27,21 +27,25 @@ AURA — bu insonning kundalik hayotini har tomonlama (moliya, salomatlik, ruhiy
 
 ## 2. MAHALLIYLASHTIRISH (LOCALIZATION)
 
-**✅ IMPLEMENTATSIYA HOLATI: To'liq amalga oshirilgan**
+## ✅ IMPLEMENTATSIYA HOLATI: To'liq amalga oshirilgan**
 
 ### 2.1. Qo'llab-quvvatlanadigan Tillar
+
 • **Ingliz (English)** - Asosiy til
 • **O'zbek (Uzbek)** - To'liq qo'llab-quvvatlash
 • **Rus (Russian)** - To'liq qo'llab-quvvatlash
 
 ### 2.2. Texnik Implementatsiya
+
 • **LanguageContext:** React Context API yordamida global til boshqaruvi
 • **Dynamic Switching:** Real vaqtda til o'zgartirish (sahifa yangilanishi shart emas)
 • **Persistence:** Firebase user profile da `language` maydoni saqlanadi
 • **Translation Keys:** Barcha UI matnlar strukturalashtirilgan kalitlar orqali tartibga solingan
 
 ### 2.3. Qamrov
+
 Barcha modullar va komponentlar uchun:
+
 - Interfeys matnlari
 - Placeholder'lar
 - Xatolik xabarlari
@@ -55,6 +59,7 @@ Barcha modullar va komponentlar uchun:
 ## 3. UI/UX DIZAYN KONSEPTSIYASI
 
 ### 3.1. Mobil Ilova: "The Soul" 🚧 PENDING
+
 *(Hissiy va Minimalistik)*
 
 • **Maqsad:** Tezkor kirish, hissiy bog'liqlik va kichik ekranlar uchun qulaylik.
@@ -63,15 +68,17 @@ Barcha modullar va komponentlar uchun:
 • **Adaptive UI:** Stress holatida ilova murakkab menyularni yashirib, tinchlantiruvchi rejimga o'tadi.
 
 ### 3.2. Web Dashboard: "The Brain" ✅ IMPLEMENTED
+
 *(Analitik Boshqaruv)*
 
 • **Maqsad:** Chuqur tahlil, strategik rejalashtirish va katta hajmdagi ma'lumotlarni ko'rish.
 • **Visual Style:** "Control Center" uslubi. Quyuq fon (dark theme), neon urg'ular, vidjetlar tizimi.
 • **Technology Stack:**
-  - Next.js 14 (App Router)
-  - TypeScript
-  - Tailwind CSS
-  - Glassmorphism effects
+
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- Glassmorphism effects
 • **Responsive Design:** Desktop-first, lekin tablet va mobile uchun moslashuvchan
 • **Accessibility:** Keyboard navigation, focus states, semantic HTML
 
@@ -99,6 +106,7 @@ Barcha modullar va komponentlar uchun:
 • Arxivlangan kunlar tahrir qilinmaydi (faqat ko'rish)
 
 **Ma'lumotlar Strukturasi:**
+
 ```typescript
 {
   userId: string;
@@ -114,7 +122,7 @@ Barcha modullar va komponentlar uchun:
 **AI Tahlil (21:00):** ✅ IMPLEMENTED (Simulated)
 Xarajatlar sababini boshqa modullar (stress, mood) bilan bog'lab tahlil qiladi. Hozirda moliya sahifasida "Advanced Stats" va "AI Analysis" kartalari orqali ko'rsatiladi.
 
-**Yangi (v2.5):** 
+**Yangi (v2.5):**
 • **Credits Management:** Qarz va kreditlarni boshqarish (Principal/Interest split) ✅
 • **Deposits:** Depozitlarni boshqarish (Add funds, Withdraw, Profit tracking) ✅
 • **Net Worth:** Haqiqiy sof boylik hisobi (Assets - Liabilities) ✅
@@ -147,6 +155,12 @@ Kunlik hissiy xulosa va tavsiyalar.
 • 5, 10, 15, 20, 25 daqiqali Pomodoro sessiyalari
 • Start/Pause/Stop funksiyalari
 • Session history
+
+**Audio Rejimlar (Ambient Mode):** ✅ NEW in v2.6
+• **Brain Waves:** Diqqatni jamlash uchun maxsus to'lqinlar
+• **Nature Sounds:** Yomg'ir (Rain), O'rmon (Forest), Okean (Ocean)
+• **Lofi Beats:** Ishlash uchun sokin musiqa
+• Ovoz balandligini boshqarish va fon musiqasini almashtirish imkoniyati
 
 **Tarix Mantiqi:**
 • Muddatidan oldin to'xtatilsa "Failed" deb yoziladi
@@ -234,11 +248,13 @@ Kechki payt (21:00 dan keyin) kunlik xulosa (Audio Report) shaklida taqdim etila
 **Maqsad:** Kaloriyani aniqlash va ovqatlanish tahlili.
 
 **Kiritish Usullari:**
+
 1. **Kamera:** Real vaqtda rasmga olish ✅
 2. **Galereya:** Telefondagi rasmni yuklash ✅
 3. **Manual:** Ovqat nomi va kaloriyani qo'lda kiritish ✅
 
 **Jarayon:**
+
 1. Rasm yuklanadi (Firebase Storage)
 2. AI tahlil qiladi (GROQ Vision API) 🚧 PENDING
 3. Nomi va Kaloriyasi aniqlanadi
@@ -272,13 +288,15 @@ Kunlik ovqatlanish xulosasi va ertangi kun tavsiyalari.
 • **Duality:** Ijobiy (Growth) va Salbiy (Controlled Habit) balans.
 • **AI Feedback Loop:** AI har kuni 3 marta tavsiya beradi. Foydalanuvchi "Qiziq/Qiziq emas" tugmalari orqali tavsiyalarga baho berishi AI'ni shaxsiylashtirishni kuchaytiradi.
 • **Smart Habit Modes:**
-  - **Frequency:** Sanoqli odatlar (masalan: sigaret). Har bir urinish alohida sanaladi.
-  - **Binary:** Bir martalik odatlar (masalan: kech uyg'onish). Kunda faqat bir marta qayd etiladi.
+
+- **Frequency:** Sanoqli odatlar (masalan: sigaret). Har bir urinish alohida sanaladi.
+- **Binary:** Bir martalik odatlar (masalan: kech uyg'onish). Kunda faqat bir marta qayd etiladi.
 • **AI Habit Coach:** AI kunlik salbiy odatlar tahlili asosida maxsus "Corrective Insight" beradi.
 • **Bugungi Mashg'ulotlar (Daily Stats):** Kundalik faoliyatlar jamlangan statistika ko'rinishida aks etadi.
 • **Persistence:** Tavsiyalar, feedbacklar va habit counterlar Firestore'da saqlanadi.
 
 **AI Tahlil (Kunlik 3 Tsikl):** ✅ IMPLEMENTED
+
 - Ertalab: Energiya va o'rganishga yo'naltirilgan.
 - Abed: Ijtimoiy va kognitiv yangilanish.
 - Kechqurun: Oila va dam olish.
@@ -298,10 +316,11 @@ Kunlik ovqatlanish xulosasi va ertangi kun tavsiyalari.
 **Yaratish (Create):** ✅
 • Foydalanuvchi Oila nomini kiritadi
 • **Creator Profile Setup (PRD v2.1 UPDATE):**
-  - Yaratuvchi o'zi haqida to'liq ma'lumot kiritadi
-  - To'liq ism (Familiya bilan)
-  - Tug'ilgan sana
-  - Rol (Ota, Ona, etc.)
+
+- Yaratuvchi o'zi haqida to'liq ma'lumot kiritadi
+- To'liq ism (Familiya bilan)
+- Tug'ilgan sana
+- Rol (Ota, Ona, etc.)
 • Yaratuvchi (Owner) avtomatik admin huquqiga ega
 
 **Tahrirlash va O'chirish:** ✅
@@ -320,6 +339,7 @@ Kunlik ovqatlanish xulosasi va ertangi kun tavsiyalari.
 • Owner "Approve" yoki "Deny" qilishi mumkin
 
 **Tasdiqlash Oqimi (Approval Workflow):** ✅
+
 1. Owner "So'rovlar" (Requests) oynasini ko'radi
 2. Har bir so'rovda nomzodning ismi
 3. Owner "Qabul qilish" bosganda **Rol tanlash MAJBURIY**
@@ -327,6 +347,7 @@ Kunlik ovqatlanish xulosasi va ertangi kun tavsiyalari.
 5. Boshlang'ich profil yaratiladi (Coins: 0, Level: 1)
 
 **Rollar (18 ta rol):**
+
 - Bobo (Grandfather), Buvi (Grandmother)
 - Ota (Father), Ona (Mother)  
 - Aka (Brother), Uka (Younger Brother)
@@ -381,11 +402,12 @@ Kunlik ovqatlanish xulosasi va ertangi kun tavsiyalari.
 
 **Data Integrity:**
 • **Majburiy Maydonlar:**
-  - `fullName`: To'liq Ism
-  - `birthDate`: Tug'ilgan sana
-  - `role`: Oiladagi rol
-  - `fatherId` / `motherId`: Ota-ona ID'lari (agar mavjud bo'lsa)
-  - `spouseId`: Turmush o'rtog'i (ixtiyoriy)
+
+- `fullName`: To'liq Ism
+- `birthDate`: Tug'ilgan sana
+- `role`: Oiladagi rol
+- `fatherId` / `motherId`: Ota-ona ID'lari (agar mavjud bo'lsa)
+- `spouseId`: Turmush o'rtog'i (ixtiyoriy)
 
 **Oila Yaratish Flow:** ✅
 • Creator o'zi haqida to'liq ma'lumot kiritadi
@@ -393,6 +415,7 @@ Kunlik ovqatlanish xulosasi va ertangi kun tavsiyalari.
 
 **A'zolarni Qo'shish va Bog'lash:** ✅
 • Owner yangi a'zoni qabul qilayotganda:
+
   1. Rol tanlaydi
   2. Ota-onasini belgilaydi (Parent Linkage)
   3. *Avtomatik Mantiq:* Agar Owner (Erkak) "O'g'il" qabul qilsa, `fatherId` avtomatik Owner'ga tenglashadi
@@ -420,9 +443,10 @@ Kunlik ovqatlanish xulosasi va ertangi kun tavsiyalari.
 
 **Safety Monitor:**
 • Keksa a'zolar (Bobo, Buvi) uchun:
-  - So'nggi faollik monitoring
-  - Batareya quvvati tracking
-  - Emergency alerts
+
+- So'nggi faollik monitoring
+- Batareya quvvati tracking
+- Emergency alerts
 
 --------------------------------------------------------------------------------
 
@@ -526,6 +550,7 @@ Kunlik ovqatlanish xulosasi va ertangi kun tavsiyalari.
 • Barcha o'zgarishlar (Events) AI konteksti uchun real vaqtda yuboriladi 🚧 PENDING
 
 **Firebase Firestore Collections:**
+
 ```
 users/
   {userId}/
@@ -578,6 +603,7 @@ notifications/
 ### 10.1. Firestore Real-time Listeners
 
 **Family Module Listeners:**
+
 ```typescript
 subscribeToFamilyGroup(groupId, callback)
 subscribeToUserFamilies(userId, callback)
@@ -691,6 +717,7 @@ subscribeToDeletedFamilies(userId, callback)
 • **Vitality:** Health snapshot
 • **Nutrition:** Daily calories
 • **Hobbies:** Interest streak
+• **Liveness Status:** Safety check-in for elderly/family (Panic Button & I'm OK) ✅ NEW
 
 **Layout:**
 • CSS Grid responsive layout
@@ -711,6 +738,7 @@ subscribeToDeletedFamilies(userId, callback)
 • Highlight selected date
 • Disable future dates (optional)
 • Premium design with- **Version**: 2.3 - "The Financial Revolution"
+
 - **Last Updated**: 2026-01-20
 - **Status**: Production Ready / Module V10
 • Finance module (planned)
@@ -778,6 +806,7 @@ subscribeToDeletedFamilies(userId, callback)
 ### 14.2. Environment Configuration
 
 **Environment Variables:**
+
 ```
 NEXT_PUBLIC_FIREBASE_API_KEY
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
@@ -795,11 +824,13 @@ NEXT_PUBLIC_FIREBASE_APP_ID
 ### 14.3. Build & Deploy
 
 **Development:**
+
 ```bash
 npm run dev
 ```
 
 **Production Build:**
+
 ```bash
 npm run build
 npm start
@@ -826,47 +857,47 @@ npm start
 
 **Cloud Functions:**
 
-1.  **`dailyCrunch`**
+1. **`dailyCrunch`**
     - Trigger: Cron Job (23:59 daily)
     - Purpose: Archive previous day's data
     - Set `isArchived: true` for all users
 
-2.  **`analyzeFinance`**
+2. **`analyzeFinance`**
     - Trigger: Cron Job (21:00 daily)
     - Purpose: AI analysis of spending patterns
     - Cross-reference with mood/stress data
 
-3.  **`analyzeMood`**
+3. **`analyzeMood`**
     - Trigger: Cron Job (20:00 daily)
     - Purpose: Mental health trend analysis
     - Recommendations based on patterns
 
-4.  **`analyzeFocus`**
+4. **`analyzeFocus`**
     - Trigger: Cron Job (18:00 daily)
     - Purpose: Productivity metrics
     - Identify distraction patterns
 
-5.  **`analyzeTasks`**
+5. **`analyzeTasks`**
     - Trigger: Cron Job (09:00 daily)
     - Purpose: Daily plan recommendations
     - Priority re-ordering
 
-6.  **`analyzeHealth`**
+6. **`analyzeHealth`**
     - Trigger: Cron Job (08:00 daily)
     - Purpose: Health insights
     - Biometric trend analysis
 
-7.  **`analyzeInterests`**
+7. **`analyzeInterests`**
     - Trigger: Cron Job (19:00 daily)
     - Purpose: Hobby suggestions
     - Learning resource recommendations
 
-8.  **`analyzeFood`**
+8. **`analyzeFood`**
     - Trigger: Cron Job (22:00 daily)
     - Purpose: Nutrition summary
     - Meal planning suggestions
 
-9.  **`smartParentingUnlock`**
+9. **`smartParentingUnlock`**
     - Trigger: Firestore trigger on task completion
     - Purpose: Reward distribution
     - Parent notification
@@ -910,6 +941,7 @@ npm start
 • Camera integration (Food AI)
 • Focus Overlay (mini timer on other apps)
 • Sensor data collection:
+
 - Pedometer (steps)
 - Sleep tracking (HealthKit/Google Fit)
 - Screen time API
@@ -980,6 +1012,7 @@ npm start
 ## APPENDIX A: FIRESTORE DATA SCHEMA
 
 ### Users Collection
+
 ```typescript
 users/{userId}
 {
@@ -995,6 +1028,7 @@ users/{userId}
 ```
 
 ### Daily Logs
+
 ```typescript
 daily_logs/{userId}_{date}
 {
@@ -1033,6 +1067,7 @@ daily_logs/{userId}_{date}
 ```
 
 ### Family Groups
+
 ```typescript
 family_groups/{groupId}
 {
@@ -1046,6 +1081,7 @@ family_groups/{groupId}
 ```
 
 ### Family Members (Subcollection)
+
 ```typescript
 users/{ownerId}/family_members/{memberId}
 {
@@ -1068,6 +1104,7 @@ users/{ownerId}/family_members/{memberId}
 ```
 
 ### Tasks
+
 ```typescript
 tasks/{taskId}
 {
@@ -1156,6 +1193,7 @@ web/
 Ushbu PRD v2.1 hujjati AURA loyihasining hozirgi holatini to'liq aks ettiradi:
 
 **✅ Amalga oshirilgan (Web Platform):**
+
 - 7 ta asosiy modul
 - Real-time synchronization
 - Multi-language support
@@ -1166,11 +1204,13 @@ Ushbu PRD v2.1 hujjati AURA loyihasining hozirgi holatini to'liq aks ettiradi:
 - Authentication
 
 **🚧 Ishlab chiqilmoqda:**
+
 - Landing page
 - User settings enhancements
 - Missing module features
 
 **🔴 Rejalashtirilgan:**
+
 - Backend Cloud Functions
 - AI integrations (GROQ)
 - Mobile app (React Native)
@@ -1178,6 +1218,7 @@ Ushbu PRD v2.1 hujjati AURA loyihasining hozirgi holatini to'liq aks ettiradi:
 - Push notifications
 
 **Keyingi Qadamlar:**
+
 1. Backend Cloud Functions'ni yozish
 2. AI API'larni integratsiya qilish
 3. Mobile app'ni boshlash
@@ -1187,6 +1228,7 @@ Ushbu PRD v2.1 hujjati AURA loyihasining hozirgi holatini to'liq aks ettiradi:
 Bu hujjat loyiha uchun "Master Plan" sifatida xizmat qiladi va barcha stakeholder'lar uchun aniq yo'l-yo'riq beradi.
 
 **Versiya Tarixi:**
+
 - v1.0: Initial release (konsept)
 - v2.0: Kengaytirilgan xususiyatlar (PRD v2.0'dan)
 - v2.1: Joriy implementatsiyaga moslashtirilgan (2026-01-15)

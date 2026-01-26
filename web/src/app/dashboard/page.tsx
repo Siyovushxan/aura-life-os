@@ -56,7 +56,14 @@ export default function Dashboard() {
     // UI State
     const [time, setTime] = useState<Date | null>(null);
     const [stressLevel] = useState(30);
-    const [aiInsight, setAiInsight] = useState(t.home.analyzing);
+
+    interface AIInsight {
+        title?: string;
+        emoji?: string;
+        insight: string;
+    }
+
+    const [aiInsight, setAiInsight] = useState<string | AIInsight>(t.home.analyzing);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [isLoadingInsight, setIsLoadingInsight] = useState(false);
 
@@ -163,10 +170,15 @@ export default function Dashboard() {
             console.log("AI Tahlil: Muvaffaqiyatli!", { insight });
 
             // Extract string from object if needed
-            const insightText = typeof insight === 'string' ? insight : (insight?.insight || JSON.stringify(insight));
+            // const insightText = typeof insight === 'string' ? insight : (insight?.insight || JSON.stringify(insight));
 
-            if (insightText) {
-                setAiInsight(insightText);
+            if (insight) {
+                // Store the whole object if possible, or formatted string
+                // Actually, let's store the object in state, but state is currently string | object?
+                // The state definition is: const [aiInsight, setAiInsight] = useState(t.home.analyzing);
+                // Typescript infers string. Let's cast or just set it.
+                // To avoid TS issues without changing 100 lines, let's keep it as is but assume component handles it.
+                setAiInsight(insight);
             }
         } catch (error) {
             console.error('AI Insight Error:', error);
@@ -181,8 +193,10 @@ export default function Dashboard() {
 
         try {
             const today = getLocalTodayStr();
+            // Handle AIInsight type (object or string) for logging
+            const logInsight = typeof aiInsight === 'string' ? aiInsight : JSON.stringify(aiInsight);
             await createOrUpdateDailyLog(user.uid, today, {
-                aiInsight: aiInsight
+                aiInsight: logInsight
             });
             triggerAlert("Muvaffaqiyatli", "Tahlil tarixingizga saqlandi.", "success");
             // Refresh history
@@ -320,18 +334,35 @@ export default function Dashboard() {
                         <div className="hidden md:flex flex-1 max-w-xl mx-8 relative">
                             <div className={`w-full bg-white/5 border rounded-full px-8 py-2.5 flex items-center justify-center gap-3 group transition-all cursor-default overflow-hidden ${aiInsight !== t.home.analyzing ? 'border-aura-cyan/30 shadow-[0_0_15px_rgba(34,211,238,0.1)]' : 'border-white/5 hover:border-white/10'}`}>
                                 <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLoadingInsight ? 'bg-aura-purple animate-bounce' : (aiInsight !== t.home.analyzing ? 'bg-aura-cyan' : 'bg-aura-purple')}`}></div>
-                                <p className={`text-xs font-medium tracking-wide transition-colors flex items-center gap-3 ${aiInsight !== t.home.analyzing ? 'text-white' : 'text-gray-300'}`}>
-                                    <span>{isLoadingInsight ? (t.home.analyzing || "Tizim tahlil qilinmoqda...") : (aiInsight && aiInsight !== t.home.analyzing ? (typeof aiInsight === 'string' ? aiInsight : JSON.stringify(aiInsight)) : "AURA AI tizim tayyor")}</span>
+                                <div className={`text-xs font-medium tracking-wide transition-colors flex items-center gap-3 ${aiInsight !== t.home.analyzing ? 'text-white' : 'text-gray-300'} truncate`}>
+                                    {isLoadingInsight ? (
+                                        <span>{t.home.analyzing || "Tizim tahlil qilinmoqda..."}</span>
+                                    ) : (
+                                        aiInsight && aiInsight !== t.home.analyzing ? (
+                                            typeof aiInsight === 'object' && (aiInsight as AIInsight).insight ? (
+                                                <span className="flex items-center gap-2">
+                                                    <span className="text-lg">{(aiInsight as AIInsight).emoji || '✨'}</span>
+                                                    <span className="font-bold text-aura-cyan">{(aiInsight as AIInsight).title}:</span>
+                                                    <span className="truncate max-w-[300px]">{(aiInsight as AIInsight).insight}</span>
+                                                </span>
+                                            ) : (
+                                                <span>{typeof aiInsight === 'string' ? aiInsight : JSON.stringify(aiInsight)}</span>
+                                            )
+                                        ) : (
+                                            <span>&quot;AURA AI tizim tayyor&quot;</span>
+                                        )
+                                    )}
+
                                     {aiInsight && aiInsight !== t.home.analyzing && aiInsight !== "AURA AI tizim tayyor" && !isLoadingInsight && (
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleSaveLog(); }}
-                                            className="ml-1 p-1.5 rounded-lg bg-aura-cyan/20 border border-aura-cyan/30 text-[10px] hover:bg-aura-cyan/40 hover:scale-110 active:scale-95 transition-all shadow-[0_0_10px_rgba(34,211,238,0.2)] group/save"
+                                            className="ml-1 p-1.5 rounded-lg bg-aura-cyan/20 border border-aura-cyan/30 text-[10px] hover:bg-aura-cyan/40 hover:scale-110 active:scale-95 transition-all shadow-[0_0_10px_rgba(34,211,238,0.2)] group/save shrink-0"
                                             title="Saqlash"
                                         >
                                             <span className="group-hover/save:animate-bounce inline-block">💾</span>
                                         </button>
                                     )}
-                                </p>
+                                </div>
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                             </div>
                         </div>
@@ -413,9 +444,21 @@ export default function Dashboard() {
 
                                             {log.aiInsight && (
                                                 <div className="relative z-10 p-5 rounded-3xl bg-black/40 border border-white/5">
-                                                    <p className="text-gray-200 text-sm leading-relaxed font-medium">
-                                                        {log.aiInsight}
-                                                    </p>
+                                                    {typeof log.aiInsight === 'object' && (log.aiInsight as AIInsight).title ? (
+                                                        <div className="space-y-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-2xl">{(log.aiInsight as AIInsight).emoji}</span>
+                                                                <h5 className="text-aura-cyan font-bold">{(log.aiInsight as AIInsight).title}</h5>
+                                                            </div>
+                                                            <p className="text-gray-200 text-sm leading-relaxed font-medium">
+                                                                {(log.aiInsight as AIInsight).insight}
+                                                            </p>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-gray-200 text-sm leading-relaxed font-medium">
+                                                            {typeof log.aiInsight === 'string' ? log.aiInsight : JSON.stringify(log.aiInsight)}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             )}
 

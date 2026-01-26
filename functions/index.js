@@ -13,6 +13,7 @@ setGlobalOptions({
 
 // Import all functions
 export { onTaskCreate } from './triggers/onTaskCreate.js';
+export { onTaskUpdate } from './triggers/onTaskUpdate.js';
 export { dailyArchive } from './schedulers/dailyArchive.js';
 export { dailyAIAnalysis } from './schedulers/dailyAIAnalysis.js';
 
@@ -62,6 +63,9 @@ export const getFamilyInsight = createAiEndpoint(analyzeFamily);
 export const getFoodLogInsight = createAiEndpoint(analyzeFoodLog);
 import { transcribeAudio } from './ai/aiAnalysis.js';
 export const getTranscription = createAiEndpoint(transcribeAudio);
+
+import { unlockReward } from './ai/gamification.js';
+export const smartParentingUnlock = createAiEndpoint(unlockReward);
 
 // Generic Text Analysis for Onboarding etc.
 import { analyzeWithGroq } from './ai/groqClient.js';

@@ -99,6 +99,8 @@ export interface Ancestor {
     fatherId?: string;
     motherId?: string;
     spouseId?: string;
+    bio?: string;
+    education?: string;
 }
 
 // New Roles List

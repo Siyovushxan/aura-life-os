@@ -33,9 +33,9 @@ export async function analyzeSimilarTasks(newTask, existingTasks) {
   `;
 
   const response = await analyzeWithGroq(
-    prompt,
-    'AURA Productivity Engine. Output JSON.',
-    'tasks'
+      prompt,
+      'AURA Productivity Engine. Output JSON.',
+      'tasks'
   );
 
   return parseGroqJSON(response) || {
@@ -67,9 +67,9 @@ export async function suggestPriority(task, context = {}) {
   `;
 
   const response = await analyzeWithGroq(
-    prompt,
-    'AURA Smart Prioritization. Output JSON.',
-    'tasks'
+      prompt,
+      'AURA Smart Prioritization. Output JSON.',
+      'tasks'
   );
 
   return parseGroqJSON(response) || {
@@ -183,9 +183,9 @@ export async function generateDailyInsights(userData, language = 'uz') {
   `;
 
   const response = await analyzeWithGroq(
-    prompt,
-    'AURA Holistic Life Analyst. Output JSON.',
-    'home'
+      prompt,
+      'AURA Holistic Life Analyst. Output JSON.',
+      'home'
   );
 
   return parseGroqJSON(response) || {

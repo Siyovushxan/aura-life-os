@@ -1,0 +1,39 @@
+﻿
+> web@0.1.0 build
+> next build
+
+тЦ▓ Next.js 16.1.1 (Turbopack)
+
+  Creating an optimized production build ...
+тЬУ Compiled successfully in 18.3s
+  Running TypeScript ...
+node.exe : Failed to compile.
+строка:1 знак:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Failed to compile.:String) [], Re 
+   moteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+./src/app/dashboard/family/genealogy/page.tsx:220:74
+Type error: Property 'bio' does not exist on type 'Ancestor'.
+
+[0m [90m 218 |[39m                                     id[33m=[39m[32m"ge
+n-bio"[39m
+ [90m 219 |[39m                                     className[33m=[39m[32m
+"w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:bord
+er-aura-gold outline-none h-20 resize-none"[39m
+[31m[1m>[22m[39m[90m 220 |[39m                                     value
+[33m=[39m{(editingAncestor [36mas[39m [33mAncestor[39m)[33m.[39mbio [33
+m||[39m [32m''[39m}
+ [90m     |[39m                                                              
+            [31m[1m^[22m[39m
+ [90m 221 |[39m                                     onChange[33m=[39m{e [3
+3m=>[39m setEditingAncestor(prev [33m=>[39m ({ [33m...[39mprev[33m,[39m 
+bio[33m:[39m e[33m.[39mtarget[33m.[39mvalue } [36mas[39m [33mPartial[
+39m[33m<[39m[33mAncestor[39m[33m>[39m))}
+ [90m 222 |[39m                                 [33m/[39m[33m>[39m
+ [90m 223 |[39m                             [33m<[39m[33m/[39m[33mdiv[3
+9m[33m>[39m[0m
+Next.js build worker exited with code: 1 and signal: null

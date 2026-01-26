@@ -1,5 +1,6 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuth } from './AuthContext';
 import { db } from '@/firebaseConfig';
 import { collection, query, where, onSnapshot, doc } from 'firebase/firestore';
@@ -153,7 +154,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     }, [user]);
 
     // V2: Centralized Path-Aware Logic
-    const { usePathname } = require('next/navigation');
     const pathname = usePathname();
 
     // Mapping: Path Segment -> Notification Key

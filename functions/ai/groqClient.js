@@ -68,11 +68,12 @@ function getGroqClient(type = GROQ_TYPES.TEXT) {
 
   // Ultimate last resort: Try EVERY key in the .env until one is found
   if (!apiKey) {
-    apiKey = Object.values(moduleKeyMap).find(k => !!k) || process.env.GROQ_TEXT_API_KEY;
+    apiKey = Object.values(moduleKeyMap).find((k) => !!k) || process.env.GROQ_TEXT_API_KEY;
   }
 
   if (!apiKey) {
-    throw new Error(`GROQ API kaliti topilmadi: ${type}`);
+    console.warn(`GROQ API kaliti topilmadi: ${type}. AI funksiyalari o'chirib qo'yildi.`);
+    return null;
   }
 
   return new Groq({ apiKey });
@@ -86,15 +87,24 @@ function getGroqClient(type = GROQ_TYPES.TEXT) {
  * @returns {Promise<string>} AI response
  */
 export async function analyzeWithGroq(
-  prompt,
-  systemPrompt = '',
-  type = GROQ_TYPES.TEXT
+    prompt,
+    systemPrompt = '',
+    type = GROQ_TYPES.TEXT
 ) {
   try {
     const groq = getGroqClient(type);
+    if (!groq) {
+      console.warn('Groq client not initialized (missing key). Returning fallback.');
+      return JSON.stringify({
+        title: 'AI Sozlanmagan',
+        insight: 'Tizimda AI kalitlari topilmadi. Iltimos, .env faylini tekshiring.',
+        emoji: '⚠️',
+        text: 'AI o\'chirilgan.'
+      });
+    }
 
     const isVision = type === GROQ_TYPES.IMAGE || type === 'food'; // Food uses vision for image analysis, or text?
-    // Actually analyzeFoodImage calls with specific params. 
+    // Actually analyzeFoodImage calls with specific params.
     // Let's rely on checking if it's NOT vision/voice to default to text.
 
     const isText = !isVision && type !== GROQ_TYPES.VOICE;
@@ -141,6 +151,7 @@ export async function analyzeWithGroq(
 export async function analyzeImage(base64Image, question, clientType = GROQ_TYPES.IMAGE) {
   try {
     const groq = getGroqClient(clientType);
+    if (!groq) throw new Error('Groq client not initialized (missing key).');
 
     // Check if it's already a data URL, if not make it one
     const imageUrl = base64Image.startsWith('data:') ?
@@ -179,6 +190,7 @@ export async function transcribeAudio(audioFile, language = 'uz', module = GROQ_
   try {
     console.log(`[GroqClient] Starting transcription (Mode: ${module}) in language: ${language}`);
     const groq = getGroqClient(module);
+    if (!groq) throw new Error('Groq client not initialized (missing key).');
 
     const transcription = await groq.audio.transcriptions.create({
       file: audioFile,
@@ -205,9 +217,9 @@ export function parseGroqJSON(response) {
   try {
     // 1. naive cleanup
     let cleaned = response
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim();
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
 
     // 2. Extract JSON object if wrapped in text
     const firstBrace = cleaned.indexOf('{');

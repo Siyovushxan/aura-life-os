@@ -148,7 +148,6 @@ export const calculateHistoricalLoan = (principal: number, annualRate: number, t
         : calculateDifferentialSchedule(principal, annualRate, termMonths, start);
 
     // Past payments are those with index < monthsPassed
-    const pastPayments = schedule.slice(0, monthsPassed);
     const futurePayments = schedule.slice(monthsPassed);
 
     // Determine current remaining principal from the schedule
@@ -772,3 +771,5 @@ export const addProfitToDeposit = async (userId: string, deposit: DepositItem, a
         console.error("Error adding profit to deposit: ", e);
     }
 };
+
+

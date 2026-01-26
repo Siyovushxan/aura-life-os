@@ -45,9 +45,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await createUserWithEmailAndPassword(auth, email, pass);
     };
 
+    const [isAuthenticating, setIsAuthenticating] = useState(false);
+
     const signInWithGoogle = async () => {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
+        if (isAuthenticating) return;
+        setIsAuthenticating(true);
+        try {
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+        } finally {
+            setIsAuthenticating(false);
+        }
     };
 
     const logout = async () => {

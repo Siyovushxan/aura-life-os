@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import HistoryModal from '@/components/HistoryModal';
 import { getLocalTodayStr } from '@/lib/dateUtils';
 
@@ -23,11 +23,9 @@ import {
     subscribeToUpcomingTasks,
     Task,
     Priority,
-    SubTask,
-    Resource
+    SubTask
 } from '@/services/tasksService';
 import { getScheduledInsight, dismissInsight } from '@/services/aiPersistenceService';
-import { getTodayFocusStats } from '@/services/focusService';
 import Modal from '@/components/Modal';
 
 import { useLanguage } from '@/context/LanguageContext';
@@ -35,6 +33,7 @@ import { useNotifications } from '@/context/NotificationContext';
 import { DateNavigator } from '@/components/dashboard/DateNavigator';
 import { ReadOnlyBanner } from '@/components/dashboard/ReadOnlyBanner';
 import { AiInsightSection } from '@/components/dashboard/AiInsightSection';
+import { PremiumEmptyState } from '@/components/dashboard/PremiumEmptyState';
 
 // --- RECURSIVE SUBTASK COMPONENT ---
 interface RecursiveSubtaskListProps {
@@ -44,7 +43,7 @@ interface RecursiveSubtaskListProps {
 }
 
 const RecursiveSubtaskList: React.FC<RecursiveSubtaskListProps> = ({ subtasks, onUpdate, level = 0 }) => {
-    const handleAddChild = (parentId: string, parentTitle: string) => {
+    const handleAddChild = (parentId: string) => {
         const updateRecursive = (list: SubTask[]): SubTask[] => {
             return list.map(s => {
                 if (s.id === parentId) {
@@ -84,7 +83,7 @@ const RecursiveSubtaskList: React.FC<RecursiveSubtaskListProps> = ({ subtasks, o
         onUpdate(updateRecursive(subtasks));
     };
 
-    const handleFieldChange = (id: string, field: keyof SubTask, value: any) => {
+    const handleFieldChange = (id: string, field: keyof SubTask, value: string | Priority | SubTask[]) => {
         const updateRecursive = (list: SubTask[]): SubTask[] => {
             return list.map(s => {
                 if (s.id === id) return { ...s, [field]: value };
@@ -118,6 +117,7 @@ const RecursiveSubtaskList: React.FC<RecursiveSubtaskListProps> = ({ subtasks, o
                         </button>
                         <input
                             type="text"
+                            aria-label="Kichik vazifa nomi"
                             placeholder="Kichik vazifa..."
                             className={`bg-transparent border-none focus:outline-none flex-1 text-sm ${sub.status === 'done' ? 'text-gray-500 line-through' : 'text-white'}`}
                             value={sub.title}
@@ -126,18 +126,20 @@ const RecursiveSubtaskList: React.FC<RecursiveSubtaskListProps> = ({ subtasks, o
                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <input
                                 type="date"
+                                aria-label="Kichik vazifa sanasi"
                                 className="bg-white/5 border border-white/10 rounded px-1 py-0.5 text-[10px] text-gray-400 focus:outline-none [color-scheme:dark]"
                                 value={sub.date}
                                 onChange={(e) => handleFieldChange(sub.id, 'date', e.target.value)}
                             />
                             <input
                                 type="time"
+                                aria-label="Boshlash vaqti"
                                 className="bg-white/5 border border-white/10 rounded px-1 py-0.5 text-[10px] text-gray-400 focus:outline-none"
                                 value={sub.startTime}
                                 onChange={(e) => handleFieldChange(sub.id, 'startTime', e.target.value)}
                             />
                             <button
-                                onClick={() => handleAddChild(sub.id, sub.title)}
+                                onClick={() => handleAddChild(sub.id)}
                                 className="p-1 text-aura-cyan text-[10px] uppercase font-black tracking-tighter hover:scale-110 transition-all"
                                 title="Add sub-sub task"
                             >
@@ -184,13 +186,13 @@ export default function TasksDashboard() {
     useEffect(() => {
         clearNotification('tasks');
     }, []);
-    const router = useRouter();
+    // const router = useRouter();
 
     // State
     const [todayTasks, setTodayTasks] = useState<Task[]>([]);
     const [overdueTasks, setOverdueTasks] = useState<Task[]>([]);
     const [futureTasks, setFutureTasks] = useState<Task[]>([]);
-    const [focusStats, setFocusStats] = useState({ totalMinutes: 0 });
+    // const [focusStats, setFocusStats] = useState({ totalMinutes: 0 });
     const [loading, setLoading] = useState(true);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -381,7 +383,6 @@ export default function TasksDashboard() {
             clearNotification('tasks');
             loadTasks();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, loadTasks]);
 
     // Fetch AI Insight
@@ -1041,7 +1042,7 @@ export default function TasksDashboard() {
                                         <h3 className="text-sm font-bold text-white mb-2 max-w-2xl leading-relaxed">
                                             {aiInsight.suggestion || t.tasks.aiSuggestion.suggestion}
                                         </h3>
-                                        <p className="text-gray-400 text-sm italic opacity-80">{t.tasks.actions.focus}: "{aiInsight.title || t.tasks.aiSuggestion.title}"</p>
+                                        <p className="text-gray-400 text-sm italic opacity-80">{t.tasks.actions.focus}: &quot;{aiInsight.title || t.tasks.aiSuggestion.title}&quot;</p>
                                     </div>
                                 </div>
                                 <div className="relative z-10 flex flex-col items-center gap-2">
@@ -1081,16 +1082,18 @@ export default function TasksDashboard() {
                                 </span>
                             </div>
                             <div className={`space-y-4 min-h-[200px] p-4 rounded-[2.5rem] border-2 border-dashed transition-all duration-500 ${dragedTaskId ? 'bg-aura-red/5 border-aura-red/30 scale-[1.02] shadow-[0_0_50px_rgba(255,50,50,0.1)]' : 'border-white/5'}`}>
-                                {getDisplayTasks('overdue').map((task: any) => (
+                                {getDisplayTasks('overdue').map((task: Task) => (
                                     <div key={task.id} className="animate-fade-in-up">
                                         <TaskCard task={task} />
                                     </div>
                                 ))}
                                 {getDisplayTasks('overdue').length === 0 && (
-                                    <div className="h-32 flex flex-col items-center justify-center text-gray-600 space-y-2 opacity-30">
-                                        <div className="text-2xl">🎉</div>
-                                        <div className="text-[10px] font-black uppercase tracking-[0.2em]">Silliq</div>
-                                    </div>
+                                    <PremiumEmptyState
+                                        title={t.tasks.sections.overdue}
+                                        description={t.tasks.allClear || "Ajoyib! Qarz vazifalar yo'q."}
+                                        icon="✅"
+                                        className="py-10"
+                                    />
                                 )}
                             </div>
                         </div>
@@ -1116,16 +1119,22 @@ export default function TasksDashboard() {
                                 </div>
                             </div>
                             <div className={`space-y-4 min-h-[400px] p-4 rounded-[2.5rem] transition-all duration-500 border-2 border-dashed ${dragedTaskId ? 'bg-aura-cyan/5 border-aura-cyan/30 scale-[1.02] shadow-[0_0_50px_rgba(0,240,255,0.1)]' : 'border-white/5'}`}>
-                                {getDisplayTasks('today').map((task: any) => (
+                                {getDisplayTasks('today').map((task: Task) => (
                                     <div key={task.id} className="animate-fade-in-up">
                                         <TaskCard task={task} />
                                     </div>
                                 ))}
                                 {getDisplayTasks('today').length === 0 && (
-                                    <div className="h-full flex flex-col items-center justify-center text-gray-600 space-y-4 py-20 opacity-30">
-                                        <div className="text-5xl">🎯</div>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">{t.tasks.noTasks}</span>
-                                    </div>
+                                    <PremiumEmptyState
+                                        title={t.tasks.sections.today}
+                                        description={t.tasks.allClear || "Bugun hamma narsa silliq!"}
+                                        icon="🚀"
+                                        action={{
+                                            label: t.tasks.newTask || "Yangi vazifa",
+                                            onClick: () => setIsModalOpen(true)
+                                        }}
+                                        className="py-12"
+                                    />
                                 )}
                             </div>
                         </div>
@@ -1150,16 +1159,18 @@ export default function TasksDashboard() {
                                 </span>
                             </div>
                             <div className={`space-y-4 min-h-[200px] p-4 rounded-[2.5rem] border-2 border-dashed transition-all duration-500 ${dragedTaskId ? 'bg-aura-purple/5 border-aura-purple/30 scale-[1.02] shadow-[0_0_50px_rgba(157,78,221,0.1)]' : 'border-white/5'}`}>
-                                {getDisplayTasks('future').map((task: any) => (
+                                {getDisplayTasks('future').map((task: Task) => (
                                     <div key={task.id} className="animate-fade-in-up">
                                         <TaskCard task={task} />
                                     </div>
                                 ))}
                                 {getDisplayTasks('future').length === 0 && (
-                                    <div className="h-32 flex flex-col items-center justify-center text-gray-600 space-y-2 opacity-30">
-                                        <div className="text-2xl">📅</div>
-                                        <div className="text-[10px] font-black uppercase tracking-[0.2em]">Rejalashtirilmagan</div>
-                                    </div>
+                                    <PremiumEmptyState
+                                        title={t.tasks.sections.future}
+                                        description={t.tasks.allClear || "Kelajak rejalari hali bo'sh."}
+                                        icon="📅"
+                                        className="py-10"
+                                    />
                                 )}
                             </div>
                         </div>
@@ -1323,8 +1334,8 @@ export default function TasksDashboard() {
                                                                         </div>
                                                                         <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
                                                                             <div
-                                                                                className="h-full bg-aura-cyan shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-1000"
-                                                                                style={{ width: `${catPercent}%` }}
+                                                                                className="h-full bg-aura-cyan shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-1000 w-[var(--width)]"
+                                                                                style={{ '--width': `${catPercent}%` } as React.CSSProperties}
                                                                             ></div>
                                                                         </div>
                                                                     </div>
@@ -1399,8 +1410,8 @@ export default function TasksDashboard() {
                                                                     <div className={`w-12 text-[10px] font-black uppercase tracking-widest ${p.text}`}>{p.label}</div>
                                                                     <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/5">
                                                                         <div
-                                                                            className={`h-full ${p.color} rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(0,0,0,0.5)]`}
-                                                                            style={{ width: `${percent}%` }}
+                                                                            className={`h-full ${p.color} rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(0,0,0,0.5)] w-[var(--width)]`}
+                                                                            style={{ '--width': `${percent}%` } as React.CSSProperties}
                                                                         ></div>
                                                                     </div>
                                                                     <div className="text-[10px] font-mono font-bold text-gray-500 w-8">{count}</div>
@@ -1455,7 +1466,7 @@ export default function TasksDashboard() {
                                                                 ) : (
                                                                     <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
                                                                         <p className="text-[11px] text-gray-400 leading-relaxed">
-                                                                            Hozircha ishlaringiz reja bo'yicha ketmoqda.
+                                                                            Hozircha ishlaringiz reja bo&apos;yicha ketmoqda.
                                                                         </p>
                                                                     </div>
                                                                 )}
@@ -1476,7 +1487,7 @@ export default function TasksDashboard() {
             <Modal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-                title={editingTaskId ? "Vazifani tahrirlash" : ((newTask as any).parentId ? "Qo'shimcha vazifa qo'shish" : t.tasks.newTask)}
+                title={editingTaskId ? "Vazifani tahrirlash" : (('parentId' in newTask) ? "Qo&apos;shimcha vazifa qo&apos;shish" : t.tasks.newTask)}
             >
                 <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-4 custom-scrollbar">
                     <div className="space-y-1">
@@ -1491,9 +1502,9 @@ export default function TasksDashboard() {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black ml-1">Batafsil ma'lumot</label>
+                        <label className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black ml-1">Batafsil ma&apos;lumot</label>
                         <textarea
-                            placeholder="Vazifa haqida qo'shimcha..."
+                            placeholder="Vazifa haqida qo&apos;shimcha..."
                             className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-aura-cyan focus:outline-none h-24 resize-none transition-all placeholder:text-gray-700"
                             value={newTask.description}
                             onChange={e => setNewTask({ ...newTask, description: e.target.value })}
@@ -1516,6 +1527,7 @@ export default function TasksDashboard() {
                         <div className="space-y-2">
                             <label className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black ml-1">Sana (Date)</label>
                             <input
+                                aria-label="Task Date"
                                 type="date"
                                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-aura-cyan focus:outline-none [color-scheme:dark]"
                                 value={newTask.date}
@@ -1525,15 +1537,16 @@ export default function TasksDashboard() {
                         <div className="space-y-2">
                             <label className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black ml-1">Kategoriya</label>
                             <select
+                                aria-label="Task Category"
                                 className="w-full bg-[#1a1a1a] border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-aura-cyan focus:outline-none appearance-none cursor-pointer [color-scheme:dark]"
                                 value={newTask.category}
                                 onChange={e => setNewTask({ ...newTask, category: e.target.value })}
                             >
                                 <option value="Asosiy" className="bg-[#1a1a1a] text-white py-2">Asosiy</option>
                                 <option value="Ish" className="bg-[#1a1a1a] text-white py-2">Ish</option>
-                                <option value="O'qish" className="bg-[#1a1a1a] text-white py-2">O'qish</option>
+                                <option value="O'qish" className="bg-[#1a1a1a] text-white py-2">O&apos;qish</option>
                                 <option value="Shaxsiy" className="bg-[#1a1a1a] text-white py-2">Shaxsiy</option>
-                                <option value="Sog'liq" className="bg-[#1a1a1a] text-white py-2">Sog'liq</option>
+                                <option value="Sog'liq" className="bg-[#1a1a1a] text-white py-2">Sog&apos;liq</option>
                             </select>
                         </div>
                     </div>
@@ -1542,6 +1555,7 @@ export default function TasksDashboard() {
                         <div className="space-y-2">
                             <label className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black ml-1">{t.tasks.startTime}</label>
                             <input
+                                aria-label={t.tasks.startTime}
                                 type="time"
                                 value={newTask.startTime}
                                 onChange={e => setNewTask({ ...newTask, startTime: e.target.value })}
@@ -1551,6 +1565,7 @@ export default function TasksDashboard() {
                         <div className="space-y-2">
                             <label className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black ml-1">{t.tasks.endTime}</label>
                             <input
+                                aria-label={t.tasks.endTime}
                                 type="time"
                                 value={newTask.endTime}
                                 onChange={e => setNewTask({ ...newTask, endTime: e.target.value })}
@@ -1591,7 +1606,7 @@ export default function TasksDashboard() {
                     </div>
                     <div>
                         <h3 className="text-2xl font-display font-black text-white tracking-tight mb-2">
-                            Vazifani ko'chirish
+                            Vazifani ko&apos;chirish
                         </h3>
                         <p className="text-gray-400 text-sm">Vazifa uchun yangi vaqtni tanlang:</p>
                     </div>
@@ -1627,7 +1642,7 @@ export default function TasksDashboard() {
                 </div>
             </Modal>
             <HistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} title="Arxiv" >
-                <div className="p-8 text-center text-gray-500 uppercase tracking-widest text-[10px] font-black opacity-30">Arxiv bo'sh</div>
+                <div className="p-8 text-center text-gray-500 uppercase tracking-widest text-[10px] font-black opacity-30">Arxiv bo&apos;sh</div>
             </HistoryModal>
         </>
     )

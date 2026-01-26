@@ -419,6 +419,7 @@ type TranslationStructure = {
             promote: string;
         };
         noTasks: string;
+        allClear: string;
         completedArchive: string;
         readOnly: string;
         readOnlyDesc: string;
@@ -491,6 +492,7 @@ type TranslationStructure = {
             maintain: string;
             unitCm: string;
             unitKg: string;
+            goalLabel: string;
         };
         aiAdvisor: {
             title: string;
@@ -1159,7 +1161,8 @@ const translations: Record<Language, TranslationStructure> = {
             completedArchive: 'Completed Tasks Archive',
             readOnly: 'Tasks Archived',
             readOnlyDesc: 'Past tasks are read-only.',
-            noTasks: 'No tasks for today. Enjoy your day!'
+            noTasks: 'No tasks for today. Enjoy your day!',
+            allClear: 'Everything is clear for now!'
         },
         health: {
             history: 'History',
@@ -1226,7 +1229,8 @@ const translations: Record<Language, TranslationStructure> = {
                 gain: 'Gain Muscle',
                 maintain: 'Maintain Health',
                 unitCm: 'cm',
-                unitKg: 'kg'
+                unitKg: 'kg',
+                goalLabel: 'Choose your health goal'
             },
             aiAdvisor: {
                 title: 'AI Health Advisor',
@@ -1860,7 +1864,8 @@ const translations: Record<Language, TranslationStructure> = {
             completedArchive: 'Bajarilgan Vazifalar Arxivi',
             readOnly: 'Vazifalar Arxivlandi',
             readOnlyDesc: 'O\'tmishdagi vazifalarni o\'zgartirib bo\'lmaydi.',
-            noTasks: 'Bugun uchun vazifalar yo\'q. Kuningiz maroqli o\'tsin!'
+            noTasks: 'Bugun uchun vazifalar yo\'q. Kuningiz maroqli o\'tsin!',
+            allClear: 'Hozircha hamma narsa silliq!'
         },
         health: {
             history: 'Tarix',
@@ -1930,6 +1935,7 @@ const translations: Record<Language, TranslationStructure> = {
                 maintain: 'Vaznni saqlash',
                 unitCm: 'sm',
                 unitKg: "kg",
+                goalLabel: 'Salomatlik maqsadini tanlang'
             },
             aiAdvisor: {
                 title: 'AI Salomatlik Maslahatchisi',
@@ -2560,7 +2566,8 @@ const translations: Record<Language, TranslationStructure> = {
             completedArchive: 'Архив выполненных задач',
             readOnly: 'Задачи архивированы',
             readOnlyDesc: 'Прошлые задачи доступны только для чтения.',
-            noTasks: 'На сегодня задач нет. Хорошего дня!'
+            noTasks: 'На сегодня задач нет. Хорошего дня!',
+            allClear: 'На данный момент все чисто!'
         },
         health: {
             history: 'История',
@@ -2629,7 +2636,8 @@ const translations: Record<Language, TranslationStructure> = {
                 unitKg: 'кг',
                 aiRecTitle: 'Рекомендация ИИ',
                 aiRecLose: 'Предлагается ускорение метаболизма. ИИ скорректирует цели по калориям.',
-                aiRecMaintain: 'Стабильный прогресс. Сохраняйте ритм.'
+                aiRecMaintain: 'Стабильный прогресс. Сохраняйте ритм.',
+                goalLabel: 'Выберите вашу цель по здоровью'
             },
             aiAdvisor: {
                 title: 'ИИ Консультант по здоровью',

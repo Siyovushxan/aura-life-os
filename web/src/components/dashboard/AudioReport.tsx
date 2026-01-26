@@ -2,13 +2,14 @@
 import React, { useState, useEffect } from 'react';
 
 interface AudioReportProps {
+    title?: string;
     text: string;
     onStart?: () => void;
     onEnd?: () => void;
     autoPlay?: boolean;
 }
 
-export const AudioReport: React.FC<AudioReportProps> = ({ text, onStart, onEnd, autoPlay = false }) => {
+export const AudioReport: React.FC<AudioReportProps> = ({ title = "AI Summary", text, onStart, onEnd, autoPlay = false }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [utterance, setUtterance] = useState<SpeechSynthesisUtterance | null>(null);
 
@@ -68,7 +69,7 @@ export const AudioReport: React.FC<AudioReportProps> = ({ text, onStart, onEnd, 
                 {isPlaying ? <span className="animate-bounce">🔊</span> : '🔈'}
             </div>
             <div className="flex-1">
-                <h4 className="text-white font-bold text-sm tracking-tight">AI Health Summary</h4>
+                <h4 className="text-white font-bold text-sm tracking-tight">{title}</h4>
                 <p className="text-[10px] text-gray-500 line-clamp-1 italic">"{text}"</p>
             </div>
             <div className="flex gap-2">

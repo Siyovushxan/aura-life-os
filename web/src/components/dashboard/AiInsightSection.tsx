@@ -110,7 +110,7 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                             )}
                         </div>
                         <p className="text-gray-400 text-sm md:text-base leading-relaxed max-w-2xl font-medium">
-                            {insight ? (effectiveInsight.insight || effectiveInsight.text || insight.insight || insight.text || "Operatsion tahlil yakunlandi. Protokol tayyor.") : description}
+                            {insight ? (effectiveInsight.insight || effectiveInsight.text || effectiveInsight.recommendation || insight.insight || insight.text || "Operatsion tahlil yakunlandi. Protokol tayyor.") : description}
                         </p>
                     </div>
                 </div>
@@ -156,9 +156,10 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                             <div className="absolute top-0 left-0 w-1 h-full bg-aura-cyan opacity-50"></div>
                             <div className={`absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover/opt:scale-125 transition-transform duration-500`}>{effectiveInsight.emoji || insight.emoji || '💡'}</div>
                             <p className="text-base text-gray-200 leading-relaxed font-medium relative z-10">
-                                {effectiveInsight.optimization || effectiveInsight.recommendation || effectiveInsight.suggestion || "Natijalar tahlil qilinmoqda."}
+                                {effectiveInsight.optimization || effectiveInsight.recommendation || effectiveInsight.suggestion || effectiveInsight.text ||
+                                    (effectiveInsight.insight ? (effectiveInsight.insight.length > 100 ? effectiveInsight.insight.substring(0, 100) + '...' : effectiveInsight.insight) : "Natijalar tahlil qilinmoqda.")}
                             </p>
-                            {effectiveInsight.success_mock && (
+                            {(effectiveInsight.success_mock || insight.success_mock) && (
                                 <div className="mt-4 flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-aura-cyan animate-pulse"></span>
                                     <span className="text-[8px] font-black text-aura-cyan uppercase tracking-widest opacity-50">AURA Simulation Active</span>
@@ -179,8 +180,8 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                                     </div>
                                     <div className="h-3 bg-white/5 rounded-full overflow-hidden p-[2px] border border-white/5 shadow-inner">
                                         <div
-                                            className={`h-full ${styles.btnBg} rounded-full transition-all duration-[1.5s] ease-out-expo shadow-[0_0_15px_rgba(0,0,0,0.5)]`}
-                                            style={{ width: `${effectiveScore}%` }}
+                                            className={`h-full ${styles.btnBg} rounded-full transition-all duration-[1.5s] ease-out-expo shadow-[0_0_15px_rgba(0,0,0,0.5)] w-[var(--value)]`}
+                                            style={{ '--value': `${effectiveScore}%` } as React.CSSProperties}
                                         ></div>
                                     </div>
                                 </>

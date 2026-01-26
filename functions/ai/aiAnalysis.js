@@ -1,5 +1,4 @@
-import { analyzeWithGroq, parseGroqJSON, analyzeImage as groqAnalyzeImage, GROQ_TYPES } from './groqClient.js';
-
+import { analyzeWithGroq, parseGroqJSON, analyzeImage as groqAnalyzeImage } from './groqClient.js';
 
 
 /**
@@ -48,6 +47,8 @@ export async function analyzeFinance(context, language = 'uz') {
       "insight": "Deep analysis (2 sentences) explaining the current wealth trajectory and core friction point.",
       "roadmap": ["Step 1: Immediate Action", "Step 2: Structural Change", "Step 3: Long-term Growth"],
       "potentialSavings": "Estimated monthly savings if protocol is followed (e.g. 500k UZS)",
+      "optimization": "One short sentence of holistic financial optimization (e.g. 'Diversify liquidity to hedge against inflation.')",
+      "vitalityScore": 0-100,
       "emoji": "🛡️",
       "priority": "high|medium|low"
   }
@@ -64,7 +65,7 @@ export async function analyzeFinance(context, language = 'uz') {
  * @returns {Promise<object>} Health feedback
  */
 export async function analyzeHealth(context, language = 'uz') {
-  const { steps, sleepHours, waterMl, stress, mood, biometrics, battery } = context;
+  const { steps, sleepHours, waterMl, stress, biometrics, battery } = context;
 
   const prompt = `
   ROLE: You are AURA, a high-performance Vitality Strategist and Biological Systems Optimizer.
@@ -129,7 +130,9 @@ export async function analyzeInterests(context, language = 'uz') {
       "recommendations": [
           { "type": "growth", "recommendation": "Name", "reason": "Why this advances your interests.", "emoji": "🚀" },
           { "type": "correction", "recommendation": "Name", "reason": "Specific advice to stay on track.", "emoji": "🛡️" }
-      ]
+      ],
+      "optimization": "One short, highly specific sentence of growth advice based on the user's current interests.",
+      "vitalityScore": 0-100
   }`;
 
   const response = await analyzeWithGroq(prompt, 'AURA Mentor. Duality Mode. Output JSON.', 'interests');
@@ -210,12 +213,12 @@ export async function analyzeFoodImage(base64Image, userContext, language = 'uz'
     const parsed = parseGroqJSON(response);
 
     if (parsed) return parsed;
-    throw new Error("Failed to parse AI response");
+    throw new Error('Failed to parse AI response');
   } catch (error) {
-    console.error("Food Analysis Error:", error);
+    console.error('Food Analysis Error:', error);
     // Return a SAFE fallback so UI doesn't break
     return {
-      name: "Aniqlanmagan Taom",
+      name: 'Aniqlanmagan Taom',
       calories: 0,
       protein: 0,
       carbs: 0,
@@ -339,12 +342,14 @@ export async function analyzeFamily(context, language = 'uz') {
       "title": "AURA Family Harmony",
       "insight": "Advice on managing requests or spending quality time, referencing the cross-module situation if relevant (e.g. 'High spending? Cook at home together instead of eating out.').",
       "emoji": "👨‍👩‍👧‍👦",
+      "optimization": "One short sentence of holistic optimization (e.g. 'Strengthen generational bonds through shared finance goals.')",
+      "vitalityScore": 0-100,
       "action": "Suggested activity or decision"
   }
   `;
 
   const response = await analyzeWithGroq(prompt, 'AURA Family Counselor. Output JSON.', 'family');
-  return parseGroqJSON(response) || { title: 'Oila Muhiti', insight: 'Oilaviy vaqtni qadrlang.', emoji: '🏡' };
+  return parseGroqJSON(response) || { title: 'Oila Muhiti', insight: 'Oilaviy vaqtni qadrlang.', emoji: '🏡', optimization: 'Oila muloqotini saqlang.', vitalityScore: 85 };
 }
 
 /**
@@ -394,7 +399,7 @@ import path from 'path';
 
 export async function transcribeAudio(data, language = 'uz') {
   const { base64Audio, module } = data;
-  if (!base64Audio) throw new Error("No audio provided.");
+  if (!base64Audio) throw new Error('No audio provided.');
 
   // For Groq API, we need to provide a real file object or a fetch file if not using multi-part
   // But groq-sdk can take a Buffer with a filename.
@@ -416,7 +421,11 @@ export async function transcribeAudio(data, language = 'uz') {
     throw err;
   } finally {
     if (fs.existsSync(tempFilePath)) {
-      try { fs.unlinkSync(tempFilePath); } catch (e) { }
+      try {
+        fs.unlinkSync(tempFilePath);
+      } catch (e) {
+        // ignore error
+      }
     }
   }
 }

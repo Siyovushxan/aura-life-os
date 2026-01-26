@@ -1,23 +1,17 @@
 "use client";
 import Modal from '@/components/Modal';
 import MoneyInput from '@/components/MoneyInput';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { categories } from '@/data/financeMock';
-import HistoryModal from '@/components/HistoryModal';
 import * as XLSX from 'xlsx';
-import VoiceInput from '@/components/VoiceInput';
 import { useAuth } from '@/context/AuthContext';
 import { useNotifications } from '@/context/NotificationContext';
 // ... other imports ...
 import {
     getFinanceOverview,
-    // subscribeToFinanceOverview, // Removed: Handled in hook
-    // subscribeToTransactions, // Removed
     getTransactions,
     addTransaction,
-    FinanceOverview,
     Transaction,
-    seedFinanceData,
     getTransactionsByDate,
     getCurrencyRates,
     getStatisticsByRange,
@@ -41,23 +35,20 @@ import {
     updateDeposit,
     deleteDeposit,
     DepositItem,
-    // subscribeToDebts, // Removed
-    // subscribeToCredits, // Removed
-    // subscribeToDeposits, // Removed
-    calculateAnnuitySchedule,
-    calculateDifferentialSchedule,
     calculateHistoricalLoan,
     calculateHistoricalDeposit,
-    // subscribeToTransactionsByDate // Removed
 } from '@/services/financeService';
-import { getScheduledInsight } from '@/services/aiPersistenceService'; // Kept for types if needed, but logic moved
-import { DateNavigator } from '@/components/dashboard/DateNavigator';
-import { getFinanceInsight } from '@/services/groqService';
-import { getUserProfile, UserProfile } from '@/services/userService';
+// import { getUserProfile, UserProfile } from '@/services/userService';
 import { useLanguage } from '@/context/LanguageContext';
 import { useFinance } from '@/hooks/useFinance'; // NEW HOOK
 import { getLocalTodayStr } from '@/lib/dateUtils';
+import { DateNavigator } from '@/components/dashboard/DateNavigator';
+import VoiceInput from '@/components/VoiceInput';
+import { PremiumEmptyState } from '@/components/dashboard/PremiumEmptyState';
+import { format } from 'date-fns';
 import { AiInsightSection } from '@/components/dashboard/AiInsightSection';
+import { AudioReport } from '@/components/dashboard/AudioReport';
+import HistoryModal from '@/components/HistoryModal';
 
 // V14: Real Exchange Rates (Simulator)
 const exchangeRates = [
@@ -66,11 +57,11 @@ const exchangeRates = [
     { code: 'RUB', rate: 142 },
 ];
 
-const convertCurrency = (amount: number, from: string, to: string, customRates?: any[]) => {
+const convertCurrency = (amount: number, from: string, to: string, customRates?: { code: string, rate: number }[]) => {
     if (from === to) return amount;
     const rates = customRates && customRates.length > 0 ? customRates : exchangeRates;
     // Normalize to UZS first
-    let amountInUZS = from === 'UZS' ? amount : amount * (rates.find(r => r.code === from)?.rate || 1);
+    const amountInUZS = from === 'UZS' ? amount : amount * (rates.find(r => r.code === from)?.rate || 1);
     // Convert to target
     return to === 'UZS' ? amountInUZS : amountInUZS / (rates.find(r => r.code === to)?.rate || 1);
 };
@@ -100,7 +91,7 @@ export default function FinanceDashboard() {
         debts,
         credits,
         deposits,
-        loading,
+        // loading,
         aiInsight,
         aiLoading,
         refreshInsight,
@@ -113,7 +104,7 @@ export default function FinanceDashboard() {
     // ------------------------------
 
     // UI Local States
-    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    // const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [currencyRates, setCurrencyRates] = useState<any[]>([]);
     const [statsData, setStatsData] = useState<any>(null);
     const [isQRModalOpen, setIsQRModalOpen] = useState(false);
@@ -147,7 +138,7 @@ export default function FinanceDashboard() {
     }, [financeData.ultimateGoal?.target, financeData.ultimateGoal?.deadline, financeData.ultimateGoal?.currency, isGoalModalOpen]);
 
     // V17: Daily Check for Due Payments & Manual Confirmation
-    const [dueItems, setDueItems] = useState<{ type: 'credit' | 'deposit', item: any }[]>([]);
+    const [dueItems, setDueItems] = useState<{ type: 'credit' | 'deposit', item: CreditItem | DepositItem | any }[]>([]);
     const [isDueModalOpen, setIsDueModalOpen] = useState(false);
 
     useEffect(() => {
@@ -213,6 +204,11 @@ export default function FinanceDashboard() {
         isOpen: false, title: '', message: '', type: 'success'
     });
 
+    const [txCurrency, setTxCurrency] = useState<'UZS' | 'USD' | 'EUR' | 'RUB'>('UZS');
+    const [statsPeriod, setStatsPeriod] = useState<'weekly' | 'monthly' | 'custom'>('monthly');
+    const [statsDisplayCurrency, setStatsDisplayCurrency] = useState<'UZS' | 'USD' | 'EUR' | 'RUB'>('UZS'); // V16: Global Stats Currency
+    const [customRange, setCustomRange] = useState({ start: '', end: '' });
+
     // V17: Auto-Sync Currency with Language (User Request)
     useEffect(() => {
         if (language === 'uz') {
@@ -225,12 +221,8 @@ export default function FinanceDashboard() {
             setStatsDisplayCurrency('USD');
             setTxCurrency('USD');
         }
-    }, [language]);
+    }, [language, setStatsDisplayCurrency, setTxCurrency]);
 
-    const [txCurrency, setTxCurrency] = useState<'UZS' | 'USD' | 'EUR' | 'RUB'>('UZS');
-    const [statsPeriod, setStatsPeriod] = useState<'weekly' | 'monthly' | 'custom'>('monthly');
-    const [statsDisplayCurrency, setStatsDisplayCurrency] = useState<'UZS' | 'USD' | 'EUR' | 'RUB'>('UZS'); // V16: Global Stats Currency
-    const [customRange, setCustomRange] = useState({ start: '', end: '' });
 
     const convert = (amount: number, from: string, to: string) => convertCurrency(amount, from, to, currencyRates);
 
@@ -494,7 +486,7 @@ export default function FinanceDashboard() {
     };
 
     // Voice Command Handler
-    const handleVoiceCommand = async (command: any) => {
+    const handleVoiceCommand = async (command: Record<string, any>) => {
         if (!user) return;
 
         const { action, data } = command;
@@ -814,7 +806,6 @@ export default function FinanceDashboard() {
         const val = Math.round(num || 0);
         return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     };
-    const parseNumber = (str: string) => Number(str.replace(/\s/g, ''));
 
     const expensePercentage = financeData.expenseBudget > 0
         ? (financeData.monthlySpent / financeData.expenseBudget) * 100
@@ -831,16 +822,9 @@ export default function FinanceDashboard() {
             clearNotification('finance');
 
             // setLoading(true); // Removed as loading is handled by hook
-            Promise.all([
-                getCurrencyRates(),
-                getUserProfile(user.uid)
-            ]).then(async ([rates, profile]) => {
+            getCurrencyRates().then(rates => {
                 setCurrencyRates(rates);
-                setUserProfile(profile);
                 // Loading state handled by subscription
-
-                // Fetch AI Insight if we have data (transactions check moved to effect dependency or separate check)
-                // We'll let the AI Insight effect handle itself based on state changes
             });
         }
     }, [user?.uid, language]);
@@ -1067,8 +1051,8 @@ export default function FinanceDashboard() {
 
                                                 <div className="h-4 w-full bg-white/5 rounded-full border border-white/10 p-1">
                                                     <div
-                                                        className="h-full bg-gradient-to-r from-aura-gold to-yellow-500 rounded-full shadow-[0_0_20px_rgba(255,214,0,0.4)] transition-all duration-1000"
-                                                        style={{ width: `${Math.min(100, (financeData.totalBalance / financeData.ultimateGoal.target) * 100)}%` }}
+                                                        style={{ '--width': `${Math.min(100, (financeData.totalBalance / financeData.ultimateGoal.target) * 100)}%` } as React.CSSProperties}
+                                                        className="h-full bg-gradient-to-r from-aura-gold to-yellow-500 rounded-full shadow-[0_0_20px_rgba(255,214,0,0.4)] transition-all duration-1000 w-[var(--width)]"
                                                     ></div>
                                                 </div>
 
@@ -1186,7 +1170,7 @@ export default function FinanceDashboard() {
                                     <span>/ {formatNumber(convert(financeData.incomeBudget || 0, 'UZS', statsDisplayCurrency))} {statsDisplayCurrency} {t.finance.target}</span>
                                 </div>
                                 <div className="w-full bg-white/5 h-2 rounded-full mb-2 p-[2px] border border-white/5">
-                                    <div className="bg-aura-green h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(0,255,150,0.3)]" style={{ width: `${Math.min(incomePercentage, 100)}%` }}></div>
+                                    <div className="bg-aura-green h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(0,255,150,0.3)] w-[var(--width)]" style={{ '--width': `${Math.min(incomePercentage, 100)}%` } as React.CSSProperties}></div>
                                 </div>
 
                                 <div className="flex justify-between text-[11px] font-black uppercase tracking-wider text-white/40 mt-6 pt-4 border-t border-white/5">
@@ -1228,10 +1212,10 @@ export default function FinanceDashboard() {
                                     <span className="text-xs font-black text-white/40">{statsDisplayCurrency}</span>
                                 </div>
                                 <div className="flex items-baseline gap-2 mb-4 text-[10px] font-black text-white/20 uppercase tracking-widest">
-                                    <span>/ {formatNumber(convert(financeData.expenseBudget || 0, 'UZS', statsDisplayCurrency))} {statsDisplayCurrency} {t.finance.limit}</span>
+                                    <span>/ {formatNumber(convert(financeData.expenseBudget || 0, 'UZS', statsDisplayCurrency))} {t.finance.limit}</span>
                                 </div>
                                 <div className="w-full bg-white/5 h-2 rounded-full mb-2 p-[2px] border border-white/5">
-                                    <div className="bg-aura-red h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(255,50,50,0.3)]" style={{ width: `${Math.min(expensePercentage, 100)}%` }}></div>
+                                    <div className="bg-aura-red h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(255,50,50,0.3)] w-[var(--width)]" style={{ '--width': `${Math.min(expensePercentage, 100)}%` } as React.CSSProperties}></div>
                                 </div>
 
                                 <div className="flex justify-between text-[11px] font-black uppercase tracking-wider text-white/40 mt-6 pt-4 border-t border-white/5">
@@ -1287,10 +1271,16 @@ export default function FinanceDashboard() {
                                             </div>
                                         </div>
                                     )) : (
-                                        <div className="py-20 text-center opacity-20">
-                                            <p className="text-4xl mb-4">🕳️</p>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.5em]">{t.finance.noTransactions}</p>
-                                        </div>
+                                        <PremiumEmptyState
+                                            title={t.finance.noTransactions}
+                                            description={t.finance.statusDescStart}
+                                            icon="💸"
+                                            action={{
+                                                label: t.finance.addTransaction || "Tranzaksiya qo'shish",
+                                                onClick: () => setIsAddModalOpen(true)
+                                            }}
+                                            className="py-12"
+                                        />
                                     )}
                                 </div>
                             </div>
@@ -1340,9 +1330,14 @@ export default function FinanceDashboard() {
                                                 <span className="text-2xl mt-1">{aiInsight.emoji || '💡'}</span>
                                                 <div>
                                                     <h5 className="text-sm font-bold text-white mb-1">{aiInsight.title || 'AI Advisor'}</h5>
-                                                    <p className="text-xs text-indigo-200 leading-relaxed font-medium">
-                                                        {typeof aiInsight.insight === 'string' ? aiInsight.insight : JSON.stringify(aiInsight.insight)}
+                                                    <p className="text-xs text-indigo-200 leading-relaxed font-medium mb-3">
+                                                        {typeof aiInsight.insight === 'string' ? aiInsight.insight : (aiInsight.data?.insight || "Tahlil tayyor.")}
                                                     </p>
+                                                    {(aiInsight.optimization || aiInsight.data?.optimization) && (
+                                                        <div className="p-3 rounded-lg bg-white/5 border border-white/5 text-[10px] text-indigo-300 italic">
+                                                            💡 {aiInsight.optimization || aiInsight.data?.optimization}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ) : (
@@ -1621,7 +1616,7 @@ export default function FinanceDashboard() {
                                                 )}
 
                                                 <div className="w-full bg-white/5 h-1 rounded-full mt-2 mb-4 overflow-hidden">
-                                                    <div style={{ width: `${Math.min(100, ((credit.totalAmount - credit.remainingAmount) / credit.totalAmount) * 100)}%` }} className="h-full bg-aura-red shadow-[0_0_10px_rgba(255,50,50,0.3)]"></div>
+                                                    <div style={{ '--width': `${Math.min(100, ((credit.totalAmount - credit.remainingAmount) / credit.totalAmount) * 100)}%` } as React.CSSProperties} className="h-full bg-aura-red shadow-[0_0_10px_rgba(255,50,50,0.3)] w-[var(--width)]"></div>
                                                 </div>
 
                                                 <div className="flex justify-between items-end mb-6">
@@ -1809,22 +1804,22 @@ export default function FinanceDashboard() {
                                     <div>
                                         <label className="text-[10px] uppercase text-gray-500 block mb-1">{t.finance.fromLabel}</label>
                                         <input
+                                            aria-label={t.finance.fromLabel}
                                             type="date"
                                             value={customRange.start}
                                             onChange={e => setCustomRange({ ...customRange, start: e.target.value })}
-                                            className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:border-aura-gold outline-none"
-                                            style={{ colorScheme: 'dark' }}
+                                            className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:border-aura-gold outline-none [color-scheme:dark]"
                                         />
                                     </div>
                                     <span className="text-gray-500">-</span>
                                     <div>
                                         <label className="text-[10px] uppercase text-gray-500 block mb-1">{t.finance.toLabel}</label>
                                         <input
+                                            aria-label={t.finance.toLabel}
                                             type="date"
                                             value={customRange.end}
                                             onChange={e => setCustomRange({ ...customRange, end: e.target.value })}
-                                            className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:border-aura-gold outline-none"
-                                            style={{ colorScheme: 'dark' }}
+                                            className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-xs focus:border-aura-gold outline-none [color-scheme:dark]"
                                         />
                                     </div>
                                 </div>
@@ -1907,7 +1902,7 @@ export default function FinanceDashboard() {
                                     <div>
                                         <h4 className="text-[10px] font-black text-aura-green uppercase tracking-[0.2em] mb-4">{t.finance.incomeTitle} {t.finance.byCategory}</h4>
                                         <div className="space-y-4">
-                                            {Object.entries(statsData.income || {}).sort(([, a]: any, [, b]: any) => b - a).map(([cat, amount]: any) => {
+                                            {(Object.entries(statsData.income || {}) as [string, number][]).sort(([, a], [, b]) => b - a).map(([cat, amount]) => {
                                                 const percentage = Math.round((amount / (statsData.totalIncome || 1)) * 100);
                                                 return (
                                                     <div key={cat} className="group cursor-help">
@@ -1919,7 +1914,10 @@ export default function FinanceDashboard() {
                                                             </div>
                                                         </div>
                                                         <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                                            <div className="h-full bg-aura-green transition-all duration-1000 ease-out" style={{ width: `${percentage}%` }}></div>
+                                                            <div
+                                                                className="h-full w-[var(--width)] bg-aura-green/80"
+                                                                style={{ '--width': `${(amount / (statsData?.maxIncome || 1)) * 100}%` } as React.CSSProperties}
+                                                            ></div>
                                                         </div>
                                                         <div className="text-[8px] text-right mt-1 text-gray-500 font-black">{percentage}%</div>
                                                     </div>
@@ -1932,7 +1930,7 @@ export default function FinanceDashboard() {
                                     <div>
                                         <h4 className="text-[10px] font-black text-aura-red uppercase tracking-[0.2em] mb-4">{t.finance.expenseTitle} {t.finance.byCategory}</h4>
                                         <div className="space-y-4">
-                                            {Object.entries(statsData.expense || {}).sort(([, a]: any, [, b]: any) => b - a).map(([cat, amount]: any) => {
+                                            {(Object.entries(statsData.expense || {}) as [string, number][]).sort(([, a], [, b]) => b - a).map(([cat, amount]) => {
                                                 const percentage = Math.round((amount / (statsData.totalExpense || 1)) * 100);
                                                 return (
                                                     <div key={cat} className="group cursor-help">
@@ -1944,7 +1942,10 @@ export default function FinanceDashboard() {
                                                             </div>
                                                         </div>
                                                         <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                                            <div className="h-full bg-aura-red transition-all duration-1000 ease-out" style={{ width: `${percentage}%` }}></div>
+                                                            <div
+                                                                style={{ '--width': `${(amount / (statsData?.maxExpense || 1)) * 100}%` } as React.CSSProperties}
+                                                                className="h-full w-[var(--width)] bg-aura-red transition-all duration-1000 ease-out"
+                                                            ></div>
                                                         </div>
                                                         <div className="text-[8px] text-right mt-1 text-gray-500 font-black">{percentage}%</div>
                                                     </div>
@@ -2023,6 +2024,7 @@ export default function FinanceDashboard() {
                                             {statsPeriod === 'weekly' ? t.finance.weeklyLabel : statsPeriod === 'monthly' ? t.finance.monthlyLabel : t.finance.customLabel} {t.finance.incomeTitle}
                                         </h3>
                                         <select
+                                            aria-label="Filter by Currency"
                                             value={statsDisplayCurrency}
                                             onChange={(e) => setStatsDisplayCurrency(e.target.value as any)}
                                             className="bg-black border border-white/10 rounded-lg px-2 py-1 text-[10px] text-white font-bold uppercase outline-none"
@@ -2048,8 +2050,8 @@ export default function FinanceDashboard() {
                                                     </div>
                                                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                                                         <div
-                                                            className="h-full bg-aura-green"
-                                                            style={{ width: `${Math.min(100, (displayAmount / (totalIncomeConverted || 1)) * 100)}%` }}
+                                                            style={{ '--width': `${Math.min(100, (displayAmount / (totalIncomeConverted || 1)) * 100)}%` } as React.CSSProperties}
+                                                            className="h-full bg-aura-green w-[var(--width)]"
                                                         ></div>
                                                     </div>
                                                 </div>
@@ -2086,8 +2088,8 @@ export default function FinanceDashboard() {
                                                     </div>
                                                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                                                         <div
-                                                            className="h-full bg-aura-red"
-                                                            style={{ width: `${Math.min(100, (displayAmount / (totalExpenseConverted || 1)) * 100)}%` }}
+                                                            style={{ '--width': `${Math.min(100, (displayAmount / (totalExpenseConverted || 1)) * 100)}%` } as React.CSSProperties}
+                                                            className="h-full bg-aura-red w-[var(--width)]"
                                                         ></div>
                                                     </div>
                                                 </div>
@@ -2160,7 +2162,13 @@ export default function FinanceDashboard() {
                             description="Moliyaviy holatingizni sun'iy intellekt yordamida chuqur tahlil qiling. Bu jarayon bir necha soniya vaqt olishi mumkin."
                             buttonText="Tahlilni Boshlash"
                             color="gold"
-                        />
+                        >
+                            {aiInsight && (
+                                <div className="mt-6">
+                                    <AudioReport text={aiInsight.insight || aiInsight.text} />
+                                </div>
+                            )}
+                        </AiInsightSection>
                     </div>
                 )
                 }
@@ -2214,6 +2222,7 @@ export default function FinanceDashboard() {
                         <div>
                             <label className="text-xs text-gray-500 uppercase mb-1 block">{t.finance.transTitle}</label>
                             <input
+                                aria-label={t.finance.transTitle}
                                 value={newTx.title}
                                 onChange={e => setNewTx({ ...newTx, title: e.target.value })}
                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-aura-gold"
@@ -2231,6 +2240,7 @@ export default function FinanceDashboard() {
                             <div>
                                 <label className="text-xs text-gray-500 uppercase mb-1 block">{t.finance.currency}</label>
                                 <select
+                                    aria-label="Transaction Currency"
                                     value={newTx.currency || 'UZS'}
                                     onChange={e => setNewTx({ ...newTx, currency: e.target.value as any })}
                                     className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none"
@@ -2242,6 +2252,7 @@ export default function FinanceDashboard() {
                         <div>
                             <label className="text-xs text-gray-500 uppercase mb-1 block">{t.finance.transCategory}</label>
                             <select
+                                aria-label="Transaction Category"
                                 value={newTx.category}
                                 onChange={e => setNewTx({ ...newTx, category: e.target.value })}
                                 className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none"
@@ -2277,7 +2288,8 @@ export default function FinanceDashboard() {
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="font-mono text-aura-red font-bold">-${(Math.random() * 100).toFixed(2)}</p>
+                                <p className="font-mono text-aura-red font-bold">-$50.00</p>
+
                                 <p className="text-xs text-gray-500">{t.finance.spent}</p>
                             </div>
                         </div>
@@ -2325,6 +2337,7 @@ export default function FinanceDashboard() {
                         <div>
                             <label className="text-xs text-gray-500 uppercase mb-1 block">{t.finance.currency}</label>
                             <select
+                                aria-label="Debt Currency"
                                 value={debtForm.currency}
                                 onChange={e => setDebtForm({ ...debtForm, currency: e.target.value as any })}
                                 className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none appearance-none"
@@ -2340,21 +2353,21 @@ export default function FinanceDashboard() {
                         <div>
                             <label className="text-xs text-gray-500 uppercase mb-1 block">{t.finance.dateTaken}</label>
                             <input
+                                aria-label={t.finance.dateTaken}
                                 type="date"
                                 value={debtForm.startDate}
                                 onChange={e => setDebtForm({ ...debtForm, startDate: e.target.value })}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none"
-                                style={{ colorScheme: 'dark' }}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none [color-scheme:dark]"
                             />
                         </div>
                         <div>
                             <label className="text-xs text-gray-500 uppercase mb-1 block">{t.finance.returnDate}</label>
                             <input
+                                aria-label={t.finance.returnDate}
                                 type="date"
                                 value={debtForm.deadline}
                                 onChange={e => setDebtForm({ ...debtForm, deadline: e.target.value })}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none"
-                                style={{ colorScheme: 'dark' }}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none [color-scheme:dark]"
                             />
                         </div>
                     </div>
@@ -2375,6 +2388,7 @@ export default function FinanceDashboard() {
                         <label className="text-xs text-gray-500 uppercase mb-1 block">{t.finance.target} {t.finance.amount}</label>
                         <div className="flex gap-2">
                             <select
+                                aria-label="Goal Currency"
                                 value={goalForm.currency}
                                 onChange={(e) => {
                                     const newCurrency = e.target.value;
@@ -2384,7 +2398,7 @@ export default function FinanceDashboard() {
                                     if (newCurrency !== oldCurrency) {
                                         const oldRate = exchangeRates.find(r => r.code === oldCurrency)?.rate || 1;
                                         const newRate = exchangeRates.find(r => r.code === newCurrency)?.rate || 1;
-                                        let amountInUZS = oldCurrency === 'UZS' ? newTarget : newTarget * oldRate;
+                                        const amountInUZS = oldCurrency === 'UZS' ? newTarget : newTarget * oldRate;
                                         newTarget = newCurrency === 'UZS' ? amountInUZS : amountInUZS / newRate;
                                     }
 
@@ -2498,14 +2512,15 @@ export default function FinanceDashboard() {
                     <div>
                         <label className="text-xs text-aura-gold uppercase mb-1 block">{t.finance.startDate}</label>
                         <input
+                            aria-label={t.finance.startDate}
                             type="date"
                             value={creditForm.startDate}
                             onChange={e => setCreditForm({ ...creditForm, startDate: e.target.value })}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-aura-gold mb-4"
-                            style={{ colorScheme: 'dark' }}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-aura-gold mb-4 [color-scheme:dark]"
                         />
                         <label className="text-xs text-gray-500 uppercase mb-1 block">{t.finance.currency}</label>
                         <select
+                            aria-label="Credit Currency"
                             value={creditForm.currency}
                             onChange={e => setCreditForm({ ...creditForm, currency: e.target.value })}
                             className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none"
@@ -2518,6 +2533,7 @@ export default function FinanceDashboard() {
                         <div>
                             <label className="text-xs text-aura-gold uppercase mb-1 block">{t.finance.interestRate}</label>
                             <input
+                                aria-label={t.finance.interestRate}
                                 type="number"
                                 value={creditForm.interestRate || ''}
                                 onChange={e => setCreditForm({ ...creditForm, interestRate: Number(e.target.value) })}
@@ -2527,6 +2543,7 @@ export default function FinanceDashboard() {
                         <div>
                             <label className="text-xs text-aura-gold uppercase mb-1 block">{t.finance.termMonths}</label>
                             <input
+                                aria-label={t.finance.termMonths}
                                 type="number"
                                 value={creditForm.termMonths || ''}
                                 onChange={e => setCreditForm({ ...creditForm, termMonths: Number(e.target.value) })}
@@ -2586,6 +2603,7 @@ export default function FinanceDashboard() {
                         <div>
                             <label className="text-xs text-gray-500 uppercase mb-1 block">{t.finance.currency}</label>
                             <select
+                                aria-label="Deposit Currency"
                                 value={depositForm.currency}
                                 onChange={e => setDepositForm({ ...depositForm, currency: e.target.value as any })}
                                 className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none"
@@ -2637,11 +2655,11 @@ export default function FinanceDashboard() {
                     <div>
                         <label className="text-xs text-gray-500 uppercase mb-1 block">{t.finance.startDate}</label>
                         <input
+                            aria-label={t.finance.startDate}
                             type="date"
                             value={depositForm.startDate}
                             onChange={e => setDepositForm({ ...depositForm, startDate: e.target.value })}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none"
-                            style={{ colorScheme: 'dark' }}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none [color-scheme:dark]"
                         />
                     </div>
 
@@ -2808,7 +2826,7 @@ export default function FinanceDashboard() {
                 <div className="p-6 text-center space-y-4">
                     <div className="text-4xl">⚠️</div>
                     <p className="text-white font-bold">{confirmModal.message}</p>
-                    <p className="text-xs text-gray-400">Bu amalni ortga qaytarib bo'lmasligi mumkin.</p>
+                    <p className="text-xs text-gray-400">Bu amalni ortga qaytarib bo&apos;lmasligi mumkin.</p>
                     <div className="flex gap-4 mt-6">
                         <button onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })} className="flex-1 py-3 rounded-xl bg-white/5 text-gray-300 font-bold hover:bg-white/10 transition-all">Bekor qilish</button>
                         <button onClick={confirmModal.onConfirm} className="flex-1 py-3 rounded-xl bg-aura-red text-white font-bold hover:bg-red-600 transition-all">Tasdiqlash</button>
@@ -2822,11 +2840,11 @@ export default function FinanceDashboard() {
                     <div>
                         <label className="text-xs text-aura-gold uppercase mb-1 block">{t.finance.deadline}</label>
                         <input
+                            aria-label={t.finance.deadline}
                             type="date"
                             value={newDeadline}
                             onChange={e => setNewDeadline(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-aura-gold"
-                            style={{ colorScheme: 'dark' }}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-aura-gold [color-scheme:dark]"
                         />
                     </div>
                     <button

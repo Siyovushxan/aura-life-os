@@ -78,10 +78,11 @@ export default function VoiceInput({ module, onCommand, onTranscript, className 
                     const langCode = window.localStorage.getItem('language') === 'ru' ? 'ru' : window.localStorage.getItem('language') === 'uz' ? 'uz' : 'en';
                     const text = await transcribeAudio(audioBlob, langCode, module);
 
-                    if (onTranscript) onTranscript(text);
+                    const textValue = text || "";
+                    if (onTranscript) onTranscript(textValue);
 
-                    if (text.startsWith("ERROR:") || text === "Audio system offline.") {
-                        const errorMsg = text.startsWith("ERROR:") ? text.replace("ERROR: ", "") : "Ovoz tizimi oflayn.";
+                    if (textValue.startsWith("ERROR:") || textValue === "Audio system offline." || !textValue) {
+                        const errorMsg = textValue.startsWith("ERROR:") ? textValue.replace("ERROR: ", "") : (textValue === "Audio system offline." ? "Ovoz tizimi oflayn." : "Ovoz tushunarsiz.");
                         setModalState({ isOpen: true, type: 'error', message: errorMsg });
                         setIsProcessing(false);
                         return;

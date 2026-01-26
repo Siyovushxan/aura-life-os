@@ -3,10 +3,14 @@
  * Provides methods to call AURA backend functions
  */
 
-// Use LOCAL Emulator URLs for development
 const PROJECT_ID = 'aura-f1d36';
 const REGION = 'us-central1';
-const BASE_URL = `http://127.0.0.1:5001/${PROJECT_ID}/${REGION}`;
+const IS_LOCAL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const USE_EMULATOR = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true';
+
+const BASE_URL = IS_LOCAL && USE_EMULATOR
+    ? `http://127.0.0.1:5001/${PROJECT_ID}/${REGION}`
+    : `https://${REGION}-${PROJECT_ID}.cloudfunctions.net`;
 
 const ANALYZE_TASK_URL = `${BASE_URL}/analyzeTask`;
 const GET_DAILY_INSIGHT_URL = `${BASE_URL}/getDailyInsight`;

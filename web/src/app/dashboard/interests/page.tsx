@@ -19,6 +19,7 @@ import { getMindData } from '@/services/mindService';
 import { ReadOnlyBanner } from '@/components/dashboard/ReadOnlyBanner';
 import { format } from 'date-fns';
 import { AiInsightSection } from '@/components/dashboard/AiInsightSection';
+import { AudioReport } from '@/components/dashboard/AudioReport';
 
 export default function InterestsDashboard() {
     const { t, language } = useLanguage();
@@ -40,6 +41,7 @@ export default function InterestsDashboard() {
     const [habitAdvice, setHabitAdvice] = useState<string | null>(null);
     const [newHobbyTrackingMode, setNewHobbyTrackingMode] = useState<'frequency' | 'binary'>('frequency');
     const [isArchived, setIsArchived] = useState(false);
+    const [fullAiInsight, setFullAiInsight] = useState<any>(null);
 
     useEffect(() => {
         const todayStr = getLocalTodayStr();
@@ -143,6 +145,7 @@ export default function InterestsDashboard() {
                     }];
                     setAiRecs(recs);
                 }
+                setFullAiInsight(insight.data || insight);
             }
         } catch (err) {
             console.error("Interests AI Error:", err);
@@ -401,8 +404,8 @@ export default function InterestsDashboard() {
                     <div className="space-y-3">
                         <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                             <div
-                                className="h-full bg-gradient-to-r from-aura-cyan to-aura-purple transition-all duration-1000"
-                                style={{ width: `${hobby.progress}%` }}
+                                className="h-full bg-gradient-to-r from-aura-cyan to-aura-purple transition-all duration-1000 w-[var(--value)]"
+                                style={{ '--value': `${hobby.progress}%` } as React.CSSProperties}
                             ></div>
                         </div>
                         <button
@@ -495,12 +498,20 @@ export default function InterestsDashboard() {
             <AiInsightSection
                 onAnalyze={() => fetchAiRecs(true)}
                 isLoading={recLoading}
-                insight={aiRecs.length > 0 ? { title: "AI Analysis", text: t.interests.aiRecTitleGrowth || "Recommendations Ready", emoji: "🎨" } : null}
+                insight={fullAiInsight || (aiRecs.length > 0 ? { title: "AI Analysis", text: t.interests.aiRecTitleGrowth || "Recommendations Ready", emoji: "🎨" } : null)}
                 title="AURA AI Interests"
                 description={t.interests.subtitle || "AI-powered recommendations based on your interests."}
                 buttonText={aiRecs.length > 0 ? (t.common?.refresh || "Refresh") : "Start Analysis"}
                 color="purple"
             >
+                {fullAiInsight && (
+                    <div className="mb-6">
+                        <AudioReport
+                            title="AI Interests Summary"
+                            text={fullAiInsight.optimization || fullAiInsight.insight || fullAiInsight.text}
+                        />
+                    </div>
+                )}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
                     {aiRecs.map((rec, index) => (
                         <div key={index} className={`p-6 rounded-[2rem] bg-black/40 border relative overflow-hidden group flex flex-col justify-between min-h-[250px] transition-all ${rec.isDone ? 'opacity-50 grayscale-[0.5]' : ''} ${rec.type === 'correction' ? 'border-aura-red/30' : 'border-aura-cyan/30'}`}>
@@ -613,8 +624,9 @@ export default function InterestsDashboard() {
             >
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-xs text-gray-500 uppercase tracking-widest">{t.interests.hobbyName}</label>
+                        <label htmlFor="hobby-name" className="text-xs text-gray-500 uppercase tracking-widest">{t.interests.hobbyName}</label>
                         <input
+                            id="hobby-name"
                             type="text"
                             className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder:text-gray-600 focus:border-aura-cyan outline-none transition-all"
                             placeholder={t.interests.placeholderName}
@@ -625,6 +637,7 @@ export default function InterestsDashboard() {
                     <div className="space-y-2">
                         <label className="text-xs text-gray-500 uppercase tracking-widest">{t.interests.category}</label>
                         <select
+                            aria-label="Kategoriyani tanlash"
                             className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white outline-none appearance-none cursor-pointer hover:bg-white/10 transition-all font-bold"
                             value={newHobbyCategory}
                             onChange={(e) => setNewHobbyCategory(e.target.value)}

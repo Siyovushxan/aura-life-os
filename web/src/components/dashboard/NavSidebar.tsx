@@ -2,8 +2,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-
-
+import { useState, useEffect } from 'react';
+import { UserProfile, subscribeToUserProfile } from '@/services/userService';
 
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
@@ -14,6 +14,15 @@ export default function NavSidebar() {
     const { t } = useLanguage();
     const { user, logout } = useAuth();
     const { notifications } = useNotifications();
+
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+
+    useEffect(() => {
+        if (user?.uid) {
+            const unsub = subscribeToUserProfile(user.uid, setProfile);
+            return () => unsub();
+        }
+    }, [user?.uid]);
 
     const navItems = [
         { name: t.sidebar.dashboard, href: '/dashboard/', icon: '⚡' },
@@ -38,6 +47,34 @@ export default function NavSidebar() {
                     <span className="font-display font-bold text-xl tracking-wider text-white">AURA</span>
                 </div>
 
+                {/* Gamification Card */}
+                {profile && profile.gamification && (
+                    <div className="mx-4 mt-4 p-4 rounded-2xl bg-gradient-to-br from-white/5 to-white/0 border border-white/10 relative overflow-hidden group">
+                        {/* Shimmer Effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+
+                        <div className="flex justify-between items-end mb-2 relative z-10">
+                            <div>
+                                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Level {profile.gamification.level}</h4>
+                                <div className="text-xl font-display font-bold text-white flex items-center gap-2">
+                                    {profile.gamification.coins || 0} <span className="text-aura-gold text-sm">🟡</span>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-[10px] font-bold text-aura-cyan">XP {profile.gamification.xp}</span>
+                            </div>
+                        </div>
+
+                        {/* XP Progress Bar */}
+                        <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden relative z-10">
+                            <div
+                                className="h-full bg-gradient-to-r from-aura-cyan to-aura-purple rounded-full shadow-[0_0_10px_rgba(0,240,255,0.5)] transition-all duration-1000 ease-out w-[var(--width)]"
+                                style={{ '--width': `${Math.min(100, (profile.gamification.xp % 1000) / 10)}%` } as React.CSSProperties} // Assuming 1000 XP per level
+                            ></div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
                     {navItems.map((item) => {
@@ -48,7 +85,7 @@ export default function NavSidebar() {
                         const isActive = currentPath === itemHref || currentPath.startsWith(itemHref);
 
                         // UI FORCE CLEAR: If active, show 0 immediately
-                        const count = isActive ? 0 : (item.key ? (notifications as any)[item.key] : 0);
+                        const count = isActive ? 0 : (item.key && item.key in notifications ? notifications[item.key as keyof typeof notifications] : 0);
 
                         return (
                             <Link

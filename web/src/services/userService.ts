@@ -1,5 +1,14 @@
 import { db } from "@/firebaseConfig";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
+
+export interface GamificationParams {
+    xp: number;
+    level: number;
+    coins: number;
+    streak: number;
+    lastActive?: any; // Timestamp
+    totalXP?: number;
+}
 
 export interface UserProfile {
     uid: string;
@@ -13,6 +22,7 @@ export interface UserProfile {
     profession?: string;
     education?: string;
     bio?: string;
+    gamification?: GamificationParams; // New Gamification Field
     settings?: {
         notifications?: {
             dailyBriefing: boolean;
@@ -49,4 +59,15 @@ export const createUserProfile = async (uid: string, data: Partial<UserProfile>)
 export const updateUserProfile = async (uid: string, data: Partial<UserProfile>) => {
     const docRef = doc(db, "users", uid);
     await setDoc(docRef, data, { merge: true });
+};
+
+export const subscribeToUserProfile = (uid: string, callback: (profile: UserProfile | null) => void) => {
+    const docRef = doc(db, "users", uid);
+    return onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            callback(docSnap.data() as UserProfile);
+        } else {
+            callback(null);
+        }
+    });
 };

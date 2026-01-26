@@ -113,29 +113,28 @@ export default function HealthDashboard() {
     };
 
     // Manual AI Trigger Logic
-    const [aiInsight, setAiInsight] = useState<{ title: string, text: string, emoji: string, status: string } | null>(null);
+    const [aiInsight, setAiInsight] = useState<any | null>(null);
     const [aiLoading, setAiLoading] = useState(false);
 
-    const refreshInsight = async () => {
+    const refreshInsight = async (force: boolean = true) => {
         if (!user || !data) return;
         setAiLoading(true);
         try {
             const batteryData = calculateBodyBatteryData(data);
             const context = {
                 steps: data.activity.steps,
-                sleepHours: data.sleep.score / 10, // Approx
+                sleepHours: data.sleep.score / 10,
                 waterMl: data.hydration.current,
                 stress: data.vitals.stress,
-                mood: 'neutral', // simplified
+                mood: 'neutral',
                 biometrics: data.biometrics,
                 battery: {
                     total: batteryData.total,
                     impacts: batteryData.impacts
                 }
             };
-            const insight = await getScheduledInsight(user.uid, 'health', language, context);
+            const insight = await getScheduledInsight(user.uid, 'health', language, context, { force });
             if (insight) {
-                // Map or cast if necessary, backend returns text/status for health
                 setAiInsight(insight as any);
             }
         } catch (err) {
@@ -144,6 +143,13 @@ export default function HealthDashboard() {
             setAiLoading(false);
         }
     };
+
+    // Auto-load today's insight if it exists
+    useEffect(() => {
+        if (user && data && !aiInsight && !aiLoading) {
+            refreshInsight(false); // Try to load without forcing generation first
+        }
+    }, [user, data]);
 
     const handleVoiceCommand = async (command: any) => {
         if (!user || !data || isArchived) return;
@@ -328,27 +334,31 @@ export default function HealthDashboard() {
                         <h3 className="text-lg font-bold text-white flex items-center gap-2"><span>👤</span> {t.health.biometrics.title}</h3>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-xs text-gray-500">{t.health.biometrics.weight}</label>
+                                <label htmlFor="weight-input" className="text-xs text-gray-500">{t.health.biometrics.weight}</label>
                                 <div className="flex items-center gap-2">
                                     <input
+                                        id="weight-input"
                                         type="number"
                                         value={data.biometrics?.weight || 70}
                                         onChange={(e) => updateBiometrics('weight', Number(e.target.value))}
                                         disabled={isArchived}
                                         className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-center focus:border-aura-green outline-none transition-all disabled:opacity-50"
+                                        placeholder="70"
                                     />
                                     <span className="text-gray-500 text-xs">{t.health.biometrics.unitKg}</span>
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs text-gray-500">{t.health.biometrics.height}</label>
+                                <label htmlFor="height-input" className="text-xs text-gray-500">{t.health.biometrics.height}</label>
                                 <div className="flex items-center gap-2">
                                     <input
+                                        id="height-input"
                                         type="number"
                                         value={data.biometrics?.height || 175}
                                         onChange={(e) => updateBiometrics('height', Number(e.target.value))}
                                         disabled={isArchived}
                                         className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white text-center focus:border-aura-green outline-none transition-all disabled:opacity-50"
+                                        placeholder="175"
                                     />
                                     <span className="text-gray-500 text-xs">{t.health.biometrics.unitCm}</span>
                                 </div>
@@ -357,6 +367,7 @@ export default function HealthDashboard() {
                         <div className="space-y-2">
                             <label className="text-xs text-gray-500">{t.health.biometrics.goal}</label>
                             <select
+                                aria-label={t.health.biometrics.goalLabel || "Goal"}
                                 value={data.biometrics?.goal || 'maintain'}
                                 onChange={(e) => updateBiometrics('goal', e.target.value)}
                                 disabled={isArchived}
@@ -378,7 +389,13 @@ export default function HealthDashboard() {
                         description="Bugungi ko'rsatkichlarga asoslangan sun'iy intellekt tahlili."
                         buttonText={aiInsight ? 'Yangilash' : 'AI Tahlil'}
                         color="green"
-                    />
+                    >
+                        {aiInsight && (
+                            <div className="mt-6">
+                                <AudioReport text={aiInsight.insight || aiInsight.text} />
+                            </div>
+                        )}
+                    </AiInsightSection>
                 </div>
 
 

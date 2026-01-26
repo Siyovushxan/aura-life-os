@@ -22,16 +22,18 @@ export default function FoodDashboard() {
 
     useEffect(() => {
         clearNotification('food');
-        // Debug: Check Backend Health
-        fetch('http://127.0.0.1:5001/aura-f1d36/us-central1/healthCheck')
-            .then(res => res.json())
-            .then(data => {
-                console.log("Backend Health:", data);
-                if (data.keys && (!data.keys.IMAGE && !data.keys.FOOD && !data.keys.MAIN)) {
-                    triggerAlert("DIQQAT: API Kalitlar Yo'q", "Backend tizimida Groq API kalitlari topilmadi. Iltimos .env faylni tekshiring.", "danger");
-                }
-            })
-            .catch(err => console.error("Health Check Failed:", err));
+        // Debug: Check Backend Health (Optional)
+        if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
+            fetch('http://127.0.0.1:5001/aura-f1d36/us-central1/healthCheck')
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Backend Health:", data);
+                    if (data.keys && (!data.keys.IMAGE && !data.keys.FOOD && !data.keys.MAIN)) {
+                        triggerAlert("DIQQAT: API Kalitlar Yo'q", "Backend tizimida Groq API kalitlari topilmadi. Iltimos .env faylni tekshiring.", "danger");
+                    }
+                })
+                .catch(err => console.error("Health Check Failed:", err));
+        }
     }, []);
 
     const [log, setLog] = useState<FoodDayLog | null>(null);
@@ -214,7 +216,7 @@ export default function FoodDashboard() {
                     <span>{current} / {goal}g</span>
                 </div>
                 <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${percentage}%`, backgroundColor: color }}></div>
+                    <div className="h-full rounded-full transition-all duration-1000 w-[var(--width)]" style={{ '--width': `${percentage}%`, backgroundColor: color } as React.CSSProperties}></div>
                 </div>
             </div>
         );
@@ -367,7 +369,7 @@ export default function FoodDashboard() {
                         ) : (
                             <div className="flex flex-col md:flex-row items-center gap-8 w-full h-full animate-fade-in">
                                 <div className="relative w-48 h-48 rounded-2xl overflow-hidden border-2 border-aura-cyan/30 flex-shrink-0 shadow-[0_0_20px_rgba(0,255,148,0.2)]">
-                                    {previewImage && <img src={previewImage} alt="Food" className="w-full h-full object-cover" />}
+                                    {previewImage && <img src={previewImage} alt="Food" className="w-full h-full object-cover" width={192} height={192} />}
                                     {isScanning && (
                                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                                             <div className="scan-line"></div>
@@ -429,7 +431,7 @@ export default function FoodDashboard() {
                                 )}
                             </div>
                         )}
-                        <input type="file" id="meal-upload" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                        <input aria-label={t.food.scanMeal} type="file" id="meal-upload" accept="image/*" onChange={handleFileUpload} className="hidden" />
                     </div>
 
                     <h3 className="text-xl font-bold text-white mt-8">{t.food.dailyLog}</h3>

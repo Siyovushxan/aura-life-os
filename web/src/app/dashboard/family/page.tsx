@@ -33,6 +33,7 @@ import { getFamilyInsight } from '@/services/groqService';
 import { getFinanceOverview } from '@/services/financeService';
 import { getHealthData } from '@/services/healthService';
 import { getMindData } from '@/services/mindService';
+import { AudioReport } from '@/components/dashboard/AudioReport';
 
 import { useLanguage } from '@/context/LanguageContext';
 import { useNotifications } from '@/context/NotificationContext';
@@ -848,7 +849,7 @@ export default function FamilyDashboard() {
                                 </div>
                                 <div>
                                     <label className="text-xs text-gray-400 uppercase">Rolingiz</label>
-                                    <select value={ownerRole} onChange={e => setOwnerRole(e.target.value)} className="w-full bg-black/40 border border-white/10 text-white rounded-xl p-3 mt-1 outline-none focus:border-white">
+                                    <select aria-label="Rolni tanlash" value={ownerRole} onChange={e => setOwnerRole(e.target.value)} className="w-full bg-black/40 border border-white/10 text-white rounded-xl p-3 mt-1 outline-none focus:border-white">
                                         {FAMILY_ROLES.map(role => <option key={role} value={role} className="bg-gray-900">{role}</option>)}
                                     </select>
                                 </div>
@@ -1090,7 +1091,13 @@ export default function FamilyDashboard() {
                             description="Oilaviy ma'lumotlarga asoslangan sun'iy intellekt tahlili va tavsiyalari."
                             buttonText="Tahlilni Boshlash"
                             color="purple"
-                        />
+                        >
+                            {aiInsight && (
+                                <div className="mt-6">
+                                    <AudioReport text={aiInsight.insight || aiInsight.text} />
+                                </div>
+                            )}
+                        </AiInsightSection>
 
                         <div className="space-y-8">
                             {/* PULSE STATS */}
@@ -1163,8 +1170,11 @@ export default function FamilyDashboard() {
                                             <div className="space-y-3">
                                                 <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
                                                     <div
-                                                        className={`h-full rounded-full transition-all duration-1000 ${member.battery > 50 ? 'bg-aura-green' : member.battery > 20 ? 'bg-aura-gold' : 'bg-aura-red'}`}
-                                                        style={{ width: `${member.battery}%` }}
+                                                        className="h-full rounded-full transition-all duration-1000 w-[var(--value)]"
+                                                        style={{
+                                                            '--value': `${member.battery}%`,
+                                                            backgroundColor: member.battery > 50 ? '#00FF94' : member.battery > 20 ? '#FFD600' : '#FF2E2E'
+                                                        } as React.CSSProperties}
                                                     ></div>
                                                 </div>
                                                 <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5">
