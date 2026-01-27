@@ -157,7 +157,24 @@ export default function FoodDashboard() {
                 if (result && result.name) {
                     setScanResult(result);
                     setShowConfirm(true);
-                    if (result.advice) setAiAdvice(result.advice);
+
+                    // Client-side advice "healing" if AI returns too short strings like "Go"
+                    let finalAdvice = result.advice || "";
+                    if (finalAdvice.length < 10) {
+                        const goalText = (result.calories < 500) ? "ideal kognitiv va jismoniy energiya muvozanatini saqlashga yordam beradi." : "metabolik yukni oshirishi mumkin, biroq energiya zaxirasi uchun xizmat qiladi.";
+                        finalAdvice = `AURA Tahlili: Ushbu taomni iste'mol qilish ${result.name} tarkibidagi elementlar orqali ${goalText}`;
+                    }
+
+                    if (result.advice) {
+                        setAiAdvice({
+                            ...result,
+                            title: result.name || "Taom Tahlili",
+                            insight: finalAdvice,
+                            optimization: finalAdvice,
+                            vitalityScore: result.vitalityScore || 85, // Fallback if AI somehow misses it
+                            status: 'success'
+                        });
+                    }
                 } else {
                     console.error("Food Analysis Failed: Invalid result", result);
                     triggerAlert("Aniqlashda Xatolik", "Taomni aniqlab bo'lmadi. Iltimos, rasm tiniqroq ekanligiga ishonch hosil qiling va qayta urinib ko'ring.", "warning");
@@ -182,7 +199,8 @@ export default function FoodDashboard() {
                 carbs: scanResult.carbs || 0,
                 fat: scanResult.fat || 0,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                type: 'Snack'
+                type: 'Snack',
+                image: previewImage || undefined
             };
             await addMeal(user.uid, selectedDate, newMeal);
             const updatedLog = await getFoodLog(user.uid, selectedDate);
@@ -439,12 +457,16 @@ export default function FoodDashboard() {
                         {log.meals.map((meal) => (
                             <div key={meal.id} className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-5 hover:bg-white/10 transition-colors group relative overflow-hidden">
                                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-aura-cyan to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center text-2xl shadow-inner">
-                                    <span>
-                                        {meal.type === 'Breakfast' ? '☕' :
-                                            meal.type === 'Lunch' ? '🍲' :
-                                                meal.type === 'Dinner' ? '🌙' : '🍎'}
-                                    </span>
+                                <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center text-2xl shadow-inner overflow-hidden">
+                                    {meal.image ? (
+                                        <img src={meal.image} alt={meal.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span>
+                                            {meal.type === 'Breakfast' ? '☕' :
+                                                meal.type === 'Lunch' ? '🍲' :
+                                                    meal.type === 'Dinner' ? '🌙' : '🍎'}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex justify-between items-start">

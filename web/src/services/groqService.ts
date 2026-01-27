@@ -1,29 +1,49 @@
-const IS_LOCAL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-const USE_EMULATOR = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true';
+import { auth as firebaseAuth } from "@/firebaseConfig";
 
-const BACKEND_URL = IS_LOCAL && USE_EMULATOR
+// Dynamic Backend URL for Cloud Functions
+const BASE_URL = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true'
     ? 'http://127.0.0.1:5001/aura-f1d36/us-central1'
     : 'https://us-central1-aura-f1d36.cloudfunctions.net';
 
-// HELPER: Call AURA Backend Cloud Function
-const callBackend = async (functionName: string, payload: any) => {
+export async function callBackend(endpoint: string, payload: any) {
     try {
-        const response = await fetch(`${BACKEND_URL}/${functionName}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Backend Error');
-        return data;
-    } catch (error) {
-        // SILENT FALLBACK FOR DEVELOPMENT
-        if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-            console.warn(`[AURA AI Proxy] Backend offline (${functionName}). Using simulated response.`);
+        // SECURITY: Inject CURRENT user's token
+        const currentUser = firebaseAuth.currentUser;
+        if (!currentUser) {
+            console.error("Auth Error: No user logged in for backend call.");
+            return { success: false, error: 'Unauthorized' };
+        }
 
-            // Mock responses based on function names to keep UI alive
-            if (functionName === 'getFamilyInsight') return { success: true, insight: "Oila a'zolari bilan muloqotni kuchaytirish tavsiya etiladi. Azamat otaning faolligi barqaror.", emoji: "👨‍👩‍👧‍👦", success_mock: true };
-            if (functionName === 'getFinanceInsight') return {
+        const token = await currentUser.getIdToken();
+
+        const response = await fetch(`${BASE_URL}/${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                data: payload,
+                language: 'uz'
+            })
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.warn("Security Alert: Token expired or invalid.");
+            }
+            throw new Error(`Backend Error: ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        // SILENT FALLBACK FOR DEVELOPMENT (Mock Logic)
+        const IS_LOCAL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        if (IS_LOCAL) {
+            console.warn(`[AURA AI Proxy] Backend error/offline (${endpoint}). Using simulated response.`);
+
+            if (endpoint === 'getFamilyInsight') return { success: true, insight: "Oila a'zolari bilan muloqotni kuchaytirish tavsiya etiladi. Azamat otaning faolligi barqaror.", emoji: "👨‍👩‍👧‍👦", success_mock: true };
+            if (endpoint === 'getFinanceInsight') return {
                 success: true,
                 insight: "Xarajatlar nazorat ostida. Jamg'arma rejasiga amal qiling.",
                 optimization: "Zaxira jamg'armasini shakllantirish moliyaviy barqarorlikni oshiradi.",
@@ -33,8 +53,8 @@ const callBackend = async (functionName: string, payload: any) => {
                 emoji: "💰",
                 success_mock: true
             };
-            if (functionName === 'getTaskInsight') return { success: true, title: "Kunlik Reja", suggestion: "Bugun 3 ta asosiy vazifaga diqqat qarating.", priority: "high", success_mock: true };
-            if (functionName === 'getHealthInsight') return {
+            if (endpoint === 'getTaskInsight') return { success: true, title: "Kunlik Reja", suggestion: "Bugun 3 ta asosiy vazifaga diqqat qarating.", priority: "high", success_mock: true };
+            if (endpoint === 'getHealthInsight') return {
                 success: true,
                 title: "AURA Vitality Protocol",
                 insight: "Metabolik faollik va uyqu sikli sinxron holatda. Hydration darajasini oshirish orqali kognitiv samaradorlikni 15% ga oshirish mumkin.",
@@ -49,18 +69,15 @@ const callBackend = async (functionName: string, payload: any) => {
                 status: "ready",
                 success_mock: true
             };
-            if (functionName === 'getFoodLogInsight') return { success: true, title: "Nutrition Logic", insight: "Bugun oqsil miqdori yetarli. Kechki ovqatda uglevodlarni kamaytirish tavsiya etiladi.", emoji: "🥗", success_mock: true };
-
-            if (functionName === 'getTranscription') return { success: true, text: "Bugun 50000 so'm ishlatdim.", success_mock: true };
-            if (functionName === 'getCommandIntent') return { success: true, module: "finance", action: "add", data: { amount: 50000, category: "Oziq-ovqat", type: "expense" }, confirmation_message: "50,000 so'm xarajat moliya bo'limiga qo'shildi.", success_mock: true };
-
-            return { success: true, insight: "Simulated insight.", text: "Simulated text.", success_mock: true };
+            if (endpoint === 'getFoodLogInsight') return { success: true, title: "Nutrition Logic", insight: "Bugun oqsil miqdori yetarli. Kechki ovqatda uglevodlarni kamaytirish tavsiya etiladi.", emoji: "🥗", success_mock: true };
+            if (endpoint === 'getTranscription') return { success: true, text: "Bugun 50000 so'm ishlatdim.", success_mock: true };
+            if (endpoint === 'getCommandIntent') return { success: true, module: "finance", action: "add", data: { amount: 50000, category: "Oziq-ovqat", type: "expense" }, confirmation_message: "50,000 so'm xarajat moliya bo'limiga qo'shildi.", success_mock: true };
         }
 
-        console.error(`AURA Backend Error (${functionName}):`, error);
-        return { success: false, error: "System temporarily offline." };
+        console.error(`AURA Backend Error (${endpoint}):`, error);
+        return { success: false, error: (error as Error).message || "System temporarily offline." };
     }
-};
+}
 
 // VERSION: AURA-PROD-STABLE-2026-01-21
 console.log("%c AURA AI CORE: V2026.1 (SECURE BACKEND) ACTIVE ", "background: #000; color: #00F0FF; font-weight: bold; border-left: 4px solid #00F0FF; padding: 4px 8px;");
@@ -74,6 +91,30 @@ export const analyzeText = async (prompt: string, context?: string): Promise<str
 import { HealthData } from "./healthService";
 import { AIRec } from "./interestsService";
 
+// Utility: Compress image before sending to AI
+export const compressImage = async (base64Str: string, maxWidth = 800, quality = 0.7): Promise<string> => {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.src = base64Str;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+    });
+};
+
 export const analyzeImage = async (
     base64Image: string,
     language: string = 'uz',
@@ -82,7 +123,9 @@ export const analyzeImage = async (
         interests?: string[]
     }
 ): Promise<any> => {
-    const data = await callBackend('getFoodAnalysis', { base64Image, userContext, language });
+    // Compress image to save bandwidth and speed up analysis
+    const compressedImage = await compressImage(base64Image);
+    const data = await callBackend('getFoodAnalysis', { base64Image: compressedImage, userContext, language });
     return data.success ? data : null;
 };
 

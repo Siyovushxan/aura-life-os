@@ -190,22 +190,36 @@ export async function analyzeMind(context, language = 'uz') {
 export async function analyzeFoodImage(base64Image, userContext, language = 'uz') {
   const { weight, height, goal } = userContext?.biometrics || {};
 
-  const question = `Analyze this meal. 
-  User Context: ${weight}kg, ${height}cm, Goal: ${goal}. Language: ${language}.
+  const question = `
+  ROLE: You are AURA, the user's high-performance Nutrition Logic & Biological Systems Optimizer.
+  TASK: Perform a deep-layer metabolic scan of the provided food image.
   
-  Task:
-  1. Identify food items.
-  2. Estimate: Calories, Protein(g), Carbs(g), Fat(g).
-  3. AURA Strategy: Is this optimal for the user's goal? Give a 1-sentence "Go" or "Caution" advice.
-  
+  USER BIOLOGICAL CONTEXT:
+  - Weight: ${weight}kg
+  - Height: ${height}cm
+  - Goal: ${goal}
+  - Target Language: ${language}
+
+  ANALYSIS PROTOCOL:
+  1. IDENTIFY: Detect precisely what food items are in the image.
+  2. ESTIMATE: Calculate Calories, Protein(g), Carbs(g), and Fat(g) with high precision.
+  3. AURA STRATEGY: Provide 2 sentences of advanced nutritional logic. 
+     - CRITICAL: Never return one-word answers like 'Go', 'Yes', or 'No'.
+     - FEW-SHOT EXAMPLE 1 (Goal: Weight Loss, Food: Burger): "Burgherdagi yuqori kaloriya va to'yingan yog'lar vazn yo'qotish tezligini sekinlashtirishi mumkin. Ovqatlanishni kletchatka (salat) bilan boshlash glyukemik yukni kamaytiradi."
+     - FEW-SHOT EXAMPLE 2 (Goal: Muscle Gain, Food: Chicken): "Tovuq go'shtidagi yuqori sifatli oqsil mushaklar o'sishi uchun ideal amino-kislotalar profilini ta'minlaydi. Uglevodlar miqdorini oshirish anabolik holatni kuchaytiradi."
+
   Return STRICT JSON ONLY: 
   { 
-    "name": "Food name", 
+    "name": "Food Name", 
     "calories": number, 
     "protein": number, 
     "carbs": number, 
     "fat": number,
-    "advice": "AURA strategy advice" 
+    "advice": "Detailed AURA Strategic Advice in ${language} (2 sentences)",
+    "insight": "Same as advice",
+    "optimization": "Same as advice",
+    "vitalityScore": number,
+    "emoji": "🥗"
   }`;
 
   try {

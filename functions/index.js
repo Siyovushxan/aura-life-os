@@ -21,33 +21,45 @@ export { dailyAIAnalysis } from './schedulers/dailyAIAnalysis.js';
 import { analyzeSimilarTasks, generateDailyInsights } from './ai/taskAnalysis.js';
 import { analyzeFinance, analyzeHealth, analyzeInterests, analyzeMind, analyzeFoodImage, parseCommand, analyzeGenetics, analyzeFamily, analyzeFoodLog } from './ai/aiAnalysis.js';
 
+import { getAuth } from 'firebase-admin/auth';
+
 /**
- * Universal Wrapper for AI Endpoints
+ * Universal Wrapper for AI Endpoints (Secured)
  */
-
-
-// Modified Wrapper to handle AI failures gracefully (Prevent 500 errors on client)
 const createAiEndpoint = (handler) => onRequest({
   cors: true,
   memory: '512MiB',
-  invoker: 'public'
+  invoker: 'public' // We manually check auth in the handler
 }, async (req, res) => {
   try {
+    // SECURITY: Verify Firebase Auth ID Token
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.warn('Unauthorized attempt: No Bearer token found');
+      return res.status(401).json({ success: false, error: 'Unauthorized: Authentication required' });
+    }
+
+    const idToken = authHeader.split('Bearer ')[1];
+    try {
+      const decodedToken = await getAuth().verifyIdToken(idToken);
+      req.user = decodedToken; // Pass user data for potential use
+    } catch (authError) {
+      console.error('Token verification failed:', authError.message);
+      return res.status(401).json({ success: false, error: 'Unauthorized: Invalid token' });
+    }
+
     const { data, language = 'uz' } = req.body;
-    const result = await handler(data, language);
+    const result = await handler(data, language, req.user); // Pass decoded user context
     res.status(200).json({ success: true, ...result });
   } catch (error) {
     console.error(`AI error:`, error);
-    // Return 200 but with success: false and a fallback insight
-    // This prevents the frontend from throwing 500 and allows showing the "System Busy" message
     res.status(200).json({
       success: false,
       error: error.message,
-      // Fallback Insight Structure for UI
       title: 'Tizim Band',
       insight: 'AI xizmati hozirda juda band. Iltimos, birozdan so\'ng qayta urining.',
       emoji: '⏳',
-      recommendations: [] // For other structures
+      recommendations: []
     });
   }
 });
@@ -76,7 +88,7 @@ export const getGenericAnalysis = createAiEndpoint(async (data, language) => {
 });
 
 /**
- * Special handling for Food Image Analysis
+ * Special handling for Food Image Analysis (Secured)
  */
 export const getFoodAnalysis = onRequest({
   cors: true,
@@ -84,6 +96,13 @@ export const getFoodAnalysis = onRequest({
   invoker: 'public'
 }, async (req, res) => {
   try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+    const idToken = authHeader.split('Bearer ')[1];
+    await getAuth().verifyIdToken(idToken);
+
     const { base64Image, userContext, language = 'uz' } = req.body;
     const result = await analyzeFoodImage(base64Image, userContext, language);
     res.status(200).json({ success: true, ...result });
@@ -94,7 +113,7 @@ export const getFoodAnalysis = onRequest({
 });
 
 /**
- * Existing Task Analysis Endpoints
+ * Existing Task Analysis Endpoints (Secured)
  */
 export const analyzeTask = onRequest({
   cors: true,
@@ -102,6 +121,13 @@ export const analyzeTask = onRequest({
   invoker: 'public'
 }, async (req, res) => {
   try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+    const idToken = authHeader.split('Bearer ')[1];
+    await getAuth().verifyIdToken(idToken);
+
     const { taskTitle, existingTasks = [] } = req.body;
     if (!taskTitle) return res.status(400).json({ error: 'taskTitle is required' });
     const analysis = await analyzeSimilarTasks(taskTitle, existingTasks);
@@ -117,6 +143,13 @@ export const getDailyInsight = onRequest({
   invoker: 'public'
 }, async (req, res) => {
   try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+    const idToken = authHeader.split('Bearer ')[1];
+    await getAuth().verifyIdToken(idToken);
+
     const userData = req.body;
     const insight = await generateDailyInsights(userData);
     res.status(200).json({ success: true, insight });

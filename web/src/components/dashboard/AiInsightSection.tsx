@@ -110,7 +110,7 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                             )}
                         </div>
                         <p className="text-gray-400 text-sm md:text-base leading-relaxed max-w-2xl font-medium">
-                            {insight ? (effectiveInsight.insight || effectiveInsight.text || effectiveInsight.recommendation || insight.insight || insight.text || "Operatsion tahlil yakunlandi. Protokol tayyor.") : description}
+                            {insight ? (effectiveInsight.insight || effectiveInsight.text || effectiveInsight.recommendation || effectiveInsight.advice || insight.insight || insight.text || "Operatsion tahlil yakunlandi. Protokol tayyor.") : description}
                         </p>
                     </div>
                 </div>
@@ -156,7 +156,7 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                             <div className="absolute top-0 left-0 w-1 h-full bg-aura-cyan opacity-50"></div>
                             <div className={`absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover/opt:scale-125 transition-transform duration-500`}>{effectiveInsight.emoji || insight.emoji || '💡'}</div>
                             <p className="text-base text-gray-200 leading-relaxed font-medium relative z-10">
-                                {effectiveInsight.optimization || effectiveInsight.recommendation || effectiveInsight.suggestion || effectiveInsight.text ||
+                                {effectiveInsight.optimization || effectiveInsight.recommendation || effectiveInsight.suggestion || effectiveInsight.text || effectiveInsight.advice ||
                                     (effectiveInsight.insight ? (effectiveInsight.insight.length > 100 ? effectiveInsight.insight.substring(0, 100) + '...' : effectiveInsight.insight) : "Natijalar tahlil qilinmoqda.")}
                             </p>
                             {(effectiveInsight.success_mock || insight.success_mock) && (
