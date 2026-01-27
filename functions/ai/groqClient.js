@@ -153,6 +153,11 @@ export async function analyzeImage(base64Image, question, clientType = GROQ_TYPE
     const groq = getGroqClient(clientType);
     if (!groq) throw new Error('Groq client not initialized (missing key).');
 
+    // Validate base64Image parameter
+    if (!base64Image || typeof base64Image !== 'string') {
+      throw new Error('Invalid image data: base64Image is required and must be a string.');
+    }
+
     // Check if it's already a data URL, if not make it one
     const imageUrl = base64Image.startsWith('data:') ?
       base64Image :

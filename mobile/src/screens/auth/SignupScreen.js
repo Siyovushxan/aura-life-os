@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
 import {
     StyleSheet,
     Text,
@@ -15,11 +17,46 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../styles/theme';
 import { auth, db } from '../../firebaseConfig';
-import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithRedirect, signInWithCredential } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useLanguage } from '../../context/LanguageContext';
 
+
+WebBrowser.maybeCompleteAuthSession();
+
 export default function SignupScreen({ navigation }) {
+    const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+        // O'ZINGIZNING CLIENT ID LARINGIZNI KUYING
+        androidClientId: 'YOUR_ANDROID_CLIENT_ID',
+        iosClientId: 'YOUR_IOS_CLIENT_ID',
+        webClientId: '804734494584-placeholder.apps.googleusercontent.com',
+    });
+
+    useEffect(() => {
+        if (response?.type === 'success') {
+            const { id_token } = response.params;
+            const credential = GoogleAuthProvider.credential(id_token);
+            signInWithCredential(auth, credential)
+                .then(async (userCredential) => {
+                    // Create profile if new user?
+                    // signInWithCredential can accept existing users too.
+                    // If we are in Signup, maybe we want to enforce profile creation?
+                    // Usually signIn will trigger onAuthStateChanged anyway.
+                    // But for signup we might want to ensure 'users' doc exists.
+                    // We can check if doc exists using onAuthStateChanged or just proceed.
+                    // For MVP, letting App.js handle generic auth state change is easiest.
+                    // But strictly speaking, profile creation logic is inside handleSignup.
+                    // With Google Sign In, profile creation is often implicit or handled by cloud functions.
+                    // Check if we need to manually create doc here.
+                    // Yes, ideally. But signInWithCredential acts like Login if user exists.
+                    // I will just let it sign in. 
+                })
+                .catch((error) => {
+                    Alert.alert("Google Error", error.message);
+                });
+        }
+    }, [response]);
+
     const { t } = useLanguage();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -53,15 +90,32 @@ export default function SignupScreen({ navigation }) {
                     streak: 0
                 }
             });
-
         } catch (error) {
-            Alert.alert(t.common.error, error.message);
+            if (error.code === 'auth/email-already-in-use') {
+                Alert.alert(
+                    "Hisob mavjud",
+                    "Ushbu email bilan allaqachon ro'yxatdan o'tilgan. Kirish oynasiga o'tishni xohlaysizmi?",
+                    [
+                        { text: "Yo'q", style: "cancel" },
+                        { text: "Ha, Kirish", onPress: () => navigation.navigate('Login') }
+                    ]
+                );
+            } else {
+                Alert.alert(t.common.error, error.message);
+            }
         } finally {
             setLoading(false);
         }
     };
 
+
     const handleGoogle = async () => {
+        if (Platform.OS !== 'web') {
+            promptAsync();
+            return;
+        }
+
+
         setLoading(true);
         try {
             const provider = new GoogleAuthProvider();

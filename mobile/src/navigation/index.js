@@ -1,25 +1,32 @@
+// Complete App Navigator with all screens
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Platform, Text } from 'react-native';
 import { Theme } from '../styles/theme';
-import { Text } from 'react-native';
 
-// Screens
+// Auth Screens
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignupScreen from '../screens/auth/SignupScreen';
-import DashboardScreen from '../screens/main/DashboardScreen';
-import HealthScreen from '../screens/main/HealthScreen';
-import FinanceScreen from '../screens/main/FinanceScreen';
-import FamilyScreen from '../screens/main/FamilyScreen';
-import FoodCameraScreen from '../screens/main/FoodCameraScreen';
-import FocusScreen from '../screens/main/FocusScreen';
-import HistoryScreen from '../screens/main/HistoryScreen';
-import TasksScreen from '../screens/main/TasksScreen';
-import InterestsScreen from '../screens/main/InterestsScreen';
+
+// Main Screens
+import HomeScreen from '../screens/main/HomeScreen';
+import FinanceScreen from '../screens/finance/FinanceScreen';
+import FocusScreen from '../screens/focus/FocusScreen';
+import FamilyScreen from '../screens/family/FamilyScreen';
+import MoreScreen from '../screens/main/MoreScreen';
+
+// Module Screens
+import TasksScreen from '../screens/tasks/TasksScreen';
+import HealthScreen from '../screens/health/HealthScreen';
+import FoodScreen from '../screens/food/FoodScreen';
+import InterestsScreen from '../screens/interests/InterestsScreen';
+import MindScreen from '../screens/mind/MindScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Auth Navigator
 export const AuthNavigator = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
@@ -27,70 +34,101 @@ export const AuthNavigator = () => (
     </Stack.Navigator>
 );
 
-const AppStack = createStackNavigator();
+// Tab Icon Component
+const TabIcon = ({ focused, color, emoji }) => {
+    return (
+        <Text style={{ fontSize: 24, opacity: focused ? 1 : 0.6 }}>
+            {emoji}
+        </Text>
+    );
+};
 
-const MainStack = () => (
-    <AppStack.Navigator screenOptions={{ headerShown: false }}>
-        <AppStack.Screen name="Root" component={TabNavigator} />
-        <AppStack.Screen name="FoodCamera" component={FoodCameraScreen} />
-        <AppStack.Screen name="Tasks" component={TasksScreen} />
-        <AppStack.Screen name="Interests" component={InterestsScreen} />
-    </AppStack.Navigator>
-);
-
-function TabNavigator() {
+// Bottom Tab Navigator
+const BottomTabs = () => {
     return (
         <Tab.Navigator
             screenOptions={{
                 headerShown: false,
                 tabBarStyle: {
-                    backgroundColor: '#000',
+                    backgroundColor: Theme.colors.surface,
                     borderTopWidth: 1,
-                    borderTopColor: '#222',
-                    paddingBottom: 20,
-                    height: 70,
+                    borderTopColor: Theme.colors.gray[100],
+                    height: Platform.OS === 'ios' ? 88 : 68,
+                    paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+                    paddingTop: 8,
                 },
                 tabBarActiveTintColor: Theme.colors.cyan,
-                tabBarInactiveTintColor: Theme.colors.textDim,
+                tabBarInactiveTintColor: Theme.colors.gray[500],
                 tabBarLabelStyle: {
-                    fontSize: 10,
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase',
-                }
+                    fontSize: 12,
+                    fontWeight: '600',
+                },
             }}
         >
             <Tab.Screen
-                name="AURA"
-                component={DashboardScreen}
-                options={{ tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🏠</Text> }}
+                name="Home"
+                component={HomeScreen}
+                options={{
+                    tabBarIcon: ({ focused, color }) => (
+                        <TabIcon focused={focused} color={color} emoji="🏠" />
+                    ),
+                    tabBarLabel: 'Home',
+                }}
+            />
+            <Tab.Screen
+                name="Money"
+                component={FinanceScreen}
+                options={{
+                    tabBarIcon: ({ focused, color }) => (
+                        <TabIcon focused={focused} color={color} emoji="💰" />
+                    ),
+                    tabBarLabel: 'Money',
+                }}
             />
             <Tab.Screen
                 name="Focus"
                 component={FocusScreen}
-                options={{ tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🎯</Text> }}
-            />
-            <Tab.Screen
-                name="Health"
-                component={HealthScreen}
-                options={{ tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>⚡</Text> }}
-            />
-            <Tab.Screen
-                name="Finance"
-                component={FinanceScreen}
-                options={{ tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>💰</Text> }}
+                options={{
+                    tabBarIcon: ({ focused, color }) => (
+                        <TabIcon focused={focused} color={color} emoji="🎯" />
+                    ),
+                    tabBarLabel: 'Focus',
+                }}
             />
             <Tab.Screen
                 name="Family"
                 component={FamilyScreen}
-                options={{ tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>👨‍👩‍👧‍👦</Text> }}
+                options={{
+                    tabBarIcon: ({ focused, color }) => (
+                        <TabIcon focused={focused} color={color} emoji="👥" />
+                    ),
+                    tabBarLabel: 'Family',
+                }}
             />
             <Tab.Screen
-                name="History"
-                component={HistoryScreen}
-                options={{ tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🧠</Text> }}
+                name="More"
+                component={MoreScreen}
+                options={{
+                    tabBarIcon: ({ focused, color }) => (
+                        <TabIcon focused={focused} color={color} emoji="⚙️" />
+                    ),
+                    tabBarLabel: 'More',
+                }}
             />
         </Tab.Navigator>
     );
-}
+};
 
-export const AppNavigator = MainStack;
+// Main App Navigator with Stack
+export const AppNavigator = () => {
+    return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="MainTabs" component={BottomTabs} />
+            <Stack.Screen name="Tasks" component={TasksScreen} />
+            <Stack.Screen name="Health" component={HealthScreen} />
+            <Stack.Screen name="Food" component={FoodScreen} />
+            <Stack.Screen name="Interests" component={InterestsScreen} />
+            <Stack.Screen name="Mind" component={MindScreen} />
+        </Stack.Navigator>
+    );
+};

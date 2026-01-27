@@ -10,8 +10,19 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 import { Theme } from '../../styles/theme';
 import { useLanguage } from '../../context/LanguageContext';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withRepeat,
+    withTiming,
+    withSequence,
+    withSpring,
+    interpolate
+} from 'react-native-reanimated';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function FocusScreen() {
     const { t } = useLanguage();
@@ -19,22 +30,41 @@ export default function FocusScreen() {
     const [isActive, setIsActive] = useState(false);
     const [totalFocusTime, setTotalFocusTime] = useState(0);
 
+    const glowValue = useSharedValue(1);
+    const overlayOpacity = useSharedValue(0);
+
     useEffect(() => {
         let interval = null;
         if (isActive && seconds > 0) {
+            glowValue.value = withRepeat(
+                withSequence(withTiming(1.2, { duration: 2000 }), withTiming(1, { duration: 2000 })),
+                -1,
+                true
+            );
+            overlayOpacity.value = withSpring(1);
+
             interval = setInterval(() => {
                 setSeconds((prev) => prev - 1);
             }, 1000);
-        } else if (seconds === 0) {
-            setIsActive(false);
-            setTotalFocusTime(prev => prev + 25);
-            // Alert or sound here
+        } else {
+            glowValue.value = withTiming(1);
+            overlayOpacity.value = withSpring(0);
+            if (seconds === 0) {
+                setIsActive(false);
+                setTotalFocusTime(prev => prev + 25);
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            }
         }
         return () => clearInterval(interval);
     }, [isActive, seconds]);
 
-    const toggleTimer = () => setIsActive(!isActive);
+    const toggleTimer = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        setIsActive(!isActive);
+    };
+
     const resetTimer = () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
         setIsActive(false);
         setSeconds(25 * 60);
     };
@@ -45,25 +75,46 @@ export default function FocusScreen() {
         return `${mins.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
+    const animatedGlowStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: glowValue.value }],
+        opacity: interpolate(glowValue.value, [1, 1.2], [0.3, 0.6]),
+    }));
+
+    const animatedOverlayStyle = useAnimatedStyle(() => ({
+        opacity: overlayOpacity.value,
+        pointerEvents: isActive ? 'auto' : 'none',
+    }));
+
     const radius = 120;
     const circumference = 2 * Math.PI * radius;
     const progress = (seconds / (25 * 60)) * circumference;
 
     return (
         <SafeAreaView style={styles.container}>
+            {isActive && (
+                <Animated.View style={[styles.deepWorkOverlay, animatedOverlayStyle]}>
+                    <LinearGradient
+                        colors={['rgba(0,0,0,0.9)', 'rgba(88, 28, 135, 0.4)', 'rgba(0,0,0,0.9)']}
+                        style={StyleSheet.absoluteFill}
+                    />
+                    <Text style={styles.deepWorkText}>DIQQAT REJIMI FAOL</Text>
+                </Animated.View>
+            )}
+
             <View style={styles.header}>
                 <Text style={styles.title}>{t.focus.title}</Text>
                 <Text style={styles.subtitle}>{t.focus.subtitle}</Text>
             </View>
 
             <View style={styles.timerContainer}>
+                <Animated.View style={[styles.pulseCircle, animatedGlowStyle]} />
                 <Svg width={300} height={300} viewBox="0 0 300 300">
                     <Circle
                         cx="150"
                         cy="150"
                         r={radius}
                         stroke="rgba(192, 132, 252, 0.1)"
-                        strokeWidth="10"
+                        strokeWidth="8"
                         fill="none"
                     />
                     <Circle
@@ -81,16 +132,18 @@ export default function FocusScreen() {
                 </Svg>
                 <View style={styles.timerOverlay}>
                     <Text style={styles.timeText}>{formatTime(seconds)}</Text>
-                    <Text style={styles.statusLabel}>{isActive ? 'DEEP FOCUS' : 'READY'}</Text>
+                    <Text style={styles.statusLabel}>{isActive ? 'FLOW STATE' : 'READY'}</Text>
                 </View>
             </View>
 
             <View style={styles.controls}>
                 <TouchableOpacity
-                    style={[styles.mainButton, { backgroundColor: isActive ? Theme.colors.red : Theme.colors.purple }]}
+                    style={[styles.mainButton, { backgroundColor: isActive ? 'rgba(239, 68, 68, 0.2)' : Theme.colors.purple }]}
                     onPress={toggleTimer}
                 >
-                    <Text style={styles.buttonText}>{isActive ? t.focus.stop : t.focus.start}</Text>
+                    <Text style={[styles.buttonText, { color: isActive ? Theme.colors.red : '#000' }]}>
+                        {isActive ? t.focus.stop : t.focus.start}
+                    </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.resetButton} onPress={resetTimer}>
@@ -108,12 +161,6 @@ export default function FocusScreen() {
                     <Text style={styles.statLabel}>{t.focus.streak}</Text>
                     <Text style={styles.statValue}>5 KUN</Text>
                 </View>
-            </View>
-
-            <View style={styles.mindQuote}>
-                <Text style={styles.quoteText}>
-                    &quot;Diqqatni bir joyga jamlash — intellektual salohiyatning kalitidir.&quot;
-                </Text>
             </View>
         </SafeAreaView>
     );
@@ -232,5 +279,27 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         lineHeight: 20,
         fontSize: 14,
+    },
+    deepWorkOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        zIndex: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    deepWorkText: {
+        color: '#FFF',
+        fontSize: 10,
+        fontWeight: '900',
+        letterSpacing: 8,
+        opacity: 0.5,
+        marginTop: height * 0.4,
+    },
+    pulseCircle: {
+        position: 'absolute',
+        width: 240,
+        height: 240,
+        borderRadius: 120,
+        backgroundColor: Theme.colors.purple,
+        zIndex: -1,
     }
 });

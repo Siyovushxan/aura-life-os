@@ -1,4 +1,8 @@
-import { Pedometer } from 'expo-sensors';
+import { Platform } from 'react-native';
+let Pedometer;
+if (Platform.OS !== 'web') {
+    Pedometer = require('expo-sensors').Pedometer;
+}
 import { db } from '../firebaseConfig';
 import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 
@@ -13,6 +17,10 @@ export const startStepTracking = (userId, onUpdate) => {
     let subscription;
 
     const checkAvailability = async () => {
+        if (Platform.OS === 'web' || !Pedometer) {
+            console.log("Step tracking disabled on web");
+            return;
+        }
         const isAvailable = await Pedometer.isAvailableAsync();
         if (isAvailable) {
             subscription = Pedometer.watchStepCount(result => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../styles/theme';
 
@@ -89,11 +89,18 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         justifyContent: 'space-between',
         // Layered Shadow for depth
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
-        elevation: 10,
+        ...Platform.select({
+            web: {
+                boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.3)',
+            },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 20,
+                elevation: 10,
+            }
+        }),
     },
     gradient: {
         ...StyleSheet.absoluteFillObject,

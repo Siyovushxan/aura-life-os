@@ -12,7 +12,9 @@ import {
 import { Theme } from '../../styles/theme';
 import { useLanguage } from '../../context/LanguageContext';
 import { auth, db } from '../../firebaseConfig';
-import { collection, query, where, getDocs, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
+import * as Haptics from 'expo-haptics';
 
 export default function TasksScreen({ navigation }) {
     const { t } = useLanguage();
@@ -74,65 +76,109 @@ export default function TasksScreen({ navigation }) {
     const pendingTasks = tasks.filter(t => t.status !== 'completed');
     const completedTasks = tasks.filter(t => t.status === 'completed');
 
+    const deleteTask = async (taskId) => {
+        try {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+            await deleteDoc(doc(db, `users/${user.uid}/tasks`, taskId));
+            setTasks(tasks.filter(t => t.id !== taskId));
+        } catch (error) {
+            console.error("Error deleting task:", error);
+        }
+    };
+
+    const renderRightActions = (taskId) => (
+        <TouchableOpacity
+            style={styles.deleteAction}
+            onPress={() => deleteTask(taskId)}
+        >
+            <Text style={styles.actionText}>KEYINGA</Text>
+        </TouchableOpacity>
+    );
+
+    const renderLeftActions = (task) => (
+        <TouchableOpacity
+            style={styles.completeAction}
+            onPress={() => toggleTask(task)}
+        >
+            <Text style={styles.actionText}>BAJARILDI</Text>
+        </TouchableOpacity>
+    );
+
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Text style={styles.backText}>{t.common.back}</Text>
-                </TouchableOpacity>
-                <Text style={styles.title}>{t.tasks.title}</Text>
-                <View style={{ width: 40 }} />
-            </View>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.container}>
+                <View style={styles.header}>
+                    {!navigation.canGoBack() ? null : (
+                        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                            <Text style={styles.backText}>{t.common.back}</Text>
+                        </TouchableOpacity>
+                    )}
+                    <Text style={styles.title}>{t.tasks.title}</Text>
+                    <View style={{ width: 40 }} />
+                </View>
 
-            <View style={styles.inputArea}>
-                <TextInput
-                    style={styles.input}
-                    placeholder={t.tasks.add}
-                    placeholderTextColor="rgba(255,255,255,0.3)"
-                    value={newTask}
-                    onChangeText={setNewTask}
-                />
-                <TouchableOpacity style={styles.addButton} onPress={addTask}>
-                    <Text style={styles.addButtonText}>+</Text>
-                </TouchableOpacity>
-            </View>
+                <View style={styles.inputArea}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder={t.tasks.add}
+                        placeholderTextColor="rgba(255,255,255,0.3)"
+                        value={newTask}
+                        onChangeText={setNewTask}
+                    />
+                    <TouchableOpacity style={styles.addButton} onPress={addTask}>
+                        <Text style={styles.addButtonText}>+</Text>
+                    </TouchableOpacity>
+                </View>
 
-            {loading ? (
-                <ActivityIndicator color={Theme.colors.cyan} style={{ marginTop: 40 }} />
-            ) : (
-                <ScrollView contentContainerStyle={styles.scrollContent}>
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>{t.tasks.pending} ({pendingTasks.length})</Text>
-                        {pendingTasks.map(task => (
-                            <TouchableOpacity
-                                key={task.id}
-                                style={styles.taskItem}
-                                onPress={() => toggleTask(task)}
-                            >
-                                <View style={styles.checkbox} />
-                                <Text style={styles.taskText}>{task.title}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                {loading ? (
+                    <ActivityIndicator color={Theme.colors.cyan} style={{ marginTop: 40 }} />
+                ) : (
+                    <ScrollView contentContainerStyle={styles.scrollContent}>
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>{t.tasks.pending} ({pendingTasks.length})</Text>
+                            {pendingTasks.map(task => (
+                                <Swipeable
+                                    key={task.id}
+                                    renderRightActions={() => renderRightActions(task.id)}
+                                    renderLeftActions={() => renderLeftActions(task)}
+                                    onSwipeableWillOpen={(direction) => {
+                                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                                    }}
+                                >
+                                    <TouchableOpacity
+                                        style={styles.taskItem}
+                                        onPress={() => toggleTask(task)}
+                                    >
+                                        <View style={styles.checkbox} />
+                                        <Text style={styles.taskText}>{task.title}</Text>
+                                    </TouchableOpacity>
+                                </Swipeable>
+                            ))}
+                        </View>
 
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>{t.tasks.completed} ({completedTasks.length})</Text>
-                        {completedTasks.map(task => (
-                            <TouchableOpacity
-                                key={task.id}
-                                style={[styles.taskItem, styles.taskItemCompleted]}
-                                onPress={() => toggleTask(task)}
-                            >
-                                <View style={[styles.checkbox, styles.checkboxChecked]}>
-                                    <Text style={styles.checkIcon}>✓</Text>
-                                </View>
-                                <Text style={[styles.taskText, styles.taskTextCompleted]}>{task.title}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </ScrollView>
-            )}
-        </SafeAreaView>
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>{t.tasks.completed} ({completedTasks.length})</Text>
+                            {completedTasks.map(task => (
+                                <Swipeable
+                                    key={task.id}
+                                    renderRightActions={() => renderRightActions(task.id)}
+                                >
+                                    <TouchableOpacity
+                                        style={[styles.taskItem, styles.taskItemCompleted]}
+                                        onPress={() => toggleTask(task)}
+                                    >
+                                        <View style={[styles.checkbox, styles.checkboxChecked]}>
+                                            <Text style={styles.checkIcon}>✓</Text>
+                                        </View>
+                                        <Text style={[styles.taskText, styles.taskTextCompleted]}>{task.title}</Text>
+                                    </TouchableOpacity>
+                                </Swipeable>
+                            ))}
+                        </View>
+                    </ScrollView>
+                )}
+            </SafeAreaView>
+        </GestureHandlerRootView>
     );
 }
 
@@ -204,10 +250,36 @@ const styles = StyleSheet.create({
     taskItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.03)',
-        padding: 16,
-        borderRadius: 12,
-        marginBottom: 8,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        padding: 20,
+        borderRadius: 20,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)',
+    },
+    deleteAction: {
+        backgroundColor: Theme.colors.red,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 100,
+        borderRadius: 20,
+        marginBottom: 12,
+        marginLeft: 8,
+    },
+    completeAction: {
+        backgroundColor: Theme.colors.green,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 100,
+        borderRadius: 20,
+        marginBottom: 12,
+        marginRight: 10,
+    },
+    actionText: {
+        color: '#000',
+        fontWeight: '900',
+        fontSize: 10,
+        letterSpacing: 1,
     },
     taskItemCompleted: {
         opacity: 0.5,

@@ -12,6 +12,8 @@ import { Theme } from '../../styles/theme';
 import { useLanguage } from '../../context/LanguageContext';
 import { auth } from '../../firebaseConfig';
 import { getRecentLogs } from '../../services/dailyService';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 
 export default function HistoryScreen() {
     const { t } = useLanguage();
@@ -50,18 +52,31 @@ export default function HistoryScreen() {
     };
 
     const onRefresh = () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         setRefreshing(true);
         fetchHistory();
     };
 
-    const renderItem = ({ item }) => (
-        <View style={styles.historyCard}>
-            <View style={[styles.moduleBadge, { backgroundColor: item.color + '20', borderColor: item.color + '40' }]}>
-                <Text style={[styles.moduleText, { color: item.color }]}>{item.module.toUpperCase()}</Text>
+    const renderItem = ({ item, index }) => (
+        <View style={styles.timelineItem}>
+            <View style={styles.timelineSide}>
+                <View style={[styles.timelineDot, { backgroundColor: item.color }]} />
+                <View style={[styles.timelineLine, { height: '100%' }]} />
             </View>
-            <Text style={styles.cardTitle}>{item.title}</Text>
-            <Text style={styles.cardInsight}>{item.insight}</Text>
-            <Text style={styles.cardTimestamp}>{item.timestamp}</Text>
+            <View style={styles.historyCard}>
+                <LinearGradient
+                    colors={['rgba(255,255,255,0.02)', 'transparent']}
+                    style={styles.cardGradient}
+                />
+                <View style={styles.cardHeader}>
+                    <View style={[styles.moduleBadge, { borderColor: item.color + '40' }]}>
+                        <Text style={[styles.moduleText, { color: item.color }]}>{item.module.toUpperCase()}</Text>
+                    </View>
+                    <Text style={styles.cardTimestamp}>{item.timestamp}</Text>
+                </View>
+                <Text style={styles.cardTitle}>{item.title}</Text>
+                <Text style={styles.cardInsight}>{item.insight}</Text>
+            </View>
         </View>
     );
 
@@ -122,43 +137,76 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         paddingBottom: 40,
     },
+    timelineItem: {
+        flexDirection: 'row',
+    },
+    timelineSide: {
+        width: 20,
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    timelineDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        zIndex: 1,
+        marginTop: 24,
+    },
+    timelineLine: {
+        width: 1,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        position: 'absolute',
+        top: 34,
+        bottom: 0,
+    },
     historyCard: {
-        backgroundColor: Theme.colors.card,
-        borderRadius: 20,
-        padding: 20,
-        marginBottom: 16,
+        flex: 1,
+        backgroundColor: 'rgba(255,255,255,0.02)',
+        borderRadius: 24,
+        padding: 24,
+        marginBottom: 20,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
+        borderColor: 'rgba(255,255,255,0.06)',
+        overflow: 'hidden',
+    },
+    cardGradient: {
+        ...StyleSheet.absoluteFillObject,
+    },
+    cardHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
     },
     moduleBadge: {
-        alignSelf: 'flex-start',
         paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 8,
+        borderRadius: 6,
         borderWidth: 1,
-        marginBottom: 12,
+        backgroundColor: 'rgba(255,255,255,0.02)',
     },
     moduleText: {
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: '900',
-        letterSpacing: 1,
-    },
-    cardTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#FFF',
-        marginBottom: 8,
-    },
-    cardInsight: {
-        fontSize: 14,
-        color: Theme.colors.textSecondary,
-        lineHeight: 20,
-        marginBottom: 12,
+        letterSpacing: 1.5,
     },
     cardTimestamp: {
         fontSize: 10,
         color: Theme.colors.textDim,
         fontWeight: 'bold',
+    },
+    cardTitle: {
+        fontSize: 18,
+        fontWeight: '900',
+        color: '#FFF',
+        marginBottom: 12,
+        letterSpacing: 0.5,
+    },
+    cardInsight: {
+        fontSize: 14,
+        color: Theme.colors.textSecondary,
+        lineHeight: 22,
+        opacity: 0.8,
     },
     emptyContainer: {
         alignItems: 'center',
@@ -167,5 +215,6 @@ const styles = StyleSheet.create({
     emptyText: {
         color: Theme.colors.textDim,
         fontSize: 14,
+        letterSpacing: 1,
     }
 });

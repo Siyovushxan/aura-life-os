@@ -36,6 +36,8 @@ UI/UX and business strategy (Uzbek):
 | Document | Description |
 |----------|-------------|
 | [**UI/UX Konseptsiya**](AURA%20-%20UIUX%20Konseptsiya%20va%20Dizayn%20Tizimi.md) | Design system and principles |
+| [**Web Design System**](AURA_WEB_DESIGN_SYSTEM.md) | Detailed Landing & Dashboard Design (Production) |
+| [**Mobile Design System**](AURA_MOBILE_DESIGN_SYSTEM.md) | Complete Mobile App Design (Feature Parity) |
 | [**Foydalanuvchi Portreti**](AURA%20-%20Foydalanuvchi%20Portreti%20va%20Yo'l%20Xaritasi.md) | User personas and journey |
 | [**Strategik Tahlil**](AURA%20-%20Strategik%20Bozor%20Tahlili%20va%20SWOT%20Hisoboti.md) | Market analysis and SWOT |
 | [**Sotuv Sahifasi**](AURA%20-%20Hayot%20Tizimi%20Loyihasining%20Sotuv%20Sahifasi%20Tuzilmasi.md) | Landing page structure |
@@ -47,6 +49,7 @@ UI/UX and business strategy (Uzbek):
 ## 🗂 Document Categories
 
 ### 1. Product & Planning (5 docs)
+
 - PRD v2.1 (Master plan)
 - ROADMAP (Timeline)
 - Implementation Status (Progress tracking)
@@ -54,15 +57,18 @@ UI/UX and business strategy (Uzbek):
 - User Personas (Foydalanuvchi Portreti)
 
 ### 2. Technical (3 docs)
+
 - API Documentation (Service reference)
 - Technical Architecture (System design)
 - Deployment Guide (Production setup)
 
 ### 3. Design & UX (2 docs)
+
 - UI/UX Konseptsiya (Design system)
 - Landing Page Structure (Sotuv Sahifasi)
 
 ### 4. Strategy & Business (3 docs)
+
 - Market Analysis (Strategik Tahlil)
 - Project Context (Loyiha Miyasi)
 - Development Strategy (Rivojlantirish)
@@ -76,6 +82,7 @@ UI/UX and business strategy (Uzbek):
 ### For New Developers
 
 **Start Here:**
+
 1. [README.md](../README.md) - Project overview (in root)
 2. [PRD v2.1](AURA%20-%20PRD.md) - Understand the vision
 3. [Technical Architecture](Technical_Architecture.md) - Learn the stack
@@ -85,6 +92,7 @@ UI/UX and business strategy (Uzbek):
 ### For Product Managers
 
 **Start Here:**
+
 1. [PRD v2.1](AURA%20-%20PRD.md) - Full requirements
 2. [Implementation Status](Implementation_Status.md) - Current progress
 3. [ROADMAP](ROADMAP.md) - Timeline and milestones
@@ -93,13 +101,17 @@ UI/UX and business strategy (Uzbek):
 ### For Designers
 
 **Start Here:**
-1. [UI/UX Konseptsiya](AURA%20-%20UIUX%20Konseptsiya%20va%20Dizayn%20Tizimi.md) - Design system
-2. [PRD v2.1](AURA%20-%20PRD.md) - Feature requirements
-3. [Landing Page Structure](AURA%20-%20Hayot%20Tizimi%20Loyihasining%20Sotuv%20Sahifasi%20Tuzilmasi.md) - Marketing
+
+1. [Web Design System](AURA_WEB_DESIGN_SYSTEM.md) - Production Landing & Dashboard
+2. [Mobile Design System](AURA_MOBILE_DESIGN_SYSTEM.md) - Complete Mobile App Design
+3. [UI/UX Konseptsiya](AURA%20-%20UIUX%20Konseptsiya%20va%20Dizayn%20Tizimi.md) - Overall design philosophy
+4. [PRD v2.1](AURA%20-%20PRD.md) - Feature requirements
+5. [Landing Page Structure](AURA%20-%20Hayot%20Tizimi%20Loyihasining%20Sotuv%20Sahifasi%20Tuzilmasi.md) - Marketing
 
 ### For DevOps/Deployment
 
 **Start Here:**
+
 1. [Deployment Guide](Deployment_Guide.md) - Complete setup
 2. [Technical Architecture](Technical_Architecture.md) - Infrastructure
 3. [API Documentation](API_Documentation.md) - Service dependencies
@@ -111,7 +123,7 @@ UI/UX and business strategy (Uzbek):
 - **Total Documents:** 13
 - **Total Words:** ~40,000+
 - **Languages:** English (technical), Uzbek (strategic)
-- **Last Major Update:** 2026-01-16 (v2.2)
+- **Last Major Update:** 2026-01-27 (v2.7 - Web Production Ready)
 - **Completion Status:** ✅ 100%
 
 ---
@@ -151,12 +163,14 @@ Found an error or want to improve documentation?
 ## 🔗 External Resources
 
 ### Project Files (Root Directory)
+
 - [README.md](../README.md) - Main project README
 - [LICENSE](../LICENSE) - Proprietary license
 - [CONTRIBUTING.md](../CONTRIBUTING.md) - Contribution guidelines
 - [.gitignore](../.gitignore) - Git ignore rules
 
 ### Code Documentation
+
 - [Web Source Code](../web/src/) - TypeScript/React code
 - [Firebase Config](../web/src/firebaseConfig.ts) - Firebase setup
 - [Service Layer](../web/src/services/) - API services
@@ -186,7 +200,7 @@ Found an error or want to improve documentation?
 ---
 
 **Documentation maintained by:** AURA Development Team  
-**Last Updated:** 2026-01-16
-**Version:** 2.2
+**Last Updated:** 2026-01-27  
+**Version:** 2.7 (Web Production Ready)
 
 *For the latest updates, always refer to the main branch on GitHub.*

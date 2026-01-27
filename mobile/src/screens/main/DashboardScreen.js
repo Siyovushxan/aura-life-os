@@ -13,6 +13,7 @@ import { Theme } from '../../styles/theme';
 import { BentoCard } from '../../components/BentoCard';
 import { LinearGradient } from 'expo-linear-gradient';
 import VoiceButton from '../../components/VoiceButton';
+import AuraSphere from '../../components/AuraSphere';
 import ButterflyEffect from '../../components/ButterflyEffect';
 import { auth, db } from '../../firebaseConfig';
 import { signOut } from 'firebase/auth';
@@ -21,6 +22,8 @@ import { useLanguage } from '../../context/LanguageContext';
 import { callBackend } from '../../services/groqService';
 import { createOrUpdateDailyLog, getLocalTodayStr } from '../../services/dailyService';
 import { collection, query, where, getDocs, limit, doc, onSnapshot } from 'firebase/firestore';
+import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 export default function DashboardScreen({ navigation }) {
     const { t, language, changeLanguage } = useLanguage();
@@ -157,181 +160,221 @@ export default function DashboardScreen({ navigation }) {
         }
     };
 
+    const translateY = useSharedValue(0);
+
+    const pullDownGesture = Gesture.Pan()
+        .onUpdate((event) => {
+            if (event.translationY > 0) {
+                translateY.value = event.translationY;
+            }
+        })
+        .onEnd((event) => {
+            if (event.translationY > 100) {
+                // Trigger Voice AI / Analysis
+                fetchAITahlil();
+            }
+            translateY.value = withSpring(0);
+        });
+
+    const animatedContentStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: translateY.value }],
+    }));
+
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.scrollContent}
-            >
-                <View style={styles.header}>
-                    <View>
-                        <View style={styles.brandContainer}>
-                            <View style={styles.brandDot} />
-                            <Text style={styles.brandText}>{t.nav.aura}</Text>
-                        </View>
-                        <Text style={styles.welcomeText}>
-                            {t.dashboard.welcome}, {user?.displayName || (user?.email?.split('@')[0]) || 'User'}
-                        </Text>
-                    </View>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.container}>
+                <GestureDetector gesture={pullDownGesture}>
+                    <Animated.ScrollView
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={[styles.scrollContent, animatedContentStyle]}
+                    >
+                        <View style={styles.header}>
+                            <View>
+                                <View style={styles.brandContainer}>
+                                    <View style={styles.brandDot} />
+                                    <Text style={styles.brandText}>{t.nav.aura}</Text>
+                                </View>
+                                <Text style={styles.welcomeText}>
+                                    {t.dashboard.welcome}, {user?.displayName || (user?.email?.split('@')[0]) || 'User'}
+                                </Text>
+                            </View>
 
-                    <View style={styles.headerActions}>
-                        <VoiceButton
-                            module="dashboard"
-                            onCommand={handleVoiceCommand}
-                            color={Theme.colors.cyan}
-                        />
-                        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-                            <Text style={styles.logoutEmoji}>🚪</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-
-                {/* Language Switcher */}
-                <View style={styles.langSwitcher}>
-                    {['uz', 'en', 'ru'].map(lang => (
-                        <TouchableOpacity
-                            key={lang}
-                            onPress={() => changeLanguage(lang)}
-                            style={[styles.langItem, language === lang && styles.langItemActive]}
-                        >
-                            <Text style={[styles.langText, language === lang && styles.langTextActive]}>
-                                {lang.toUpperCase()}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-
-                {/* Butterfly Effect Widget */}
-                {butterflyScore && (
-                    <ButterflyEffect
-                        score={butterflyScore.score}
-                        correlations={correlations}
-                        onPressCorrelation={(c) => {
-                            const target = c.modules[1];
-                            if (target === 'Health') navigation.navigate('Health');
-                            else if (target === 'Finance') navigation.navigate('Finance');
-                            else if (target === 'Tasks') navigation.navigate('Tasks');
-                        }}
-                    />
-                )}
-
-                {/* AI Insight Card (Enhanced) */}
-                <TouchableOpacity
-                    style={styles.aiInsightCard}
-                    onPress={fetchAITahlil}
-                    disabled={isAnalyzing}
-                >
-                    <LinearGradient
-                        colors={[Theme.colors.purple + '20', Theme.colors.cyan + '10']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.aiGlow}
-                    />
-                    <View style={styles.aiCardHeader}>
-                        <View style={styles.aiTitleGroup}>
-                            <View style={[styles.pulseDot, isAnalyzing && styles.pulseActive]} />
-                            <Text style={styles.aiTitleText}>AURA NEURAL INSIGHT</Text>
-                        </View>
-                        {isAnalyzing && <ActivityIndicator size="small" color={Theme.colors.cyan} />}
-                    </View>
-
-                    {aiInsight && !isAnalyzing ? (
-                        <View style={styles.insightFrame}>
-                            <Text style={styles.insightText}>{aiInsight}</Text>
-                            <View style={styles.insightFooter}>
-                                <TouchableOpacity style={styles.actionPill} onPress={handleSaveInsight}>
-                                    <Text style={styles.actionPillText}>{t.common.save}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.iconPill} onPress={() => navigation.navigate('History')}>
-                                    <Text style={styles.iconPillEmoji}>🧠</Text>
+                            <View style={styles.headerActions}>
+                                <VoiceButton
+                                    module="dashboard"
+                                    onCommand={handleVoiceCommand}
+                                    color={Theme.colors.cyan}
+                                />
+                                <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+                                    <Text style={styles.logoutEmoji}>🚪</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    ) : (
-                        !isAnalyzing && <Text style={styles.aiPlaceholder}>{t.dashboard.status.toUpperCase()}</Text>
-                    )}
-                </TouchableOpacity>
 
-                {/* Dynamic Bento Grid (Real Data) */}
-                <View style={styles.grid}>
-                    {/* Wealth - Full Width Row */}
-                    <BentoCard
-                        title={t.dashboard.wealth}
-                        value={financeData?.totalBalance ? `${financeData.totalBalance.toLocaleString()} UZS` : '0 UZS'}
-                        subtitle={financeData?.monthlyIncome ? `+${financeData.monthlyIncome.toLocaleString()} BU OY` : '+0 BU OY'}
-                        emoji="💰"
-                        color={Theme.colors.gold}
-                        size="full"
-                        trend={financeData?.monthlyIncome > 0 ? { value: '+2.4%', up: true } : null}
-                        onPress={() => navigation.navigate('Finance')}
-                    />
+                        {/* Aura Sfera - The Soul centerpiece */}
+                        <View style={styles.sphereHero}>
+                            <AuraSphere
+                                score={butterflyScore.score}
+                                onPress={() => fetchAITahlil()}
+                            />
+                        </View>
 
-                    {/* Health & Tasks - Half Width Row */}
-                    <BentoCard
-                        title={t.dashboard.vitality}
-                        value={healthData?.bodyBattery?.current ? `${healthData.bodyBattery.current}%` : '0%'}
-                        subtitle={healthData?.bodyBattery?.status || 'INITIALIZING'}
-                        emoji="⚡"
-                        color={Theme.colors.green}
-                        onPress={() => navigation.navigate('Health')}
-                    />
-                    <BentoCard
-                        title={t.dashboard.tasks}
-                        value={taskCount.toString()}
-                        subtitle="PENDING"
-                        emoji="📝"
-                        color={Theme.colors.cyan}
-                        onPress={() => navigation.navigate('Tasks')}
-                    />
+                        {/* Language Switcher */}
+                        <View style={styles.langSwitcher}>
+                            {['uz', 'en', 'ru'].map(lang => (
+                                <TouchableOpacity
+                                    key={lang}
+                                    onPress={() => changeLanguage(lang)}
+                                    style={[styles.langItem, language === lang && styles.langItemActive]}
+                                >
+                                    <Text style={[styles.langText, language === lang && styles.langTextActive]}>
+                                        {lang.toUpperCase()}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
 
-                    {/* Nutrition - Full Width with different style */}
-                    <BentoCard
-                        title={t.dashboard.nutrition}
-                        value={healthData?.activity?.calories ? `${healthData.activity.calories} KCAL` : '0 KCAL'}
-                        subtitle="ENERGY CONSUMED"
-                        emoji="🥗"
-                        color={Theme.colors.green}
-                        size="full"
-                        onPress={() => navigation.navigate('FoodCamera')}
-                        style={styles.wideNutrition}
-                    />
+                        {/* Butterfly Effect Widget */}
+                        {butterflyScore && (
+                            <ButterflyEffect
+                                score={butterflyScore.score}
+                                correlations={correlations}
+                                onPressCorrelation={(c) => {
+                                    const target = c.modules[1];
+                                    if (target === 'Health') navigation.navigate('Health');
+                                    else if (target === 'Finance') navigation.navigate('Finance');
+                                    else if (target === 'Tasks') navigation.navigate('Tasks');
+                                }}
+                            />
+                        )}
 
-                    {/* Family & Goals */}
-                    <BentoCard
-                        title={t.dashboard.family}
-                        value="3 A'ZO"
-                        subtitle="ALL SECURE"
-                        emoji="👨‍👩‍👧‍👦"
-                        color={Theme.colors.cyan}
-                        onPress={() => navigation.navigate('Family')}
-                    />
-                    <BentoCard
-                        title="CHRONOS"
-                        value={currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        subtitle={currentTime.toLocaleDateString([], { weekday: 'short', day: 'numeric' }).toUpperCase()}
-                        emoji="⌚"
-                        color={Theme.colors.gold}
-                        onPress={() => { }}
-                    />
+                        {/* AI Insight Card (Enhanced) */}
+                        <TouchableOpacity
+                            style={styles.aiInsightCard}
+                            onPress={fetchAITahlil}
+                            disabled={isAnalyzing}
+                        >
+                            <LinearGradient
+                                colors={[Theme.colors.purple + '20', Theme.colors.cyan + '10']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                                style={styles.aiGlow}
+                            />
+                            <View style={styles.aiCardHeader}>
+                                <View style={styles.aiTitleGroup}>
+                                    <View style={[styles.pulseDot, isAnalyzing && styles.pulseActive]} />
+                                    <Text style={styles.aiTitleText}>AURA NEURAL INSIGHT</Text>
+                                </View>
+                                {isAnalyzing && <ActivityIndicator size="small" color={Theme.colors.cyan} />}
+                            </View>
 
-                    {/* Secondary Metrics */}
-                    <BentoCard
-                        title="STRESS"
-                        value={healthData?.vitals?.stress ? `${healthData.vitals.stress}%` : '22%'}
-                        subtitle="NEURAL LOAD"
-                        emoji="🧠"
-                        color={Theme.colors.purple}
-                    />
-                    <BentoCard
-                        title="HYDRATION"
-                        value={healthData?.hydration?.current ? `${healthData.hydration.current} ML` : '0 ML'}
-                        subtitle="GOAL: 2.5L"
-                        emoji="💧"
-                        color={Theme.colors.cyan}
-                    />
-                </View>
-            </ScrollView>
-        </SafeAreaView>
+                            {aiInsight && !isAnalyzing ? (
+                                <View style={styles.insightFrame}>
+                                    <Text style={styles.insightText}>{aiInsight}</Text>
+                                    <View style={styles.insightFooter}>
+                                        <TouchableOpacity style={styles.actionPill} onPress={handleSaveInsight}>
+                                            <Text style={styles.actionPillText}>{t.common.save}</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={styles.iconPill} onPress={() => navigation.navigate('History')}>
+                                            <Text style={styles.iconPillEmoji}>🧠</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            ) : (
+                                !isAnalyzing && <Text style={styles.aiPlaceholder}>{t.dashboard.status.toUpperCase()}</Text>
+                            )}
+                        </TouchableOpacity>
+
+                        {/* Dynamic Bento Grid (Real Data) */}
+                        <View style={styles.grid}>
+                            {/* Wealth - Full Width Row */}
+                            <BentoCard
+                                title={t.dashboard.wealth}
+                                value={financeData?.totalBalance ? `${financeData.totalBalance.toLocaleString()} UZS` : '0 UZS'}
+                                subtitle={financeData?.monthlyIncome ? `+${financeData.monthlyIncome.toLocaleString()} BU OY` : '+0 BU OY'}
+                                emoji="💰"
+                                color={Theme.colors.gold}
+                                size="full"
+                                trend={financeData?.monthlyIncome > 0 ? { value: '+2.4%', up: true } : null}
+                                onPress={() => navigation.navigate('Finance')}
+                            />
+
+                            {/* Health & Tasks - Half Width Row */}
+                            <BentoCard
+                                title={t.dashboard.vitality}
+                                value={healthData?.bodyBattery?.current ? `${healthData.bodyBattery.current}%` : '0%'}
+                                subtitle={healthData?.bodyBattery?.status || 'INITIALIZING'}
+                                emoji="⚡"
+                                color={Theme.colors.green}
+                                onPress={() => navigation.navigate('Health')}
+                            />
+                            <BentoCard
+                                title={t.dashboard.tasks}
+                                value={taskCount.toString()}
+                                subtitle="PENDING"
+                                emoji="📝"
+                                color={Theme.colors.cyan}
+                                onPress={() => navigation.navigate('Tasks')}
+                            />
+
+                            {/* Nutrition - Full Width with different style */}
+                            <BentoCard
+                                title={t.dashboard.nutrition}
+                                value={healthData?.activity?.calories ? `${healthData.activity.calories} KCAL` : '0 KCAL'}
+                                subtitle="ENERGY CONSUMED"
+                                emoji="🥗"
+                                color={Theme.colors.green}
+                                size="full"
+                                onPress={() => navigation.navigate('FoodCamera')}
+                                style={styles.wideNutrition}
+                            />
+
+                            {/* Family & Goals */}
+                            <BentoCard
+                                title={t.dashboard.family}
+                                value="3 A'ZO"
+                                subtitle="ALL SECURE"
+                                emoji="👨‍👩‍👧‍👦"
+                                color={Theme.colors.cyan}
+                                onPress={() => navigation.navigate('Family')}
+                            />
+                            <BentoCard
+                                title="CHRONOS"
+                                value={currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                subtitle={currentTime.toLocaleDateString([], { weekday: 'short', day: 'numeric' }).toUpperCase()}
+                                emoji="⌚"
+                                color={Theme.colors.gold}
+                                onPress={() => { }}
+                            />
+
+                            {/* Secondary Metrics */}
+                            <BentoCard
+                                title="STRESS"
+                                value={healthData?.vitals?.stress ? `${healthData.vitals.stress}%` : '22%'}
+                                subtitle="NEURAL LOAD"
+                                emoji="🧠"
+                                color={Theme.colors.purple}
+                            />
+                            <BentoCard
+                                title="HYDRATION"
+                                value={healthData?.hydration?.current ? `${healthData.hydration.current} ML` : '0 ML'}
+                                subtitle="GOAL: 2.5L"
+                                emoji="💧"
+                                color={Theme.colors.cyan}
+                            />
+                            <BentoCard
+                                title="DEEP FOCUS"
+                                value="FLOW"
+                                subtitle="START SESSION"
+                                emoji="🧘"
+                                color={Theme.colors.purple}
+                                onPress={() => navigation.navigate('Focus')}
+                            />
+                        </View>
+                    </Animated.ScrollView>
+                </GestureDetector>
+            </SafeAreaView>
+        </GestureHandlerRootView>
     );
 }
 
@@ -343,6 +386,11 @@ const styles = StyleSheet.create({
     scrollContent: {
         paddingHorizontal: 24,
         paddingBottom: 40,
+    },
+    sphereHero: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10,
     },
     header: {
         flexDirection: 'row',

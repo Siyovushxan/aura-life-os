@@ -5,9 +5,14 @@ import {
     View,
     TouchableOpacity,
     ActivityIndicator,
-    Alert
+    Alert,
+    Platform
 } from 'react-native';
-import { Audio } from 'expo-audio';
+// Only import expo-audio on native platforms, as it's not supported on web
+let Audio;
+if (Platform.OS !== 'web') {
+    Audio = require('expo-audio').Audio;
+}
 import * as FileSystem from 'expo-file-system';
 import { Theme } from '../styles/theme';
 import { transcribeAudio, parseCommand } from '../services/groqService';
@@ -26,6 +31,11 @@ export default function VoiceButton({ module = 'home', onCommand, color = Theme.
     }, [recording]);
 
     async function startRecording() {
+        if (Platform.OS === 'web') {
+            Alert.alert("Web version", "Ovoz yozish hozircha faqat mobil ilovada ishlaydi.");
+            return;
+        }
+
         try {
             const permission = await Audio.requestPermissionsAsync();
             if (permission.status !== 'granted') {

@@ -31,6 +31,17 @@ const createAiEndpoint = (handler) => onRequest({
   memory: '512MiB',
   invoker: 'public' // We manually check auth in the handler
 }, async (req, res) => {
+  // Set CORS headers explicitly
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.set('Access-Control-Max-Age', '3600');
+
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+
   try {
     // SECURITY: Verify Firebase Auth ID Token
     const authHeader = req.headers.authorization;
@@ -74,10 +85,12 @@ export const getGeneticsAnalysis = createAiEndpoint(analyzeGenetics);
 export const getFamilyInsight = createAiEndpoint(analyzeFamily);
 export const getFoodLogInsight = createAiEndpoint(analyzeFoodLog);
 import { transcribeAudio } from './ai/aiAnalysis.js';
+import { generateSpeech as generateOpenAISpeech } from './ai/speechService.js';
 export const getTranscription = createAiEndpoint(transcribeAudio);
+export const getSpeech = createAiEndpoint(generateOpenAISpeech);
 
-import { unlockReward } from './ai/gamification.js';
-export const smartParentingUnlock = createAiEndpoint(unlockReward);
+// import { unlockReward } from './ai/gamification.js';
+// export const smartParentingUnlock = createAiEndpoint(unlockReward);
 
 // Generic Text Analysis for Onboarding etc.
 import { analyzeWithGroq } from './ai/groqClient.js';
@@ -95,6 +108,17 @@ export const getFoodAnalysis = onRequest({
   memory: '1GiB',
   invoker: 'public'
 }, async (req, res) => {
+  // Set CORS headers explicitly
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.set('Access-Control-Max-Age', '3600');
+
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

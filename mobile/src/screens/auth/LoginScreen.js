@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
 import {
     StyleSheet,
     Text,
@@ -14,10 +16,35 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../../styles/theme';
 import { auth } from '../../firebaseConfig';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithCredential } from 'firebase/auth';
 import { useLanguage } from '../../context/LanguageContext';
 
+
+WebBrowser.maybeCompleteAuthSession();
+
 export default function LoginScreen({ navigation }) {
+    const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+        // O'ZINGIZNING CLIENT ID LARINGIZNI KUYING
+        // Firebase Console -> Project Settings -> App Check (yoki Google Cloud credentials)
+        androidClientId: 'YOUR_ANDROID_CLIENT_ID',
+        iosClientId: 'YOUR_IOS_CLIENT_ID',
+        webClientId: '804734494584-placeholder.apps.googleusercontent.com',
+    });
+
+    useEffect(() => {
+        if (response?.type === 'success') {
+            const { id_token } = response.params;
+            const credential = GoogleAuthProvider.credential(id_token);
+            signInWithCredential(auth, credential)
+                .then(() => {
+                    // Navigation handled by App.js listener
+                })
+                .catch((error) => {
+                    Alert.alert("Google Error", error.message);
+                });
+        }
+    }, [response]);
+
     const { t } = useLanguage();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -39,7 +66,15 @@ export default function LoginScreen({ navigation }) {
         }
     };
 
+
     const handleGoogle = async () => {
+        if (Platform.OS !== 'web') {
+            // Mobile (Native) Logic
+            promptAsync();
+            return;
+        }
+
+
         setLoading(true);
         console.log("Starting Google Login via Popup...");
         try {
