@@ -29,8 +29,11 @@ service cloud.firestore {
 
     // Family Groups (Root Collection) - Restricted to members
     match /family_groups/{groupId} {
-      // Allow reading if you are a member of the group
-      allow read: if isAuthenticated() && request.auth.uid in resource.data.members;
+      // Allow reading if you are a member of the group OR the owner
+      allow read: if isAuthenticated() && (
+        request.auth.uid in resource.data.members ||
+        resource.data.ownerId == request.auth.uid
+      );
       
       // Allow creation if you set yourself as owner AND you are in the members list
       allow create: if isAuthenticated() && 

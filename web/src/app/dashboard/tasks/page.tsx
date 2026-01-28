@@ -225,8 +225,10 @@ export default function TasksDashboard() {
     }, [selectedDate]);
 
     // AI Insight State
-    const [aiInsight, setAiInsight] = useState<{ title: string, suggestion: string, priority?: string } | null>(null);
+    const [aiInsight, setAiInsight] = useState<any | null>(null);
     const [aiLoading, setAiLoading] = useState(false);
+    const [isAddingSuggestion, setIsAddingSuggestion] = useState(false);
+    const [suggestionAdded, setSuggestionAdded] = useState(false);
 
     // Confirmation Modal State
     const [confirmModal, setConfirmModal] = useState<{
@@ -287,10 +289,7 @@ export default function TasksDashboard() {
             const insight = await getScheduledInsight(user.uid, 'tasks', language, { tasks: allTasks }, { force: true });
 
             if (insight) {
-                setAiInsight({
-                    title: insight.title || "Kunning maqsadi",
-                    suggestion: insight.insight || "Bugungi kuningizni unumli o'tkazing."
-                });
+                setAiInsight(insight.data || insight);
             }
         } catch (err) {
             console.error("Tasks AI Error:", err);
@@ -466,9 +465,16 @@ export default function TasksDashboard() {
         };
 
         if (task.status !== 'done' && pendingSubtasks.length > 0) {
+            // Detailed message with titles to help user identify "invisible" subtasks
+            const subtaskTitles = pendingSubtasks
+                .slice(0, 3)
+                .map(s => `- ${s.title || "Nomsiz vazifa"}`)
+                .join('\n');
+            const moreCount = pendingSubtasks.length > 3 ? `(+${pendingSubtasks.length - 3} ta)` : '';
+
             triggerConfirm(
                 "Diqqat!",
-                `Ushbu vazifada hali ${pendingSubtasks.length} ta bajarilmagan kichik vazifalar bor. Baribir yakunlaysizmi?`,
+                `Ushbu vazifada hali ${pendingSubtasks.length} ta bajarilmagan kichik vazifalar bor:\n\n${subtaskTitles}\n${moreCount}\n\nBaribir yakunlaysizmi?`,
                 executeToggle,
                 'warning'
             );
@@ -527,7 +533,8 @@ export default function TasksDashboard() {
                 if (columnType === 'today') {
                     match = itemDate === selectedDate;
                 } else if (columnType === 'overdue') {
-                    match = itemDate < todayStr && itemDate !== '' && item.status !== 'done';
+                    // Update: Include DONE tasks in Overdue column too, as requested by user
+                    match = itemDate < todayStr && itemDate !== '';
                 } else if (columnType === 'future') {
                     match = itemDate > todayStr && itemDate !== selectedDate;
                 }
@@ -662,25 +669,48 @@ export default function TasksDashboard() {
 
     const handleAddAISuggestion = async () => {
         if (!user || !aiInsight || isArchived) return;
-        const today = getLocalTodayStr();
+        setIsAddingSuggestion(true);
+        try {
+            const today = getLocalTodayStr();
+            const effectiveInsight = aiInsight.data || aiInsight;
 
-        const taskPayload: Omit<Task, 'id'> = {
-            title: aiInsight.title,
-            description: aiInsight.suggestion, // Fix: Use suggestion as description
-            status: 'todo',
-            priority: (aiInsight.priority as Priority) || 'high',
-            startTime: '10:00',
-            endTime: '11:00',
-            category: 'AI Recommended',
-            date: today,
-            subtasks: [],
-            resources: [],
-            createdAt: Date.now()
-        };
-        await addTask(user.uid, taskPayload);
-        await dismissInsight(user.uid, 'tasks');
-        loadTasks();
-        setAiInsight(null); // Clear after adding
+            const subtasks: SubTask[] = (effectiveInsight.roadmap || []).map((step: string) => ({
+                id: Math.random().toString(36).substr(2, 9),
+                title: step,
+                completed: false
+            }));
+
+            const taskPayload: Omit<Task, 'id'> = {
+                title: effectiveInsight.title || aiInsight.title || "AI Planned Task",
+                description: effectiveInsight.optimization || effectiveInsight.suggestion || aiInsight.suggestion || "AI recommended action plan.",
+                status: 'todo',
+                priority: (effectiveInsight.priority as Priority) || 'high',
+                startTime: '10:00',
+                endTime: '11:00',
+                // Dynamic Category: Use insight category if available, otherwise default to 'Personal' or context-aware
+                category: effectiveInsight.category || aiInsight.category || 'Personal',
+                date: today,
+                subtasks: subtasks,
+                resources: [],
+                createdAt: Date.now()
+            };
+            await addTask(user.uid, taskPayload);
+            await dismissInsight(user.uid, 'tasks');
+
+            // Show success state
+            setIsAddingSuggestion(false);
+            setSuggestionAdded(true);
+            loadTasks();
+
+            // Delay clearing to show success message
+            setTimeout(() => {
+                setAiInsight(null);
+                setSuggestionAdded(false);
+            }, 2000);
+        } catch (error) {
+            console.error(error);
+            setIsAddingSuggestion(false);
+        }
     };
 
     const getPriorityColor = (p: string) => {
@@ -1082,11 +1112,36 @@ export default function TasksDashboard() {
                                 </span>
                             </div>
                             <div className={`space-y-4 min-h-[200px] p-4 rounded-[2.5rem] border-2 border-dashed transition-all duration-500 ${dragedTaskId ? 'bg-aura-red/5 border-aura-red/30 scale-[1.02] shadow-[0_0_50px_rgba(255,50,50,0.1)]' : 'border-white/5'}`}>
-                                {getDisplayTasks('overdue').map((task: Task) => (
-                                    <div key={task.id} className="animate-fade-in-up">
-                                        <TaskCard task={task} />
-                                    </div>
-                                ))}
+                                {(() => {
+                                    const tasks = getDisplayTasks('overdue');
+                                    const active = tasks.filter(t => t.status !== 'done');
+                                    const done = tasks.filter(t => t.status === 'done');
+
+                                    return (
+                                        <>
+                                            {active.map((task: Task) => (
+                                                <div key={task.id} className="animate-fade-in-up">
+                                                    <TaskCard task={task} />
+                                                </div>
+                                            ))}
+
+                                            {done.length > 0 && (
+                                                <>
+                                                    <div className="flex items-center gap-4 py-2 opacity-50">
+                                                        <div className="h-[1px] flex-1 bg-white/10"></div>
+                                                        <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Bajarilgan</span>
+                                                        <div className="h-[1px] flex-1 bg-white/10"></div>
+                                                    </div>
+                                                    {done.map((task: Task) => (
+                                                        <div key={task.id} className="animate-fade-in-up opacity-60 hover:opacity-100 transition-opacity">
+                                                            <TaskCard task={task} />
+                                                        </div>
+                                                    ))}
+                                                </>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                                 {getDisplayTasks('overdue').length === 0 && (
                                     <PremiumEmptyState
                                         title={t.tasks.sections.overdue}
@@ -1119,11 +1174,36 @@ export default function TasksDashboard() {
                                 </div>
                             </div>
                             <div className={`space-y-4 min-h-[400px] p-4 rounded-[2.5rem] transition-all duration-500 border-2 border-dashed ${dragedTaskId ? 'bg-aura-cyan/5 border-aura-cyan/30 scale-[1.02] shadow-[0_0_50px_rgba(0,240,255,0.1)]' : 'border-white/5'}`}>
-                                {getDisplayTasks('today').map((task: Task) => (
-                                    <div key={task.id} className="animate-fade-in-up">
-                                        <TaskCard task={task} />
-                                    </div>
-                                ))}
+                                {(() => {
+                                    const tasks = getDisplayTasks('today');
+                                    const active = tasks.filter(t => t.status !== 'done');
+                                    const done = tasks.filter(t => t.status === 'done');
+
+                                    return (
+                                        <>
+                                            {active.map((task: Task) => (
+                                                <div key={task.id} className="animate-fade-in-up">
+                                                    <TaskCard task={task} />
+                                                </div>
+                                            ))}
+
+                                            {done.length > 0 && (
+                                                <>
+                                                    <div className="flex items-center gap-4 py-2 opacity-50">
+                                                        <div className="h-[1px] flex-1 bg-white/10"></div>
+                                                        <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Bajarilgan</span>
+                                                        <div className="h-[1px] flex-1 bg-white/10"></div>
+                                                    </div>
+                                                    {done.map((task: Task) => (
+                                                        <div key={task.id} className="animate-fade-in-up opacity-60 hover:opacity-100 transition-opacity">
+                                                            <TaskCard task={task} />
+                                                        </div>
+                                                    ))}
+                                                </>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                                 {getDisplayTasks('today').length === 0 && (
                                     <PremiumEmptyState
                                         title={t.tasks.sections.today}
@@ -1159,11 +1239,36 @@ export default function TasksDashboard() {
                                 </span>
                             </div>
                             <div className={`space-y-4 min-h-[200px] p-4 rounded-[2.5rem] border-2 border-dashed transition-all duration-500 ${dragedTaskId ? 'bg-aura-purple/5 border-aura-purple/30 scale-[1.02] shadow-[0_0_50px_rgba(157,78,221,0.1)]' : 'border-white/5'}`}>
-                                {getDisplayTasks('future').map((task: Task) => (
-                                    <div key={task.id} className="animate-fade-in-up">
-                                        <TaskCard task={task} />
-                                    </div>
-                                ))}
+                                {(() => {
+                                    const tasks = getDisplayTasks('future');
+                                    const active = tasks.filter(t => t.status !== 'done');
+                                    const done = tasks.filter(t => t.status === 'done');
+
+                                    return (
+                                        <>
+                                            {active.map((task: Task) => (
+                                                <div key={task.id} className="animate-fade-in-up">
+                                                    <TaskCard task={task} />
+                                                </div>
+                                            ))}
+
+                                            {done.length > 0 && (
+                                                <>
+                                                    <div className="flex items-center gap-4 py-2 opacity-50">
+                                                        <div className="h-[1px] flex-1 bg-white/10"></div>
+                                                        <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Bajarilgan</span>
+                                                        <div className="h-[1px] flex-1 bg-white/10"></div>
+                                                    </div>
+                                                    {done.map((task: Task) => (
+                                                        <div key={task.id} className="animate-fade-in-up opacity-60 hover:opacity-100 transition-opacity">
+                                                            <TaskCard task={task} />
+                                                        </div>
+                                                    ))}
+                                                </>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                                 {getDisplayTasks('future').length === 0 && (
                                     <PremiumEmptyState
                                         title={t.tasks.sections.future}
@@ -1177,14 +1282,24 @@ export default function TasksDashboard() {
                     </div>
                 ) : (
                     <div className="space-y-8 animate-fade-in px-2">
+                        {/* STATS CALCULATION FIXED */}
                         {(() => {
-                            const aTasks = getAllRelatedTasks();
-                            const stats = getDeepSubtaskStats(aTasks);
-                            const aEfficiency = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0;
-                            const aOverdue = aTasks.filter(t => t.status !== 'done' && t.date && t.date < selectedDate).length;
-                            const aPending = stats.total - stats.done;
-                            const aTotal = stats.total;
-                            const aDone = stats.done;
+                            // Use explicit root tasks to match visual cards
+                            const aTasks = [...todayTasks, ...overdueTasks, ...futureTasks];
+                            // Deduplicate
+                            const uniqueTasks = Array.from(new Map(aTasks.map(t => [t.id, t])).values());
+
+                            // Count ROOT tasks only (matching dashboard cards)
+                            const aTotal = uniqueTasks.length;
+                            const aDone = uniqueTasks.filter(t => t.status === 'done').length;
+                            const aPending = aTotal - aDone;
+                            // Override Overdue to match root overdue
+                            const aOverdue = uniqueTasks.filter(t => t.status !== 'done' && t.date && t.date < selectedDate).length;
+
+                            // Subtask stats for efficiency (optional, but keep pulse logic if needed)
+                            // For Pulse, we might still want deep stats, but for "Jami Vazifalar" card, use root.
+                            const deepStats = getDeepSubtaskStats(uniqueTasks);
+                            const aEfficiency = deepStats.total > 0 ? Math.round((deepStats.done / deepStats.total) * 100) : 0;
 
                             const todayStr = getLocalTodayStr();
                             const aToday = Math.max(0, aTasks.filter(t => t.date === todayStr).length);
@@ -1229,17 +1344,38 @@ export default function TasksDashboard() {
                                             <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Kelajak:</span>
                                             <span className="text-xs font-black text-white">{aFuture}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-aura-green/10 border border-aura-green/20 ml-auto">
-                                            <span className="text-[8px] font-black text-aura-green uppercase tracking-widest">Samaradorlik:</span>
-                                            <span className="text-xs font-black text-aura-green">{aEfficiency}%</span>
-                                        </div>
                                     </div>
 
+                                    {/* AI Intelligent Planner (Relocated to top for better space management) */}
+                                    <AiInsightSection
+                                        onAnalyze={fetchAiInsight}
+                                        isLoading={aiLoading}
+                                        insight={aiInsight}
+                                        title="AI Planner & Analysis"
+                                        description="Sizning rejangiz va unumdorligingizni tahlil qilish hamda aqlli tavsiyalar olish uchun tugmani bosing."
+                                        buttonText={aiInsight ? "Regenerate" : "Generate Plan"}
+                                        color="cyan"
+                                    >
+                                        <button
+                                            onClick={handleAddAISuggestion}
+                                            disabled={isAddingSuggestion || suggestionAdded}
+                                            className={`px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg ${suggestionAdded ? 'bg-aura-green text-black shadow-aura-green/20 scale-105' : 'bg-aura-cyan text-black hover:bg-white hover:scale-105 active:scale-95 shadow-aura-cyan/20'}`}
+                                        >
+                                            {isAddingSuggestion ? (
+                                                <><span>⏳</span> Saqlanmoqda...</>
+                                            ) : suggestionAdded ? (
+                                                <><span>✅</span> Reja Qo'shildi!</>
+                                            ) : (
+                                                <><span>+</span> {t.tasks?.aiSuggestion?.add || "Rejani Qo'shish"}</>
+                                            )}
+                                        </button>
+                                    </AiInsightSection>
+
                                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                                        {/* LEFT COLUMN: PRIMARY STATS & HEATMAP */}
-                                        <div className="lg:col-span-8 space-y-8">
+                                        {/* ROW 1: Productivity Pulse (8) & Priority Mix (4) */}
+                                        <div className="lg:col-span-8">
                                             {/* Productivity Score & Daily Trend */}
-                                            <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 backdrop-blur-3xl relative overflow-hidden group">
+                                            <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 backdrop-blur-3xl relative overflow-hidden group h-full">
                                                 <div className="absolute top-0 right-0 w-64 h-64 bg-aura-cyan/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
 
                                                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
@@ -1309,89 +1445,11 @@ export default function TasksDashboard() {
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            {/* Category breakdown & Progression */}
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 backdrop-blur-3xl">
-                                                    <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
-                                                        <span className="text-aura-cyan">📂</span> Top Categories
-                                                    </h3>
-                                                    <div className="space-y-5">
-                                                        {(() => {
-                                                            const cats = Array.from(new Set(aTasks.map(t => t.category || focusedTask?.category || 'Boshqa'))).slice(0, 4);
-                                                            if (cats.length === 0 && focusedTask) cats.push(focusedTask.category || 'Boshqa');
-
-                                                            return cats.map(cat => {
-                                                                const catTasks = aTasks.filter(t => (t.category || focusedTask?.category || 'Boshqa') === cat);
-                                                                const catStats = getDeepSubtaskStats(catTasks);
-                                                                const catPercent = catStats.total > 0 ? Math.round((catStats.done / catStats.total) * 100) : 0;
-
-                                                                return (
-                                                                    <div key={cat} className="space-y-2 group/cat">
-                                                                        <div className="flex justify-between items-end">
-                                                                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 group-hover/cat:text-white transition-colors">{cat}</span>
-                                                                            <span className="text-[10px] font-black text-aura-cyan">{catPercent}%</span>
-                                                                        </div>
-                                                                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                                                                            <div
-                                                                                className="h-full bg-aura-cyan shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-1000 w-[var(--width)]"
-                                                                                style={{ '--width': `${catPercent}%` } as React.CSSProperties}
-                                                                            ></div>
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            });
-                                                        })()}
-                                                        {aTasks.length === 0 && (
-                                                            <div className="py-10 text-center text-gray-600 text-[10px] font-black uppercase tracking-[0.3em] opacity-30 italic">No data available</div>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                <div className="p-8 rounded-[3rem] bg-gradient-to-br from-aura-gold/10 to-transparent border border-white/5 backdrop-blur-3xl relative overflow-hidden">
-                                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-aura-gold/5 rounded-full blur-[80px]"></div>
-                                                    <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
-                                                        <span className="text-aura-gold">⚡</span> Momentum
-                                                    </h3>
-                                                    <div className="flex flex-col items-center justify-center py-4 space-y-4 relative z-10">
-                                                        <div className="relative w-24 h-24 flex items-center justify-center">
-                                                            <svg className="w-full h-full -rotate-90">
-                                                                <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-white/5" />
-                                                                <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="6" fill="transparent" strokeDasharray={276} strokeDashoffset={276 - (276 * aEfficiency) / 100} className="text-aura-gold transition-all duration-1000" />
-                                                            </svg>
-                                                            <span className="absolute inset-0 flex items-center justify-center text-2xl font-display font-black text-white">{aEfficiency}%</span>
-                                                        </div>
-                                                        <div className="text-center">
-                                                            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Bajarilgan</p>
-                                                            <p className="text-xs font-black text-white mt-1">{aDone} / {aTotal} vazifa</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
 
-                                        {/* RIGHT COLUMN: PRIORITY & SUGGESTIONS */}
-                                        <div className="lg:col-span-4 space-y-8">
-                                            {/* AI Intelligent Planner */}
-                                            {/* AI Intelligent Planner */}
-                                            <AiInsightSection
-                                                onAnalyze={fetchAiInsight}
-                                                isLoading={aiLoading}
-                                                insight={aiInsight}
-                                                title="AI Planner"
-                                                description="Analyze your schedule and get smart recommendations for today."
-                                                buttonText={aiInsight ? "Regenerate" : "Generate Plan"}
-                                                color="cyan"
-                                            >
-                                                <button
-                                                    onClick={handleAddAISuggestion}
-                                                    className="w-full py-3 rounded-xl bg-aura-cyan text-black font-black text-xs uppercase tracking-widest hover:bg-white transition-all flex items-center justify-center gap-2"
-                                                >
-                                                    <span>+</span> "Add to Tasks"
-                                                </button>
-                                            </AiInsightSection>
+                                        <div className="lg:col-span-4">
                                             {/* Priority Distribution */}
-                                            <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 backdrop-blur-3xl">
+                                            <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 backdrop-blur-3xl h-full flex flex-col justify-center">
                                                 <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-8">Priority Mix</h3>
                                                 <div className="space-y-6">
                                                     {(() => {
@@ -1421,9 +1479,72 @@ export default function TasksDashboard() {
                                                     })()}
                                                 </div>
                                             </div>
+                                        </div>
 
+                                        {/* ROW 2: Top Categories (4), Momentum (4), AI Guard (4) */}
+                                        <div className="lg:col-span-4">
+                                            <div className="p-8 rounded-[3rem] bg-black/40 border border-white/5 backdrop-blur-3xl h-full">
+                                                <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
+                                                    <span className="text-aura-cyan">📂</span> Top Categories
+                                                </h3>
+                                                <div className="space-y-5">
+                                                    {(() => {
+                                                        const cats = Array.from(new Set(aTasks.map(t => t.category || focusedTask?.category || 'Boshqa'))).slice(0, 4);
+                                                        if (cats.length === 0 && focusedTask) cats.push(focusedTask.category || 'Boshqa');
+
+                                                        return cats.map(cat => {
+                                                            const catTasks = aTasks.filter(t => (t.category || focusedTask?.category || 'Boshqa') === cat);
+                                                            const catStats = getDeepSubtaskStats(catTasks);
+                                                            const catPercent = catStats.total > 0 ? Math.round((catStats.done / catStats.total) * 100) : 0;
+
+                                                            return (
+                                                                <div key={cat} className="space-y-2 group/cat">
+                                                                    <div className="flex justify-between items-end">
+                                                                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 group-hover/cat:text-white transition-colors">{cat}</span>
+                                                                        <span className="text-[10px] font-black text-aura-cyan">{catPercent}%</span>
+                                                                    </div>
+                                                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                                                                        <div
+                                                                            className="h-full bg-aura-cyan shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all duration-1000 w-[var(--width)]"
+                                                                            style={{ '--width': `${catPercent}%` } as React.CSSProperties}
+                                                                        ></div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        });
+                                                    })()}
+                                                    {aTasks.length === 0 && (
+                                                        <div className="py-10 text-center text-gray-600 text-[10px] font-black uppercase tracking-[0.3em] opacity-30 italic">No data available</div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="lg:col-span-4">
+                                            <div className="p-8 rounded-[3rem] bg-gradient-to-br from-aura-gold/10 to-transparent border border-white/5 backdrop-blur-3xl relative overflow-hidden h-full">
+                                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-aura-gold/5 rounded-full blur-[80px]"></div>
+                                                <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
+                                                    <span className="text-aura-gold">⚡</span> Momentum
+                                                </h3>
+                                                <div className="flex flex-col items-center justify-center py-4 space-y-4 relative z-10">
+                                                    <div className="relative w-24 h-24 flex items-center justify-center">
+                                                        <svg className="w-full h-full -rotate-90">
+                                                            <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-white/5" />
+                                                            <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="6" fill="transparent" strokeDasharray={276} strokeDashoffset={276 - (276 * aEfficiency) / 100} className="text-aura-gold transition-all duration-1000" />
+                                                        </svg>
+                                                        <span className="absolute inset-0 flex items-center justify-center text-2xl font-display font-black text-white">{aEfficiency}%</span>
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Bajarilgan</p>
+                                                        <p className="text-xs font-black text-white mt-1">{aDone} / {aTotal} vazifa</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="lg:col-span-4">
                                             {/* Intelligent Guard (AI Insights) */}
-                                            <div className="p-8 rounded-[3rem] bg-gradient-to-br from-aura-purple/20 via-black/40 to-transparent border border-aura-purple/30 backdrop-blur-3xl relative overflow-hidden group">
+                                            <div className="p-8 rounded-[3rem] bg-gradient-to-br from-aura-purple/20 via-black/40 to-transparent border border-aura-purple/30 backdrop-blur-3xl relative overflow-hidden group h-full">
                                                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-aura-purple/20 rounded-full blur-[50px] group-hover:bg-aura-purple/30 transition-all duration-700"></div>
 
                                                 <div className="flex items-center gap-3 mb-6 relative z-10">

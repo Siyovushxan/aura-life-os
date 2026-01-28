@@ -38,54 +38,58 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     // Real-time listener for Family Join Requests
     useEffect(() => {
-        if (!user) {
-            // Only reset if truly logged out, not just initializing
-            // setNotifications(prev => ({ ...prev, family: 0 })); 
+        if (!user?.uid) {
+            // Reset notifications when user is not authenticated
+            setNotifications(prev => ({ ...prev, family: 0 }));
             return;
         }
 
-        const q = query(
-            collection(db, "family_groups"),
-            where("ownerId", "==", user.uid),
-            where("isDeleted", "==", false)
-        );
+        try {
+            const q = query(
+                collection(db, "family_groups"),
+                where("ownerId", "==", user.uid),
+                where("isDeleted", "==", false)
+            );
 
-        const unsubscribeFamily = onSnapshot(q, (snapshot) => {
-            let totalRequests = 0;
-            snapshot.docs.forEach(doc => {
-                const data = doc.data();
-                if (data.joinRequests && Array.isArray(data.joinRequests)) {
-                    totalRequests += data.joinRequests.length;
-                }
+            const unsubscribeFamily = onSnapshot(q, (snapshot) => {
+                let totalRequests = 0;
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (data.joinRequests && Array.isArray(data.joinRequests)) {
+                        totalRequests += data.joinRequests.length;
+                    }
+                });
+                setNotifications(prev => ({ ...prev, family: totalRequests }));
+            }, (error) => {
+                console.error("Error listening for family requests:", error);
             });
-            setNotifications(prev => ({ ...prev, family: totalRequests }));
-        }, (error) => {
-            console.error("Error listening for family requests:", error);
-        });
 
-        // Sub 3: Listen to ALL AI Insights to trigger notifications
-        const modules: (keyof NotificationState)[] = ['finance', 'health', 'interests', 'tasks', 'food', 'mind'];
-        const todayStr = getLocalTodayStr();
+            // Sub 3: Listen to ALL AI Insights to trigger notifications
+            const modules: (keyof NotificationState)[] = ['finance', 'health', 'interests', 'tasks', 'food', 'mind'];
+            const todayStr = getLocalTodayStr();
 
-        const unsubInsights = modules.map(m => {
-            return onSnapshot(doc(db, `users/${user.uid}/ai_insights/${m}_${todayStr}`), (snap) => {
-                if (snap.exists()) {
-                    const insightData = snap.data();
-                    const generatedAt = insightData.generatedAt;
+            const unsubInsights = modules.map(m => {
+                return onSnapshot(doc(db, `users/${user.uid}/ai_insights/${m}_${todayStr}`), (snap) => {
+                    if (snap.exists()) {
+                        const insightData = snap.data();
+                        const generatedAt = insightData.generatedAt;
 
-                    // We need to re-fetch profile or use the one from unsubscribeUser to compare
-                    // To keep it simple, we'll trigger a re-check of the profile's lastViewed
-                    // Actually, the unsubscribeUser listener below will handle the profile.
-                    // Let's just store the latest insight timestamps in a local state to help the user listener.
-                    setLatestInsights(prev => ({ ...prev, [m]: generatedAt }));
-                }
+                        // We need to re-fetch profile or use the one from unsubscribeUser to compare
+                        // To keep it simple, we'll trigger a re-check of the profile's lastViewed
+                        // Actually, the unsubscribeUser listener below will handle the profile.
+                        // Let's just store the latest insight timestamps in a local state to help the user listener.
+                        setLatestInsights(prev => ({ ...prev, [m]: generatedAt }));
+                    }
+                });
             });
-        });
 
-        return () => {
-            unsubscribeFamily();
-            unsubInsights.forEach(unsub => unsub());
-        };
+            return () => {
+                unsubscribeFamily();
+                unsubInsights.forEach(unsub => unsub());
+            };
+        } catch (error) {
+            console.error("Error setting up Firestore listeners:", error);
+        }
     }, [user?.uid]);
 
     const [latestInsights, setLatestInsights] = useState<Record<string, string>>({});

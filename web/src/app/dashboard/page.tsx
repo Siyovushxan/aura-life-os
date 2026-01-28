@@ -209,72 +209,78 @@ export default function Dashboard() {
 
     // Initial Data Load + Correlation Analysis
     useEffect(() => {
-        if (!user) return;
+        if (!user || isAnalyzing) return;
+
+        let isMounted = true;
         const loadDashboardData = async () => {
             const today = getLocalTodayStr();
-
             setIsAnalyzing(true);
+            try {
+                // NEW: Use aggregated data fetch
+                const allData = await aggregateAllData(user.uid, today);
+                if (!isMounted) return;
 
-            // NEW: Use aggregated data fetch
-            const allData = await aggregateAllData(user.uid, today);
-
-            // Seed missing data (Development convenience)
-            if (!allData.finance) {
-                const seeded = await seedFinanceData(user.uid);
-                setFinance(seeded);
-                allData.finance = seeded;
-            } else {
-                setFinance(allData.finance);
-            }
-
-            if (!allData.health) {
-                const seeded = await seedHealthData(user.uid, today);
-                setHealth(seeded);
-                allData.health = seeded;
-            } else {
-                setHealth(allData.health);
-            }
-
-            if (!allData.food) {
-                const seeded = await seedFoodData(user.uid, today);
-                setFood(seeded);
-                allData.food = seeded;
-            } else {
-                setFood(allData.food);
-            }
-
-            if (!allData.interests) {
-                const seeded = await seedInterestsData(user.uid);
-                setInterests(seeded);
-                allData.interests = seeded;
-            } else {
-                setInterests(allData.interests);
-            }
-
-            if (allData.family) {
-                setFamilyMembers(allData.family);
-                // Determine Family Alert
-                if (allData.family.some((m: FamilyMember) => m.status === 'Needs Approval')) {
-                    setFamilyAlert(true);
+                // Seed missing data (Development convenience)
+                if (!allData.finance) {
+                    const seeded = await seedFinanceData(user.uid);
+                    setFinance(seeded);
+                    allData.finance = seeded;
+                } else {
+                    setFinance(allData.finance);
                 }
+
+                if (!allData.health) {
+                    const seeded = await seedHealthData(user.uid, today);
+                    setHealth(seeded);
+                    allData.health = seeded;
+                } else {
+                    setHealth(allData.health);
+                }
+
+                if (!allData.food) {
+                    const seeded = await seedFoodData(user.uid, today);
+                    setFood(seeded);
+                    allData.food = seeded;
+                } else {
+                    setFood(allData.food);
+                }
+
+                if (!allData.interests) {
+                    const seeded = await seedInterestsData(user.uid);
+                    setInterests(seeded);
+                    allData.interests = seeded;
+                } else {
+                    setInterests(allData.interests);
+                }
+
+                if (allData.family) {
+                    setFamilyMembers(allData.family);
+                    // Determine Family Alert
+                    if (allData.family.some((m: FamilyMember) => m.status === 'Needs Approval')) {
+                        setFamilyAlert(true);
+                    }
+                }
+
+                // NEW: Run Correlation Analysis
+                const foundCorrelations = await analyzeCorrelations(user.uid, today);
+                setCorrelations(foundCorrelations);
+
+                // NEW: Calculate Butterfly Score
+                const scoreData = calculateButterflyScore(allData);
+                setButterflyScore(scoreData);
+
+                // Auto-archive previous days
+                checkAndArchivePreviousDays(user.uid);
+            } catch (err) {
+                console.error("Dashboard Load Error:", err);
+            } finally {
+                if (isMounted) setIsAnalyzing(false);
             }
-
-            // NEW: Run Correlation Analysis
-            const foundCorrelations = await analyzeCorrelations(user.uid, today);
-            setCorrelations(foundCorrelations);
-
-            // NEW: Calculate Butterfly Score
-            const scoreData = calculateButterflyScore(allData);
-            setButterflyScore(scoreData);
-
-            setIsAnalyzing(false);
-
-            // Auto-archive previous days
-            checkAndArchivePreviousDays(user.uid);
         };
 
         loadDashboardData();
-    }, [user]);
+        return () => { isMounted = false; };
+    }, [user?.uid]);
 
     // Fetch AI Insight after core data loads
     // REMOVED: Auto-fetch disabled per user request

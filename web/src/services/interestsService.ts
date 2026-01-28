@@ -95,6 +95,28 @@ export const updateInterestProgress = async (userId: string, interestId: string,
     await updateDoc(ref, { hobbies });
 };
 
+export const deleteInterest = async (userId: string, interestId: string) => {
+    const ref = getDocRef(userId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+
+    const data = snap.data() as InterestsData;
+    const hobbies = data.hobbies.filter(h => h.id !== interestId);
+
+    await updateDoc(ref, { hobbies });
+};
+
+export const updateInterest = async (userId: string, interest: Interest) => {
+    const ref = getDocRef(userId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+
+    const data = snap.data() as InterestsData;
+    const hobbies = data.hobbies.map(h => h.id === interest.id ? interest : h);
+
+    await updateDoc(ref, { hobbies });
+};
+
 export const seedInterestsData = async (userId: string): Promise<InterestsData> => {
     const data: InterestsData = {
         stats: {
@@ -131,6 +153,17 @@ export const logInterestActivity = async (userId: string, log: Omit<InterestLog,
 
 export const getInterestLogsByDate = async (userId: string, date: string): Promise<InterestLog[]> => {
     const q = query(collection(db, `users/${userId}/interest_logs`), where("date", "==", date));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() } as InterestLog));
+};
+
+export const getInterestLogsInRange = async (userId: string, startDate: string, endDate: string): Promise<InterestLog[]> => {
+    const q = query(
+        collection(db, `users/${userId}/interest_logs`),
+        where("date", ">=", startDate),
+        where("date", "<=", endDate),
+        orderBy("date", "asc")
+    );
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() } as InterestLog));
 };

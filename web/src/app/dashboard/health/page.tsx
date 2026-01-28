@@ -4,9 +4,9 @@ import HistoryModal from '@/components/HistoryModal';
 import VoiceInput from '@/components/VoiceInput';
 import { useAuth } from '@/context/AuthContext';
 import { getHealthData, seedHealthData, updateHealthData, HealthData, subscribeToHealthData } from '@/services/healthService';
+import { getFoodLog, FoodDayLog } from '@/services/foodService';
 import { getDailyLog } from '@/services/dailyService';
 import { getScheduledInsight } from '@/services/aiPersistenceService';
-import { AudioReport } from '@/components/dashboard/AudioReport';
 import { useLanguage } from '@/context/LanguageContext';
 import { useNotifications } from '@/context/NotificationContext';
 import { DateNavigator } from '@/components/dashboard/DateNavigator';
@@ -26,6 +26,7 @@ export default function HealthDashboard() {
     const [selectedDate, setSelectedDate] = useState(getLocalTodayStr());
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<HealthData | null>(null);
+    const [foodData, setFoodData] = useState<FoodDayLog | null>(null);
     const [isArchived, setIsArchived] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
@@ -82,6 +83,9 @@ export default function HealthDashboard() {
                 seedHealthData(user.uid, selectedDate);
             }
         });
+
+        // Fetch Food Data for Calorie calculation
+        getFoodLog(user.uid, selectedDate).then(log => setFoodData(log));
 
         const unsub = subscribeToHealthData(user.uid, selectedDate, (doc) => {
             setData(doc);
@@ -244,6 +248,16 @@ export default function HealthDashboard() {
                     </div>
                 </div>
             </div>
+            {/* AI HEALTH ADVISOR (Relocated to top for better visibility) */}
+            <AiInsightSection
+                onAnalyze={refreshInsight}
+                isLoading={aiLoading}
+                insight={aiInsight}
+                title={t.health.aiAdvisor.title || "AI Health Advisor"}
+                description="Bugungi ko'rsatkichlarga asoslangan sun'iy intellekt tahlili."
+                buttonText={aiInsight ? 'Yangilash' : 'AI Tahlil'}
+                color="green"
+            />
 
             {/* MAIN GRID */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -380,40 +394,55 @@ export default function HealthDashboard() {
                         </div>
                     </div>
 
-                    {/* AI HEALTH ADVISOR */}
-                    <AiInsightSection
-                        onAnalyze={refreshInsight}
-                        isLoading={aiLoading}
-                        insight={aiInsight}
-                        title={t.health.aiAdvisor.title || "AI Health Advisor"}
-                        description="Bugungi ko'rsatkichlarga asoslangan sun'iy intellekt tahlili."
-                        buttonText={aiInsight ? 'Yangilash' : 'AI Tahlil'}
-                        color="green"
-                    >
-                        {aiInsight && (
-                            <div className="mt-6">
-                                <AudioReport text={aiInsight.insight || aiInsight.text} />
+
+
+                    {/* VITALS STACK (Moved here to fill space) */}
+                    <div className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Heart Rate */}
+                            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex flex-col justify-between group h-full">
+                                <div className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1 flex items-center gap-2"><span>❤️</span> {t.health.vitals.title}</div>
+                                <div className="flex justify-between items-end">
+                                    <div className="text-3xl font-black text-white">{data.vitals.heartRate} <span className="text-xs font-normal text-gray-500 block">{t.health.vitals.heartRateUnit}</span></div>
+                                    <div className="w-8 h-8 rounded-full bg-aura-red/10 flex items-center justify-center text-sm group-hover:bg-aura-red/20 transition-colors pointer-events-none">
+                                        📊
+                                    </div>
+                                </div>
                             </div>
-                        )}
-                    </AiInsightSection>
+
+                            {/* Calorie Balance (New) */}
+                            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex flex-col justify-between group h-full">
+                                <div className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1 flex items-center gap-2"><span>🔥</span> Energy</div>
+                                <div className="space-y-1">
+                                    <div className="flex justify-between items-center text-xs text-gray-400 font-medium">
+                                        <span>In</span>
+                                        <span className="text-aura-green font-bold">+{foodData?.summary.calories.current || 0}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-xs text-gray-400 font-medium">
+                                        <span>Out</span>
+                                        <span className="text-aura-red font-bold">-{data.activity.calories}</span>
+                                    </div>
+                                    <div className="w-full h-1 bg-white/10 rounded-full mt-2 overflow-hidden flex">
+                                        <div className="h-full bg-aura-green" style={{ width: `${Math.min(100, ((foodData?.summary.calories.current || 0) / 2500) * 100)}%` }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
+                                <div className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1 flex items-center gap-2"><span>🌙</span> {t.health.trends.sleepQuality}</div>
+                                <div className="text-2xl font-black text-white">{data.sleep.score} <span className="text-xs font-normal text-gray-500">{t.health.sleep.unit}</span></div>
+                            </div>
+                            <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
+                                <div className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1 flex items-center gap-2"><span>🤯</span> {t.health.vitals.stressTitle}</div>
+                                <div className="text-2xl font-black text-white">{data.vitals.stress}/100</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
 
-                {/* VITALS & ACTIVITY ROW */}
-                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
-                        <div className="text-aura-red flex items-center gap-2 mb-2 font-bold"><span>❤️</span> {t.health.vitals.title}</div>
-                        <div className="text-3xl font-bold text-white">{data.vitals.heartRate} <span className="text-sm font-normal text-gray-500">{t.health.vitals.heartRateUnit}</span></div>
-                    </div>
-                    <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
-                        <div className="text-aura-purple flex items-center gap-2 mb-2 font-bold"><span>🌙</span> {t.health.trends.sleepQuality}</div>
-                        <div className="text-3xl font-bold text-white">{data.sleep.score} <span className="text-sm font-normal text-gray-500">{t.health.sleep.unit}</span></div>
-                    </div>
-                    <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
-                        <div className="text-aura-gold flex items-center gap-2 mb-2 font-bold"><span>🤯</span> {t.health.vitals.stressTitle}</div>
-                        <div className="text-3xl font-bold text-white">{data.vitals.stress}/100</div>
-                    </div>
-                </div>
+
 
                 <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* HYDRATION */}

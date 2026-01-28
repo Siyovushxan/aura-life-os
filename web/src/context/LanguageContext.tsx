@@ -610,6 +610,7 @@ type TranslationStructure = {
         discoverNew: string;
 
         addHobbyTitle: string;
+        editHobbyTitle: string;
         hobbyName: string;
         category: string;
         loading: string;
@@ -1350,6 +1351,7 @@ const translations: Record<Language, TranslationStructure> = {
             discoverNew: "Discover New Passion",
             level: "Lvl",
             addHobbyTitle: "Add New Hobby",
+            editHobbyTitle: "Edit Hobby",
             hobbyName: "Name",
             category: "Category",
             loading: "Loading Hobbies...",
@@ -2053,6 +2055,7 @@ const translations: Record<Language, TranslationStructure> = {
             discoverNew: "Yangi ehtirosni kashf eting",
             level: "Daraja",
             addHobbyTitle: "Yangi xobbi qo'shish",
+            editHobbyTitle: "Xobbini tahrirlash",
             hobbyName: "Nomi",
             category: "Kategoriya",
             loading: "Xobbilar yuklanmoqda...",
@@ -2755,6 +2758,7 @@ const translations: Record<Language, TranslationStructure> = {
             discoverNew: "Открыть новую страсть",
             level: "Ур.",
             addHobbyTitle: "Добавить новое хобби",
+            editHobbyTitle: "Редактировать хобби",
             hobbyName: "Название",
             category: "Категория",
             loading: "Загрузка увлечений...",

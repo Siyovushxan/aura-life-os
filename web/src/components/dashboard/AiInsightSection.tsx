@@ -98,31 +98,34 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                         {isLoading && <div className="absolute inset-0 border-2 border-white/20 border-t-white rounded-2xl animate-spin"></div>}
                     </div>
                     <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-2xl font-display font-black text-white tracking-tight">{title}</h3>
-                            {effectiveInsight?.status && (
-                                <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${effectiveInsight.status === 'ready' || effectiveInsight.status === 'success' ? 'bg-aura-green/20 text-aura-green border border-aura-green/30' :
-                                    effectiveInsight.status === 'warning' ? 'bg-aura-red/20 text-aura-red border border-aura-red/30' :
-                                        'bg-aura-gold/20 text-aura-gold border border-aura-gold/30'
-                                    }`}>
-                                    {effectiveInsight.status}
-                                </span>
-                            )}
+                        <div className="flex flex-col gap-1 mb-2">
+                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Asosiy Vazifa</span>
+                            <div className="flex items-center gap-3">
+                                <h3 className="text-2xl font-display font-black text-white tracking-tight">{title}</h3>
+                                {effectiveInsight?.status && (
+                                    <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${effectiveInsight.status === 'ready' || effectiveInsight.status === 'success' ? 'bg-aura-green/20 text-aura-green border border-aura-green/30' :
+                                        effectiveInsight.status === 'warning' ? 'bg-aura-red/20 text-aura-red border border-aura-red/30' :
+                                            'bg-aura-gold/20 text-aura-gold border border-aura-gold/30'
+                                        }`}>
+                                        {effectiveInsight.status}
+                                    </span>
+                                )}
+                            </div>
+                            <p className="text-gray-400 text-sm md:text-base leading-relaxed max-w-2xl font-medium">
+                                {insight ? (effectiveInsight.insight || effectiveInsight.text || effectiveInsight.recommendation || effectiveInsight.advice || insight.insight || insight.text || "Operatsion tahlil yakunlandi. Protokol tayyor.") : description}
+                            </p>
                         </div>
-                        <p className="text-gray-400 text-sm md:text-base leading-relaxed max-w-2xl font-medium">
-                            {insight ? (effectiveInsight.insight || effectiveInsight.text || effectiveInsight.recommendation || effectiveInsight.advice || insight.insight || insight.text || "Operatsion tahlil yakunlandi. Protokol tayyor.") : description}
-                        </p>
                     </div>
+                    <button
+                        onClick={onAnalyze}
+                        disabled={isLoading}
+                        className={`group/btn relative px-10 py-4 ${styles.btnBg} text-black font-black text-xs uppercase tracking-[0.2em] rounded-2xl ${styles.hoverShadow} transition-all duration-300 disabled:opacity-50 active:scale-95 flex items-center gap-3 overflow-hidden`}
+                    >
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+                        <span className="relative z-10">{isLoading ? 'Sinxronizatsiya...' : buttonText}</span>
+                        {!isLoading && <span className="relative z-10 group-hover/btn:translate-x-1 transition-transform">→</span>}
+                    </button>
                 </div>
-                <button
-                    onClick={onAnalyze}
-                    disabled={isLoading}
-                    className={`group/btn relative px-10 py-4 ${styles.btnBg} text-black font-black text-xs uppercase tracking-[0.2em] rounded-2xl ${styles.hoverShadow} transition-all duration-300 disabled:opacity-50 active:scale-95 flex items-center gap-3 overflow-hidden`}
-                >
-                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
-                    <span className="relative z-10">{isLoading ? 'Sinxronizatsiya...' : buttonText}</span>
-                    {!isLoading && <span className="relative z-10 group-hover/btn:translate-x-1 transition-transform">→</span>}
-                </button>
             </div>
 
             {insight && (
@@ -132,10 +135,10 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                         <div className="md:col-span-3">
                             <h4 className={`text-[10px] font-black uppercase tracking-[0.3em] mb-4 flex items-center gap-3 ${styles.text}`}>
                                 <span className={`w-1.5 h-1.5 rounded-full ${styles.btnBg} animate-pulse`}></span>
-                                {effectiveProtocol ? "AURA Vitality Protocol" : "Strategic Roadmap"}
+                                {effectiveProtocol ? "AURA Vitality Protocol" : "Qo'shimcha Vazifalar (Subtasks)"}
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {((effectiveProtocol || effectiveRoadmap) as string[]).map((step: string, i: number) => (
+                                {(((effectiveProtocol || effectiveRoadmap) as string[]) || []).map((step: string, i: number) => (
                                     <div key={i} className="group/step relative p-5 rounded-2xl bg-black/40 border border-white/5 hover:border-white/20 transition-all overflow-hidden">
                                         <div className={`absolute top-0 left-0 w-1 h-full ${styles.btnBg} opacity-20 group-hover/step:opacity-100 transition-opacity`}></div>
                                         <div className="flex items-start gap-4">
@@ -152,12 +155,12 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
 
                     <div className="md:col-span-2 space-y-4">
                         <h4 className={`text-[10px] font-black uppercase tracking-[0.3em] ${styles.text}`}>Kritik Xulosa</h4>
-                        <div className="p-6 rounded-2xl bg-white/5 border border-white/10 relative overflow-hidden group/opt transition-all hover:bg-white/10">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-aura-cyan opacity-50"></div>
+                        <div className="p-6 rounded-2xl bg-white/5 border border-white/10 relative overflow-hidden group/opt transition-all hover:bg-white/10 h-full min-h-[120px] flex flex-col justify-center">
+                            <div className={`absolute top-0 left-0 w-1 h-full ${styles.btnBg} opacity-50`}></div>
                             <div className={`absolute top-0 right-0 p-4 opacity-10 text-4xl group-hover/opt:scale-125 transition-transform duration-500`}>{effectiveInsight.emoji || insight.emoji || '💡'}</div>
                             <p className="text-base text-gray-200 leading-relaxed font-medium relative z-10">
                                 {effectiveInsight.optimization || effectiveInsight.recommendation || effectiveInsight.suggestion || effectiveInsight.text || effectiveInsight.advice ||
-                                    (effectiveInsight.insight ? (effectiveInsight.insight.length > 100 ? effectiveInsight.insight.substring(0, 100) + '...' : effectiveInsight.insight) : "Natijalar tahlil qilinmoqda.")}
+                                    (effectiveInsight.insight ? (effectiveInsight.insight.length > 150 ? effectiveInsight.insight.substring(0, 150) + '...' : effectiveInsight.insight) : "Natijalar tahlil qilinmoqda.")}
                             </p>
                             {(effectiveInsight.success_mock || insight.success_mock) && (
                                 <div className="mt-4 flex items-center gap-2">
@@ -171,7 +174,7 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                     {/* Score / Potential Section */}
                     <div className="space-y-4">
                         <h4 className={`text-[10px] font-black uppercase tracking-[0.3em] ${styles.text}`}>Samaradorlik</h4>
-                        <div className="p-6 rounded-2xl bg-black/40 border border-white/10 flex flex-col justify-center gap-4">
+                        <div className="p-6 rounded-2xl bg-black/40 border border-white/10 flex flex-col justify-center gap-4 h-full min-h-[120px]">
                             {effectiveScore !== undefined ? (
                                 <>
                                     <div className="flex justify-between items-end">
@@ -180,8 +183,16 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                                     </div>
                                     <div className="h-3 bg-white/5 rounded-full overflow-hidden p-[2px] border border-white/5 shadow-inner">
                                         <div
-                                            className={`h-full ${styles.btnBg} rounded-full transition-all duration-[1.5s] ease-out-expo shadow-[0_0_15px_rgba(0,0,0,0.5)] w-[var(--value)]`}
-                                            style={{ '--value': `${effectiveScore}%` } as React.CSSProperties}
+                                            className={`h-full ${styles.btnBg} rounded-full transition-all duration-[2s] ease-in-out w-[var(--value)]`}
+                                            style={{
+                                                '--value': `${effectiveScore}%`,
+                                                boxShadow: `0 0 15px ${color === 'cyan' ? 'rgba(0,240,255,0.4)' :
+                                                    color === 'purple' ? 'rgba(157,78,221,0.4)' :
+                                                        color === 'green' ? 'rgba(0,255,148,0.4)' :
+                                                            color === 'gold' ? 'rgba(255,214,0,0.4)' :
+                                                                color === 'red' ? 'rgba(255,46,46,0.4)' :
+                                                                    'rgba(59,130,246,0.4)'}`
+                                            } as React.CSSProperties}
                                         ></div>
                                     </div>
                                 </>
@@ -192,7 +203,8 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                                 </div>
                             ) : (
                                 <div className="text-center py-4">
-                                    <span className="text-4xl">💎</span>
+                                    <span className="text-4xl animate-pulse">💎</span>
+                                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.2em] mt-2">Ma'lumotlar kutilmoqda</p>
                                 </div>
                             )}
                         </div>

@@ -33,7 +33,6 @@ import { getFamilyInsight } from '@/services/groqService';
 import { getFinanceOverview } from '@/services/financeService';
 import { getHealthData } from '@/services/healthService';
 import { getMindData } from '@/services/mindService';
-import { AudioReport } from '@/components/dashboard/AudioReport';
 
 import { useLanguage } from '@/context/LanguageContext';
 import { useNotifications } from '@/context/NotificationContext';
@@ -1092,11 +1091,6 @@ export default function FamilyDashboard() {
                             buttonText="Tahlilni Boshlash"
                             color="purple"
                         >
-                            {aiInsight && (
-                                <div className="mt-6">
-                                    <AudioReport text={aiInsight.insight || aiInsight.text} />
-                                </div>
-                            )}
                         </AiInsightSection>
 
                         <div className="space-y-8">

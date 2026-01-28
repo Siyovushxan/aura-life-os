@@ -47,7 +47,6 @@ import VoiceInput from '@/components/VoiceInput';
 import { PremiumEmptyState } from '@/components/dashboard/PremiumEmptyState';
 import { format } from 'date-fns';
 import { AiInsightSection } from '@/components/dashboard/AiInsightSection';
-import { AudioReport } from '@/components/dashboard/AudioReport';
 import HistoryModal from '@/components/HistoryModal';
 
 // V14: Real Exchange Rates (Simulator)
@@ -2163,11 +2162,6 @@ export default function FinanceDashboard() {
                             buttonText="Tahlilni Boshlash"
                             color="gold"
                         >
-                            {aiInsight && (
-                                <div className="mt-6">
-                                    <AudioReport text={aiInsight.insight || aiInsight.text} />
-                                </div>
-                            )}
                         </AiInsightSection>
                     </div>
                 )

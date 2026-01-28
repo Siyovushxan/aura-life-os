@@ -141,6 +141,7 @@ export default function FoodDashboard() {
             setPreviewImage(base64);
             setIsScanning(true);
             setScanResult(null);
+            setAiAdvice(null); // Clear previous advice so "Tezkor Maslahat" updates visually
             setShowConfirm(false);
 
             const [health, interests] = await Promise.all([

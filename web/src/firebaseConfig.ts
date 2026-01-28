@@ -1,6 +1,5 @@
-
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, connectFirestoreEmulator } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -16,13 +15,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = initializeFirestore(app, {
-    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+    experimentalForceLongPolling: true
 });
+
+
 
 if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
     try {
         connectFirestoreEmulator(db, 'localhost', 8080);
-        console.log("🔥 Connected to Firestore Emulator");
+        connectAuthEmulator(auth, 'http://localhost:9099');
+        console.log("🔥 Connected to Firestore & Auth Emulators");
     } catch (e) {
         // ignore if already connected
     }
