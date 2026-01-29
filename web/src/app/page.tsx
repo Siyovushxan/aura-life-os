@@ -420,10 +420,9 @@ export default function Home() {
                   <div className="relative z-10 p-12 w-full flex flex-col items-center">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="w-48 h-48 rounded-full bg-aura-cyan/20 border-2 border-aura-cyan flex items-center justify-center relative shadow-[0_0_50px_rgba(0,243,255,0.3)]"
+                      className="flex items-center justify-center relative drop-shadow-[0_0_50px_rgba(0,243,255,0.3)]"
                     >
-                      <Image src="/logo_v3.png" alt="AURA" width={100} height={100} className="w-24 h-24 rounded-full" />
-                      <div className="absolute -inset-4 border border-aura-cyan/20 rounded-full animate-ping"></div>
+                      <Image src="/logo_v3.png" alt="AURA" width={240} height={240} className="w-60 h-60 mix-blend-screen rounded-full" />
                     </motion.div>
                   </div>
 
