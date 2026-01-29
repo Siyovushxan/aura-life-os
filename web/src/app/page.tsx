@@ -3,6 +3,33 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
+import {
+  Home as HomeIcon,
+  AlertTriangle,
+  Lightbulb,
+  Wind,
+  MonitorSmartphone,
+  Users,
+  Activity,
+  User,
+  Rocket,
+  Info,
+  Calendar,
+  DollarSign,
+  Utensils,
+  TrendingUp,
+  Settings,
+  Lock,
+  Brain,
+  Zap,
+  Menu,
+  X,
+  Baby,
+  Fingerprint,
+  HeartHandshake,
+  HeartPulse,
+  Shield
+} from "lucide-react";
 import { translations, Language } from "./i18n/translations";
 import { useAuth } from "@/context/AuthContext";
 import ProductModals from "@/components/landing/ProductModals";
@@ -137,8 +164,7 @@ export default function Home() {
       <aside className="fixed top-0 left-0 bottom-0 w-64 z-[100] hidden lg:flex flex-col bg-black/40 backdrop-blur-3xl border-r border-white/[0.05] p-8 overflow-y-auto">
         <Link href="/" className="flex items-center gap-3 group mb-16">
           <div className="relative">
-            <div className="absolute inset-0 bg-aura-cyan blur-md opacity-20 group-hover:opacity-40 transition-opacity"></div>
-            <Image src="/logo_v3.png" alt="AURA logo" width={32} height={32} className="w-8 h-8 rounded-full relative z-10 border border-white/10" />
+            <Image src="/logo_v3.png" alt="AURA logo" width={56} height={56} className="w-14 h-14 relative z-10" />
           </div>
           <span className="text-xl font-display font-bold tracking-widest group-hover:tracking-[0.2em] transition-all duration-500 uppercase text-white">AURA</span>
         </Link>
@@ -160,7 +186,7 @@ export default function Home() {
             <button
               key={item.id}
               onClick={() => scrollToSection(item.id)}
-              className="text-left text-gray-200 hover:text-white transition-all text-[0.6rem] font-bold uppercase tracking-[0.3em] hover:translate-x-2"
+              className="text-left text-gray-200 hover:text-white transition-all text-[0.6rem] font-bold uppercase tracking-[0.3em] hover:translate-x-2 cursor-pointer"
             >
               {item.label}
             </button>
@@ -170,9 +196,9 @@ export default function Home() {
         <div className="mt-auto pt-8 space-y-6">
           {/* Language Switcher */}
           <div className="flex bg-white/5 rounded-full p-1 border border-white/5">
-            <button onClick={() => setLang('uz')} className={`flex-1 py-1.5 text-[0.6rem] rounded-full transition-all ${lang === 'uz' ? 'bg-aura-cyan text-black font-bold' : 'text-gray-200 hover:text-white'}`}>UZ</button>
-            <button onClick={() => setLang('ru')} className={`flex-1 py-1.5 text-[0.6rem] rounded-full transition-all ${lang === 'ru' ? 'bg-aura-cyan text-black font-bold' : 'text-gray-200 hover:text-white'}`}>RU</button>
-            <button onClick={() => setLang('en')} className={`flex-1 py-1.5 text-[0.6rem] rounded-full transition-all ${lang === 'en' ? 'bg-aura-cyan text-black font-bold' : 'text-gray-200 hover:text-white'}`}>EN</button>
+            <button onClick={() => setLang('uz')} className={`flex-1 py-1.5 text-[0.6rem] rounded-full transition-all cursor-pointer ${lang === 'uz' ? 'bg-aura-cyan text-black font-bold' : 'text-gray-200 hover:text-white'}`}>UZ</button>
+            <button onClick={() => setLang('ru')} className={`flex-1 py-1.5 text-[0.6rem] rounded-full transition-all cursor-pointer ${lang === 'ru' ? 'bg-aura-cyan text-black font-bold' : 'text-gray-200 hover:text-white'}`}>RU</button>
+            <button onClick={() => setLang('en')} className={`flex-1 py-1.5 text-[0.6rem] rounded-full transition-all cursor-pointer ${lang === 'en' ? 'bg-aura-cyan text-black font-bold' : 'text-gray-200 hover:text-white'}`}>EN</button>
           </div>
 
           <Link href={user ? "/dashboard" : "/login"} prefetch={false} className="block w-full text-center py-3 bg-white text-black rounded-full font-bold text-[0.6rem] uppercase tracking-widest hover:bg-aura-cyan transition-all hover:scale-105">
@@ -185,17 +211,17 @@ export default function Home() {
       <nav className={`fixed top-0 left-0 right-0 z-[100] lg:hidden transition-all duration-700 ${isScrolled ? 'bg-black/60 backdrop-blur-3xl border-b border-white/[0.05]' : 'bg-transparent'} py-4`}>
         <div className="px-6 flex justify-between items-center text-white">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo_v3.png" alt="AURA logo" width={24} height={24} className="w-6 h-6 rounded-full border border-white/10" />
+            <Image src="/logo_v3.png" alt="AURA logo" width={40} height={40} className="w-10 h-10" />
             <span className="text-lg font-display font-bold uppercase">AURA</span>
           </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-white hover:bg-white/5 rounded-lg border border-white/5"
+            className="p-2 text-white hover:bg-white/5 rounded-lg border border-white/5 cursor-pointer"
           >
             {mobileMenuOpen ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <X className="w-5 h-5" />
             ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+              <Menu className="w-5 h-5" />
             )}
           </button>
         </div>
@@ -213,23 +239,23 @@ export default function Home() {
           >
             <div className="grid grid-cols-1 gap-4 px-4">
               {[
-                { id: 'hero', label: t.nav.hero, icon: '🏠' },
-                { id: 'problem', label: t.nav.problem, icon: '⚠️' },
-                { id: 'solution', label: t.nav.solution, icon: '💡' },
-                { id: 'butterfly', label: t.nav.butterfly, icon: '🦋' },
-                { id: 'platforms', label: t.nav.platforms, icon: '📱' },
-                { id: 'family', label: t.nav.family, icon: '👨‍👩‍👧‍👦' },
-                { id: 'liveness', label: t.nav.liveness, icon: '💓' },
-                { id: 'author', label: t.nav.author, icon: '👤' },
-                { id: 'cta', label: t.nav.cta, icon: '🚀' },
-                { id: 'info', label: t.nav.info, icon: 'ℹ️' }
+                { id: 'hero', label: t.nav.hero, icon: <HomeIcon size={20} /> },
+                { id: 'problem', label: t.nav.problem, icon: <AlertTriangle size={20} /> },
+                { id: 'solution', label: t.nav.solution, icon: <Lightbulb size={20} /> },
+                { id: 'butterfly', label: t.nav.butterfly, icon: <Wind size={20} /> },
+                { id: 'platforms', label: t.nav.platforms, icon: <MonitorSmartphone size={20} /> },
+                { id: 'family', label: t.nav.family, icon: <Users size={20} /> },
+                { id: 'liveness', label: t.nav.liveness, icon: <Activity size={20} /> },
+                { id: 'author', label: t.nav.author, icon: <User size={20} /> },
+                { id: 'cta', label: t.nav.cta, icon: <Rocket size={20} /> },
+                { id: 'info', label: t.nav.info, icon: <Info size={20} /> }
               ].map((item) => (
                 <button
                   key={item.id}
                   onClick={() => navigateToSection(item.id)}
-                  className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl text-xl font-medium text-white hover:bg-white/10 active:scale-95 transition-all text-left"
+                  className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl text-xl font-medium text-white hover:bg-white/10 active:scale-95 transition-all text-left cursor-pointer"
                 >
-                  <span className="text-2xl">{item.icon}</span>
+                  <span className="text-white/60">{item.icon}</span>
                   {item.label}
                 </button>
               ))}
@@ -304,21 +330,15 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.6 }}
-                className="flex flex-col md:flex-row gap-8 items-center"
+                className="flex flex-col md:flex-row gap-8 items-center cursor-pointer"
               >
                 <Link
                   href="/dashboard"
-                  className="group relative px-14 py-6 bg-white text-black rounded-full font-bold text-[0.7rem] uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-[0_30px_60px_rgba(255,255,255,0.1)] overflow-hidden"
+                  className="group relative px-14 py-6 bg-white text-black rounded-full font-bold text-[0.7rem] uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-[0_30px_60px_rgba(255,255,255,0.1)] overflow-hidden cursor-pointer"
                 >
                   <span className="relative z-10">{t.hero.cta_main}</span>
                   <div className="absolute inset-0 bg-aura-cyan scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500"></div>
                 </Link>
-
-                <button
-                  className="px-14 py-6 bg-white/[0.02] border border-white/10 text-white rounded-full font-bold text-[0.7rem] uppercase tracking-[0.2em] hover:bg-white/[0.05] transition-all backdrop-blur-3xl"
-                >
-                  {t.hero.cta_secondary}
-                </button>
               </motion.div>
             </motion.div>
 
@@ -334,16 +354,15 @@ export default function Home() {
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0"
             >
               <div className="relative w-[70vw] h-[70vw] max-w-[1000px] max-h-[1000px] rounded-full overflow-hidden flex items-center justify-center">
-                {/* Layered Cyber Glow */}
-                <div className="absolute inset-0 bg-aura-cyan blur-[200px] opacity-30 rounded-full"></div>
-                <div className="absolute inset-0 bg-aura-purple blur-[150px] opacity-20 translate-x-10 rounded-full"></div>
+                {/* Layered Cyber Glow - REMOVED */}
+                <div className="absolute inset-0 bg-transparent rounded-full"></div>
 
                 <Image
                   src="/logo_v3.png"
                   alt="AURA Background Logo"
                   width={1200}
                   height={1200}
-                  className="w-full h-full opacity-55 brightness-110 drop-shadow-[0_0_150px_rgba(0,243,255,0.4)] rounded-full object-cover mix-blend-screen"
+                  className="w-full h-full opacity-55 brightness-110 rounded-full object-cover"
                 />
               </div>
 
@@ -383,18 +402,25 @@ export default function Home() {
 
                   <div className="relative w-full h-full p-12">
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 h-full items-center">
-                      {["📅", "💰", "🍎", "🏠", "📈", "⚙️"].map((icon, i) => (
+                      {[
+                        { icon: <Calendar key="cal" size={40} />, color: "text-red-400", glow: "drop-shadow-[0_0_15px_rgba(248,113,113,0.5)]" },
+                        { icon: <DollarSign key="dol" size={40} />, color: "text-green-400", glow: "drop-shadow-[0_0_15px_rgba(74,222,128,0.5)]" },
+                        { icon: <Utensils key="food" size={40} />, color: "text-orange-400", glow: "drop-shadow-[0_0_15px_rgba(251,146,60,0.5)]" },
+                        { icon: <HomeIcon key="home" size={40} />, color: "text-blue-400", glow: "drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]" },
+                        { icon: <TrendingUp key="trend" size={40} />, color: "text-purple-400", glow: "drop-shadow-[0_0_15px_rgba(192,132,252,0.5)]" },
+                        { icon: <Settings key="set" size={40} />, color: "text-gray-400", glow: "drop-shadow-[0_0_15px_rgba(156,163,175,0.5)]" }
+                      ].map((item, i) => (
                         <motion.div
                           key={i}
                           animate={{
                             y: [0, -20, 0],
                             rotate: [0, i % 2 === 0 ? 10 : -10, 0],
-                            opacity: [0.3, 0.6, 0.3]
+                            opacity: [0.5, 1, 0.5]
                           }}
                           transition={{ duration: 3 + i, repeat: Infinity, ease: "easeInOut" }}
-                          className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl text-4xl flex items-center justify-center grayscale"
+                          className={`bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl flex items-center justify-center ${item.color} ${item.glow}`}
                         >
-                          {icon}
+                          {item.icon}
                         </motion.div>
                       ))}
                     </div>
@@ -465,9 +491,9 @@ export default function Home() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full">
                 {[
-                  { card: t.solution.cards.secure, color: "text-aura-cyan", glow: "shadow-aura-cyan/10", icon: "🔒" },
-                  { card: t.solution.cards.smart, color: "text-aura-purple", glow: "shadow-aura-purple/10", icon: "🧠" },
-                  { card: t.solution.cards.ai, color: "text-aura-green", glow: "shadow-aura-green/10", icon: "⚡" }
+                  { card: t.solution.cards.secure, color: "text-aura-cyan", glow: "shadow-aura-cyan/10", icon: <Lock size={64} /> },
+                  { card: t.solution.cards.smart, color: "text-aura-purple", glow: "shadow-aura-purple/10", icon: <Brain size={64} /> },
+                  { card: t.solution.cards.ai, color: "text-aura-green", glow: "shadow-aura-green/10", icon: <Zap size={64} /> }
                 ].map((item, idx) => (
                   <motion.div
                     key={idx}
@@ -476,10 +502,10 @@ export default function Home() {
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.2, duration: 1 }}
                     whileHover={{ y: -20, scale: 1.02 }}
-                    className={`group p-12 md:p-16 rounded-[4rem] bg-white/[0.01] backdrop-blur-[120px] border border-white/[0.05] hover:border-white/[0.1] transition-all duration-700 relative overflow-hidden flex flex-col items-center text-center`}
+                    className={`group p-12 md:p-16 rounded-[4rem] bg-white/[0.01] backdrop-blur-[120px] border border-white/[0.05] hover:border-white/[0.1] transition-all duration-700 relative overflow-hidden flex flex-col items-center text-center cursor-pointer`}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className={`text-7xl md:text-8xl mb-12 drop-shadow-2xl group-hover:scale-110 transition-transform duration-700`}>{item.icon}</div>
+                    <div className={`mb-12 drop-shadow-2xl group-hover:scale-110 transition-transform duration-700 text-white/80`}>{item.icon}</div>
                     <h3 className={`text-2xl md:text-4xl font-bold mb-8 ${item.color} uppercase tracking-widest font-display`}>{item.card.title}</h3>
                     <p className="text-gray-200 text-lg md:text-xl leading-relaxed font-light">{item.card.desc}</p>
                   </motion.div>
@@ -533,9 +559,9 @@ export default function Home() {
 
                   <div className="space-y-10">
                     {[
-                      { label: "Ruhiyat (Mind)", value: stressLevel, color: stressLevel > 60 ? 'bg-red-500' : 'bg-aura-cyan', icon: "🧠" },
-                      { label: "Moliya (Finance)", value: expenseLevel, color: expenseLevel > 60 ? 'bg-orange-500' : 'bg-aura-green', icon: "💰" },
-                      { label: "Energiya (Physical)", value: 100 - stressLevel, color: stressLevel > 60 ? 'bg-red-900/40' : 'bg-aura-purple', icon: "⚡" }
+                      { label: "Ruhiyat (Mind)", value: stressLevel, color: stressLevel > 60 ? 'bg-red-500' : 'bg-aura-cyan', icon: <Brain size={16} /> },
+                      { label: "Moliya (Finance)", value: expenseLevel, color: expenseLevel > 60 ? 'bg-orange-500' : 'bg-aura-green', icon: <DollarSign size={16} /> },
+                      { label: "Energiya (Physical)", value: 100 - stressLevel, color: stressLevel > 60 ? 'bg-red-900/40' : 'bg-aura-purple', icon: <Zap size={16} /> }
                     ].map((m, i) => (
                       <div key={i} className="space-y-3">
                         <div className="flex justify-between text-[0.65rem] font-bold uppercase tracking-[0.3em] text-gray-400">
@@ -640,9 +666,9 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto z-10">
               {[
-                { icon: "👨‍👩‍👧‍👦", title: t.family.cards.parenting.title, desc: t.family.cards.parenting.desc, color: "text-orange-400", bg: "hover:bg-orange-500/5" },
-                { icon: "🌳", title: t.family.cards.legacy.title, desc: t.family.cards.legacy.desc, color: "text-aura-cyan", bg: "hover:bg-aura-cyan/5" },
-                { icon: "👵", title: t.family.cards.elder.title, desc: t.family.cards.elder.desc, color: "text-aura-green", bg: "hover:bg-aura-green/5" }
+                { icon: <Baby size={64} />, title: t.family.cards.parenting.title, desc: t.family.cards.parenting.desc, color: "text-orange-400", bg: "hover:bg-orange-500/5", glow: "drop-shadow-[0_0_25px_rgba(251,146,60,0.6)]" },
+                { icon: <Fingerprint size={64} />, title: t.family.cards.legacy.title, desc: t.family.cards.legacy.desc, color: "text-aura-cyan", bg: "hover:bg-aura-cyan/5", glow: "drop-shadow-[0_0_25px_rgba(0,243,255,0.6)]" },
+                { icon: <HeartHandshake size={64} />, title: t.family.cards.elder.title, desc: t.family.cards.elder.desc, color: "text-aura-green", bg: "hover:bg-aura-green/5", glow: "drop-shadow-[0_0_25px_rgba(16,185,129,0.6)]" }
               ].map((card, i) => (
                 <motion.div
                   key={i}
@@ -653,7 +679,7 @@ export default function Home() {
                   whileHover={{ y: -10, scale: 1.02 }}
                   className={`group p-12 md:p-14 rounded-[3.5rem] bg-white/[0.02] backdrop-blur-3xl border border-white/[0.05] transition-all duration-700 flex flex-col items-center text-center shadow-xl ${card.bg}`}
                 >
-                  <div className="text-6xl md:text-7xl mb-10 drop-shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform">{card.icon}</div>
+                  <div className={`mb-10 group-hover:scale-110 transition-transform duration-500 ${card.color} ${card.glow}`}>{card.icon}</div>
                   <h4 className={`text-xl md:text-2xl font-bold ${card.color} mb-6 uppercase tracking-widest font-display italic leading-tight`}>{card.title}</h4>
                   <p className="text-gray-400 text-base md:text-lg leading-relaxed font-light">{card.desc}</p>
 
@@ -678,8 +704,8 @@ export default function Home() {
                 viewport={{ once: true }}
                 className="mb-12 inline-flex flex-col items-center"
               >
-                <div className="w-24 h-24 rounded-full bg-aura-cyan/10 border border-aura-cyan/20 flex items-center justify-center mb-8 animate-pulse shadow-[0_0_50px_rgba(0,243,255,0.2)]">
-                  <span className="text-4xl">💓</span>
+                <div className="w-24 h-24 rounded-full bg-aura-cyan/10 border border-aura-cyan/20 flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(0,243,255,0.2)]">
+                  <HeartPulse size={48} className="text-red-500 animate-pulse drop-shadow-[0_0_20px_rgba(239,68,68,0.8)]" />
                 </div>
                 <h2 className="text-4xl md:text-6xl font-display font-bold mb-6 italic tracking-tighter uppercase text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60">
                   {t.liveness_section.title}
@@ -817,7 +843,7 @@ export default function Home() {
                 {/* Brand Column */}
                 <div className="md:col-span-4">
                   <div className="flex items-center gap-4 mb-10">
-                    <Image src="/logo_v3.png" alt="AURA logo" width={40} height={40} className="w-10 h-10 rounded-full border border-white/10" />
+                    <Image src="/logo_v3.png" alt="AURA logo" width={80} height={80} className="w-20 h-20" />
                     <span className="text-3xl font-display font-bold text-white uppercase tracking-[0.2em]">AURA</span>
                   </div>
                   <p className="text-gray-300 mb-12 max-w-sm text-lg font-light leading-relaxed">
@@ -845,7 +871,7 @@ export default function Home() {
                           onClick={() => {
                             if ('type' in link) setActiveProductModal(link.type);
                           }}
-                          className="hover:text-white transition-all text-left relative"
+                          className="hover:text-white transition-all text-left relative cursor-pointer"
                         >
                           <span className="relative z-10">{link.label}</span>
                           <div className="absolute -inset-x-4 -inset-y-1 bg-aura-cyan/0 group-hover/link:bg-aura-cyan/10 blur-md rounded-lg transition-all"></div>
@@ -868,7 +894,7 @@ export default function Home() {
                           onClick={() => {
                             if ('type' in link) setActiveProductModal(link.type);
                           }}
-                          className="hover:text-white transition-all text-left relative"
+                          className="hover:text-white transition-all text-left relative cursor-pointer"
                         >
                           <span className="relative z-10">{link.label}</span>
                           <div className="absolute -inset-x-4 -inset-y-1 bg-white/0 group-hover/link:bg-white/5 blur-md rounded-lg transition-all"></div>
