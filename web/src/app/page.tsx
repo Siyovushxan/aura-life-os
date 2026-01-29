@@ -114,6 +114,30 @@ export default function Home() {
   };
   const butterflyState = getButterflyState();
 
+  // PWA Install Logic
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    } else {
+      alert("AURA Web App is already installed or not supported in this browser.");
+    }
+  };
+
   // Handle scroll for navbar styling
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -652,8 +676,8 @@ export default function Home() {
                 <h3 className="text-4xl md:text-5xl font-bold text-white mb-8 font-display italic tracking-tight">{t.platforms.mobile.title}</h3>
                 <p className="text-gray-200 mb-12 text-xl font-light leading-relaxed max-w-sm">{t.platforms.mobile.desc}</p>
                 <div className="flex gap-6 mt-auto">
-                  <div className="px-8 py-3 rounded-full border border-white/10 text-[0.65rem] font-bold uppercase tracking-widest text-gray-300">iOS</div>
-                  <div className="px-8 py-3 rounded-full border border-white/10 text-[0.65rem] font-bold uppercase tracking-widest text-gray-300">Android</div>
+                  <a href="https://apps.apple.com/" target="_blank" rel="noopener noreferrer" className="px-8 py-3 rounded-full border border-white/10 text-[0.65rem] font-bold uppercase tracking-widest text-gray-300 hover:bg-white hover:text-black transition-colors cursor-pointer">iOS</a>
+                  <a href="https://play.google.com/store" target="_blank" rel="noopener noreferrer" className="px-8 py-3 rounded-full border border-white/10 text-[0.65rem] font-bold uppercase tracking-widest text-gray-300 hover:bg-white hover:text-black transition-colors cursor-pointer">Android</a>
                 </div>
               </motion.div>
 
@@ -666,7 +690,9 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-br from-aura-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <h3 className="text-4xl md:text-5xl font-bold text-white mb-8 font-display italic tracking-tight">{t.platforms.web.title}</h3>
                 <p className="text-gray-200 mb-12 text-xl font-light leading-relaxed max-w-sm">{t.platforms.web.desc}</p>
-                <div className="px-8 py-3 rounded-full bg-white text-black text-[0.65rem] font-bold uppercase tracking-widest mt-auto">Open Web App</div>
+                <button onClick={handleInstallClick} className="px-8 py-3 rounded-full bg-white text-black text-[0.65rem] font-bold uppercase tracking-widest mt-auto hover:scale-105 transition-transform cursor-pointer">
+                  Install Web App
+                </button>
               </motion.div>
             </div>
           </section>
