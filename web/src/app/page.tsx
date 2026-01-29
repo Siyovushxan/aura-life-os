@@ -709,8 +709,7 @@ export default function Home() {
                   <h4 className={`text-xl md:text-2xl font-bold ${card.color} mb-6 uppercase tracking-widest font-display italic leading-tight`}>{card.title}</h4>
                   <p className="text-gray-400 text-base md:text-lg leading-relaxed font-light">{card.desc}</p>
 
-                  <div className="mt-10 w-full h-[1px] bg-white/5 group-hover:bg-white/10 transition-colors"></div>
-                  <button className="mt-8 text-[0.6rem] font-bold uppercase tracking-[0.3em] text-gray-500 hover:text-white transition-colors">Batafsil</button>
+
                 </motion.div>
               ))}
             </div>
@@ -761,15 +760,27 @@ export default function Home() {
                 viewport={{ once: true }}
                 className="p-12 md:p-16 rounded-[4rem] bg-white/[0.02] backdrop-blur-3xl border border-white/[0.05] relative overflow-hidden group"
               >
-                <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <svg className="w-32 h-32 text-aura-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
+
 
                 <p className="text-xl md:text-2xl text-gray-200 font-light leading-relaxed mb-12">
                   {t.liveness_section.desc}
                 </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+                  {[
+                    { label: "Status", value: "Active", color: "text-green-400", bg: "bg-green-400/10", border: "border-green-400/20", icon: <Activity size={16} /> },
+                    { label: "Last Check", value: "Just now", color: "text-aura-cyan", bg: "bg-aura-cyan/10", border: "border-aura-cyan/20", icon: <Clock size={16} /> },
+                    { label: "Protection", value: "24/7", color: "text-aura-purple", bg: "bg-aura-purple/10", border: "border-aura-purple/20", icon: <Shield size={16} /> }
+                  ].map((stat, i) => (
+                    <div key={i} className={`flex items-center gap-4 p-4 rounded-2xl border backdrop-blur-md ${stat.bg} ${stat.border}`}>
+                      <div className={`${stat.color}`}>{stat.icon}</div>
+                      <div className="text-left">
+                        <div className="text-[0.6rem] uppercase tracking-wider text-gray-400">{stat.label}</div>
+                        <div className={`text-sm font-bold ${stat.color}`}>{stat.value}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
 
               </motion.div>
