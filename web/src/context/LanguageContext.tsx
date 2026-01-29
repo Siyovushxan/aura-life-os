@@ -15,6 +15,7 @@ type TranslationStructure = {
         yesterday: string;
         done: string;
         user: string;
+        current: string;
     };
     nav: {
         hero: string;
@@ -110,6 +111,30 @@ type TranslationStructure = {
         yesterday: string;
         today: string;
         selectDate: string;
+    };
+    billing: {
+        title: string;
+        currentPlan: string;
+        upgrade: string;
+        switch: string;
+        manage: string;
+        trialEnds: string;
+        activeUntil: string;
+        daysLeft: string;
+        history: string;
+        noHistory: string;
+        selectPlan: string;
+        perMonth: string;
+        upgradeSuccess: string;
+        upgradeError: string;
+        checkoutTitle: string;
+        cardNumber: string;
+        expiry: string;
+        cvv: string;
+        payNow: string;
+        securePayment: string;
+        processing: string;
+        cardNumberHint: string;
     };
     family: {
         title: string;
@@ -760,7 +785,8 @@ const translations: Record<Language, TranslationStructure> = {
             today: 'Today',
             yesterday: 'Yesterday',
             done: 'Done',
-            user: 'User'
+            user: 'User',
+            current: 'CURRENT'
         },
         nav: {
             hero: 'Home',
@@ -1019,7 +1045,7 @@ const translations: Record<Language, TranslationStructure> = {
             interestRate: 'Annual Interest (%)',
             termMonths: 'Term (Months)',
             calculationMethod: 'Calculation Method',
-            annuity: 'Annuity (Equal)',
+            annuity: 'Annuitet (Equal)',
             differential: 'Differential (Decreasing)',
             add: 'Add',
             yearlyProfit: 'Yearly Profit (%)',
@@ -1486,10 +1512,34 @@ const translations: Record<Language, TranslationStructure> = {
             secureRegistration: "Secure Registration",
             countryCodeNotice: "Enter number with \"+\" and country code (e.g., +44, +998, +7)",
             setPass: "Set Password",
-            verifyAndJoin: "Verify OTP & Join",
+            verifyAndJoin: "Verify & Join",
             changeNumber: "Change Phone Number",
             signUpGoogle: "Sign Up with Google"
         },
+        billing: {
+            title: "Billing & Subscription",
+            currentPlan: "Current Plan",
+            upgrade: "Upgrade",
+            switch: "Switch",
+            manage: "Manage",
+            trialEnds: "Trial ends in",
+            activeUntil: "Active until",
+            daysLeft: "days",
+            history: "Billing History",
+            noHistory: "No billing history",
+            selectPlan: "Select a plan",
+            perMonth: "per month",
+            upgradeSuccess: "Plan upgraded successfully",
+            upgradeError: "Error upgrading plan",
+            checkoutTitle: "Payment Details",
+            cardNumber: "Card Number",
+            expiry: "Expiry",
+            cvv: "CVV",
+            payNow: "Pay Now",
+            securePayment: "Secure Payment",
+            processing: "Processing...",
+            cardNumberHint: "Enter card number"
+        }
     },
     uz: {
         common: {
@@ -1502,7 +1552,8 @@ const translations: Record<Language, TranslationStructure> = {
             today: 'Bugun',
             yesterday: 'Kecha',
             done: 'Bajarildi',
-            user: 'Foydalanuvchi'
+            user: 'Foydalanuvchi',
+            current: 'JORIY'
         },
         nav: {
             hero: 'Bosh sahifa',
@@ -2231,6 +2282,30 @@ const translations: Record<Language, TranslationStructure> = {
             changeNumber: "Raqamni o'zgartirish",
             signUpGoogle: "Google orqali ro'yxatdan o'tish"
         },
+        billing: {
+            title: "To'lov va Hisob",
+            currentPlan: "Joriy Tarif",
+            upgrade: "Yangilash",
+            switch: "O'tish",
+            manage: "Boshqarish",
+            trialEnds: "Sinov muddati tugashiga",
+            activeUntil: "Amal qilish muddati",
+            daysLeft: "kun qoldi",
+            history: "To'lovlar tarixi",
+            noHistory: "To'lovlar mavjud emas",
+            selectPlan: "Tarifni tanlang",
+            perMonth: "oyiga",
+            upgradeSuccess: "Tarif muvaffaqiyatli yangilandi",
+            upgradeError: "Yangilashda xatolik yuz berdi",
+            checkoutTitle: "To'lov Ma'lumotlari",
+            cardNumber: "Karta raqami",
+            expiry: "Muddati",
+            cvv: "CVV",
+            payNow: "To'lash",
+            securePayment: "Xavfsiz to'lov",
+            processing: "Jarayon...",
+            cardNumberHint: "Karta raqamini kiriting"
+        }
     },
     ru: {
         common: {
@@ -2243,7 +2318,8 @@ const translations: Record<Language, TranslationStructure> = {
             today: 'Сегодня',
             yesterday: 'Вчера',
             done: 'Готово',
-            user: 'Пользователь'
+            user: 'Пользователь',
+            current: 'ТЕКУЩИЙ'
         },
         nav: {
             hero: 'Главная',
@@ -2972,6 +3048,30 @@ const translations: Record<Language, TranslationStructure> = {
             changeNumber: "Изменить номер",
             signUpGoogle: "Регистрация через Google"
         },
+        billing: {
+            title: "Oplata i Podpiska",
+            currentPlan: "Tekushiy Tarif",
+            upgrade: "Obnovit",
+            switch: "Pereyti",
+            manage: "Upravlyat",
+            trialEnds: "Probniy period zakanchivaetsya cherez",
+            activeUntil: "Aktiven do",
+            daysLeft: "dney",
+            history: "Istoriya platejey",
+            noHistory: "Istoriya platejey pusta",
+            selectPlan: "Viberite tarif",
+            perMonth: "v mesyats",
+            upgradeSuccess: "Tarif uspeshno obnovlen",
+            upgradeError: "Oshibka pri obnovlenii",
+            checkoutTitle: "Detali Oplati",
+            cardNumber: "Nomer karti",
+            expiry: "Srok",
+            cvv: "CVV",
+            payNow: "Oplatit",
+            securePayment: "Bezopasniy platej",
+            processing: "Obrabotka...",
+            cardNumberHint: "Vvedite nomer karti"
+        }
     },
 };
 

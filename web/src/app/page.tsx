@@ -34,6 +34,7 @@ import {
 import { translations, Language } from "./i18n/translations";
 import { useAuth } from "@/context/AuthContext";
 import ProductModals from "@/components/landing/ProductModals";
+import LegalModals from "@/components/landing/LegalModals";
 
 // Living Background Blobs
 const LivingBackground = () => (
@@ -89,6 +90,7 @@ export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeProductModal, setActiveProductModal] = useState<'features' | 'pricing' | 'enterprise' | 'download' | 'about' | 'missions' | 'careers' | 'contact' | null>(null);
+  const [activeLegalModal, setActiveLegalModal] = useState<'privacy' | 'terms' | 'cookies' | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const t = translations[lang];
 
@@ -676,8 +678,8 @@ export default function Home() {
                 <h3 className="text-4xl md:text-5xl font-bold text-white mb-8 font-display italic tracking-tight">{t.platforms.mobile.title}</h3>
                 <p className="text-gray-200 mb-12 text-xl font-light leading-relaxed max-w-sm">{t.platforms.mobile.desc}</p>
                 <div className="flex gap-6 mt-auto">
-                  <a href="https://apps.apple.com/" target="_blank" rel="noopener noreferrer" className="px-8 py-3 rounded-full border border-white/10 text-[0.65rem] font-bold uppercase tracking-widest text-gray-300 hover:bg-white hover:text-black transition-colors cursor-pointer">iOS</a>
-                  <a href="https://play.google.com/store" target="_blank" rel="noopener noreferrer" className="px-8 py-3 rounded-full border border-white/10 text-[0.65rem] font-bold uppercase tracking-widest text-gray-300 hover:bg-white hover:text-black transition-colors cursor-pointer">Android</a>
+                  <a href="https://apps.apple.com/" target="_blank" rel="noopener noreferrer" className="px-8 py-3 rounded-full border border-white/10 text-[0.65rem] font-bold uppercase tracking-widest text-gray-300 hover:bg-white hover:text-black transition-all cursor-pointer z-10">iOS</a>
+                  <a href="https://play.google.com/store" target="_blank" rel="noopener noreferrer" className="px-8 py-3 rounded-full border border-white/10 text-[0.65rem] font-bold uppercase tracking-widest text-gray-300 hover:bg-white hover:text-black transition-all cursor-pointer z-10">Android</a>
                 </div>
               </motion.div>
 
@@ -690,7 +692,10 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-br from-aura-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <h3 className="text-4xl md:text-5xl font-bold text-white mb-8 font-display italic tracking-tight">{t.platforms.web.title}</h3>
                 <p className="text-gray-200 mb-12 text-xl font-light leading-relaxed max-w-sm">{t.platforms.web.desc}</p>
-                <button onClick={handleInstallClick} className="px-8 py-3 rounded-full bg-white text-black text-[0.65rem] font-bold uppercase tracking-widest mt-auto hover:scale-105 transition-transform cursor-pointer">
+                <button
+                  onClick={handleInstallClick}
+                  className="px-8 py-3 rounded-full bg-white text-black text-[0.65rem] font-bold uppercase tracking-widest mt-auto hover:scale-105 transition-all cursor-pointer z-10 active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+                >
                   Install Web App
                 </button>
               </motion.div>
@@ -794,9 +799,9 @@ export default function Home() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
                   {[
-                    { label: "Status", value: "Active", color: "text-green-400", bg: "bg-green-400/10", border: "border-green-400/20", icon: <Activity size={16} /> },
-                    { label: "Last Check", value: "Just now", color: "text-aura-cyan", bg: "bg-aura-cyan/10", border: "border-aura-cyan/20", icon: <Clock size={16} /> },
-                    { label: "Protection", value: "24/7", color: "text-aura-purple", bg: "bg-aura-purple/10", border: "border-aura-purple/20", icon: <Shield size={16} /> }
+                    { label: t.liveness_section.stats.status, value: t.liveness_section.stats.active, color: "text-green-400", bg: "bg-green-400/10", border: "border-green-400/20", icon: <Activity size={16} /> },
+                    { label: t.liveness_section.stats.last_check, value: t.liveness_section.stats.just_now, color: "text-aura-cyan", bg: "bg-aura-cyan/10", border: "border-aura-cyan/20", icon: <Clock size={16} /> },
+                    { label: t.liveness_section.stats.protection, value: t.liveness_section.stats.p247, color: "text-aura-purple", bg: "bg-aura-purple/10", border: "border-aura-purple/20", icon: <Shield size={16} /> }
                   ].map((stat, i) => (
                     <div key={i} className={`flex items-center gap-4 p-4 rounded-2xl border backdrop-blur-md ${stat.bg} ${stat.border}`}>
                       <div className={`${stat.color}`}>{stat.icon}</div>
@@ -828,17 +833,26 @@ export default function Home() {
                 className="relative group"
               >
                 <div className="absolute -inset-10 bg-gradient-to-tr from-aura-cyan/20 to-aura-purple/20 opacity-30 blur-[100px] group-hover:opacity-50 transition-opacity duration-1000 rounded-[5rem]"></div>
-                <div className="relative aspect-[4/5] overflow-hidden rounded-[4rem] border border-white/[0.05] shadow-2xl">
-                  <Image
-                    src="/ArslanXan.jpg"
-                    alt="ArslanXan - AURA Architect"
-                    width={1000}
-                    height={1250}
-                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0"
+                <div className="relative aspect-[4/5] rounded-[4rem] group/photo cursor-pointer overflow-hidden p-[2px]">
+                  {/* Animated Border Gradient */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-[-100%] bg-[conic-gradient(from_0deg,#00F3FF,#9D00FF,#00F3FF)] opacity-0 group-hover/photo:opacity-100 transition-opacity duration-500"
                   />
-                  <div className="absolute bottom-10 left-10 right-10 bg-black/40 backdrop-blur-[100px] border border-white/[0.05] p-10 rounded-[3rem]">
-                    <h3 className="text-3xl font-display font-bold text-white mb-2">{t.author.name}</h3>
-                    <p className="text-aura-cyan font-bold text-xs tracking-[0.4em] uppercase">{t.author.role}</p>
+
+                  <div className="relative w-full h-full rounded-[3.9rem] overflow-hidden bg-black z-10">
+                    <Image
+                      src="/ArslanXan.jpg"
+                      alt="ArslanXan - AURA Architect"
+                      width={1000}
+                      height={1250}
+                      className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0"
+                    />
+                    <div className="absolute bottom-10 left-10 right-10 bg-black/40 backdrop-blur-[100px] border border-white/[0.05] p-10 rounded-[3rem]">
+                      <h3 className="text-3xl font-display font-bold text-white mb-2">{t.author.name}</h3>
+                      <p className="text-aura-cyan font-bold text-xs tracking-[0.4em] uppercase">{t.author.role}</p>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -871,9 +885,18 @@ export default function Home() {
                     ].map((p, i) => (
                       <div
                         key={i}
-                        className={`p-6 rounded-3xl bg-white/[0.01] border border-white/[0.05] flex items-center justify-center font-bold text-[0.65rem] tracking-[0.2em] uppercase text-gray-300 transition-all duration-500 ${p.color} hover:bg-white/[0.02] hover:border-white/[0.1] h-full whitespace-nowrap`}
+                        className="relative group/partner p-[1px] rounded-3xl overflow-hidden cursor-pointer"
                       >
-                        {p.name}
+                        {/* Animated Border */}
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                          className="absolute inset-[-200%] bg-[conic-gradient(from_0deg,#ffffff1a,#00F3FF,#ffffff1a)] opacity-30 group-hover/partner:opacity-100 transition-opacity"
+                        />
+
+                        <div className={`relative px-6 py-8 rounded-[1.45rem] bg-black/80 backdrop-blur-xl border border-white/[0.05] flex items-center justify-center font-bold text-[0.65rem] tracking-[0.2em] uppercase text-gray-300 transition-all duration-500 ${p.color} hover:text-white z-10 h-full whitespace-nowrap`}>
+                          {p.name}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -926,11 +949,7 @@ export default function Home() {
                   <p className="text-gray-300 mb-12 max-w-sm text-lg font-light leading-relaxed">
                     {t.footer.description}
                   </p>
-                  <div className="flex gap-6">
-                    {["𝕏", "In", "Ig"].map((icon) => (
-                      <div key={icon} className="w-12 h-12 rounded-full bg-white/[0.02] border border-white/[0.05] flex items-center justify-center text-gray-300 hover:text-white transition-all cursor-pointer hover:border-white/20">{icon}</div>
-                    ))}
-                  </div>
+                  {/* Social Icons Removed */}
                 </div>
 
                 {/* Links Columns */}
@@ -963,7 +982,6 @@ export default function Home() {
                     {[
                       { label: t.footer.links.about, type: 'about' as const },
                       { label: t.footer.links.missions, type: 'missions' as const },
-                      { label: t.footer.links.careers, type: 'careers' as const },
                       { label: t.footer.links.contact, type: 'contact' as const }
                     ].map(link => (
                       <li key={link.label} className="group/link">
@@ -984,23 +1002,29 @@ export default function Home() {
 
               </div>
 
-              <div className="mt-32 pt-16 border-t border-white/[0.05] flex flex-col md:flex-row justify-between items-center text-[0.65rem] uppercase tracking-[0.2em] text-gray-600">
+              <div className="mt-32 pt-16 border-t border-white/[0.05] flex flex-col md:flex-row justify-between items-center text-[0.65rem] uppercase tracking-[0.2em] text-gray-400">
                 <p>{t.footer.copyright}</p>
                 <div className="flex gap-10 mt-8 md:mt-0">
-                  <a href="#" className="hover:text-white transition-colors">{t.footer.links.privacy}</a>
-                  <a href="#" className="hover:text-white transition-colors">{t.footer.links.terms}</a>
-                  <a href="#" className="hover:text-white transition-colors">{t.footer.links.cookies}</a>
+                  <button onClick={() => setActiveLegalModal('privacy')} className="hover:text-white transition-colors cursor-pointer">{t.footer.links.privacy}</button>
+                  <button onClick={() => setActiveLegalModal('terms')} className="hover:text-white transition-colors cursor-pointer">{t.footer.links.terms}</button>
+                  <button onClick={() => setActiveLegalModal('cookies')} className="hover:text-white transition-colors cursor-pointer">{t.footer.links.cookies}</button>
                 </div>
               </div>
             </div>
           </section>
 
-        </main>
-      </div>
+        </main >
+      </div >
 
       <ProductModals
         type={activeProductModal}
         onClose={() => setActiveProductModal(null)}
+        translations={t}
+      />
+
+      <LegalModals
+        type={activeLegalModal}
+        onClose={() => setActiveLegalModal(null)}
         translations={t}
       />
     </div >

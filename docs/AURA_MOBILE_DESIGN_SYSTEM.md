@@ -3,7 +3,7 @@
 **Status:** Production Ready  
 **Platforma:** iOS & Android (React Native / Expo)  
 **Moslik:** Web Dashboard v2.6 bilan 100% Funksional Paritet  
-**Falsafa:** "Cho'ntakdagi Boshqaruv Markazi" (Pocket God Mode)
+**Falsafa:** "Cho'ntakdagi Strategik Boshqaruv Markazi"
 
 Ushbu hujjat AURA mobil ilovasining yakuniy dizayn konstitutsiyasidir. Bizning qoidamiz qat'iy: "Mobil versiya — bu Web'ning kichik ukasi emas, balki uning egizagidir." Foydalanuvchi kompyuterda qila oladigan har qanday ishni telefonda ham, aynan o'sha chuqurlikda qila olishi shart.
 
@@ -36,19 +36,18 @@ Ekranning eng yuqorisida, status bar ostida joylashgan shaffof panel.
 - **O'ngda:**
   - **Bildirishnoma (Bell):** O'qilmagan xabarlar qizil nuqta bilan ko'rsatiladi.
   - **Profil (Avatar):** Boshqaruvchi rasmi.
-- **Funksiyasi:** Bosilganda oddiy sozlamalar emas, "Admin Panel" ochiladi. Unda Web Dashboarddagi barcha chuqur sozlamalar (API kalitlari, Oila a'zolarini boshqarish, Eksport, Tizim loglari) mavjud.
+- **Funksiyasi:** Bosilganda oddiy sozlamalar emas, "Admin Panel" ochiladi.- **Strategik Boshqaruv Dashboarddan** farqli ravishda, mobil versiya "Hissiyotlar Markazi" deb ataladi., Oila a'zolarini boshqarish, Eksport, Tizim loglari) mavjud.
 
 ### 2.2. Bottom Bar (Pastki Panel) — The Command Dock
 
 Sizning talabingiz bo'yicha aniq 5 ta bo'limdan iborat "Floating Dock" (Suzuvchi Dok):
 
-1. **Menu (Asosiy Menyu):** Barcha ilova imkoniyatlarining ro'yxati yoki panjarasi (Grid).
-2. **Finance (Moliya):** Hamyon balansi va tezkor tranzaksiya.
-3. **AURA (Ovozli Boshqaruv - Markazda):** Eng katta tugma.
+1. **Finance (Moliya):** Hamyon balansi va tezkor tranzaksiya.
+2. **AURA (Ovozli Boshqaruv - Markazda):** Eng katta tugma.
     - *Tap:* Tezkor menyu.
     - *Hold (Bosib turish):* Ovozli buyruq ("Aura, tushlikka 50 ming ketdi").
-4. **Tasks (Vazifalar):** Kunlik reja va kalendar.
-5. **Food (Ovqatlanish):** Kaloriya hisoblash va Food AI kamerasi.
+3. **Tasks (Vazifalar):** Kunlik reja va kalendar.
+4. **Food (Ovqatlanish):** Kaloriya hisoblash va Food AI kamerasi.
 
 ---
 
@@ -110,7 +109,7 @@ Webdagi har bir murakkab modul mobil ekranda qanday ishlashi kerak? Biz "Qulayli
 
 ## 5. QO'SHIMCHA IMKONIYATLAR
 
-### 5.1. Profil va "God Mode"
+### 5.1. Profil va "Strategik Boshqaruv"
 
 Yuqori o'ng burchakdagi Profil rasmi bosilganda ochiladigan menyu:
 

@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import Modal from '../Modal';
+import { useRouter } from 'next/navigation';
 
 interface ProductModalsProps {
     type: 'features' | 'pricing' | 'enterprise' | 'download' | 'about' | 'missions' | 'careers' | 'contact' | null;
@@ -9,10 +10,19 @@ interface ProductModalsProps {
 }
 
 export default function ProductModals({ type, onClose, translations }: ProductModalsProps) {
+    const router = useRouter();
+    const [memberCount, setMemberCount] = React.useState(2);
+
     if (!type) return null;
 
     const pt = translations.product_details;
     const ct = translations.company_details;
+
+    const calculateFamilyPrice = () => {
+        const basePrice = 4.99;
+        const extraMembers = memberCount > 2 ? memberCount - 2 : 0;
+        return (basePrice + extraMembers * 1.99).toFixed(2);
+    };
 
     const renderContent = () => {
         switch (type) {
@@ -43,28 +53,63 @@ export default function ProductModals({ type, onClose, translations }: ProductMo
                             <p className="text-gray-400 font-light leading-relaxed">{pt.pricing.subtitle}</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {pt.pricing.plans.map((plan: any, i: number) => (
-                                <div key={i} className={`p-8 rounded-[2.5rem] flex flex-col h-full transition-all duration-500 border ${plan.name === 'Expert' ? 'bg-white/[0.03] border-aura-cyan/30 shadow-[0_0_50px_rgba(0,255,255,0.05)] scale-105 z-10' : 'bg-white/[0.01] border-white/5'}`}>
-                                    <div className="mb-8">
-                                        <h4 className={`text-xs font-black uppercase tracking-[0.4em] mb-4 ${plan.name === 'Expert' ? 'text-aura-cyan' : 'text-gray-500'}`}>{plan.name}</h4>
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-5xl font-display font-black text-white">${plan.price}</span>
-                                            <span className="text-gray-500 text-xs font-light tracking-widest uppercase">/ {plan.period}</span>
+                            {pt.pricing.plans.map((plan: any, i: number) => {
+                                const isFamily = plan.name.toLowerCase().includes('family') || plan.name.toLowerCase().includes('oila');
+                                const displayPrice = isFamily ? calculateFamilyPrice() : plan.price;
+
+                                return (
+                                    <div key={i} className={`p-8 rounded-[2.5rem] flex flex-col h-full transition-all duration-500 border ${plan.name.toLowerCase().includes('yakka') || plan.name.toLowerCase().includes('individual') ? 'bg-white/[0.03] border-aura-cyan/30 shadow-[0_0_50px_rgba(0,255,255,0.05)] scale-105 z-10' : 'bg-white/[0.01] border-white/5'}`}>
+                                        <div className="mb-8">
+                                            <h4 className={`text-xs font-black uppercase tracking-[0.4em] mb-4 ${plan.name.toLowerCase().includes('yakka') || plan.name.toLowerCase().includes('individual') ? 'text-aura-cyan' : 'text-gray-500'}`}>{plan.name}</h4>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-5xl font-display font-black text-white">${displayPrice}</span>
+                                                <span className="text-gray-500 text-xs font-light tracking-widest uppercase">/ {plan.period}</span>
+                                            </div>
+
+                                            {isFamily && (
+                                                <div className="mt-6 p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-3">
+                                                    <div className="flex justify-between items-center px-1">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Members</span>
+                                                        <span className="text-aura-cyan font-display font-black">{memberCount}</span>
+                                                    </div>
+                                                    <input
+                                                        type="range"
+                                                        min="2"
+                                                        max="15"
+                                                        value={memberCount}
+                                                        title="Member count"
+                                                        onChange={(e) => setMemberCount(parseInt(e.target.value))}
+                                                        className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-aura-cyan"
+                                                    />
+                                                    <div className="flex justify-between text-[8px] font-black uppercase tracking-tighter text-gray-600">
+                                                        <span>2</span>
+                                                        <span>15 Max</span>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
+                                        <ul className="space-y-4 mb-10 flex-1">
+                                            {plan.features.map((feat: string, fi: number) => (
+                                                <li key={fi} className="flex items-center gap-3 text-sm text-gray-300 font-light">
+                                                    <svg className={`w-4 h-4 flex-shrink-0 ${plan.name.toLowerCase().includes('yakka') || plan.name.toLowerCase().includes('individual') ? 'text-aura-cyan' : 'text-aura-cyan/40'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    {feat}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <button
+                                            onClick={() => {
+                                                onClose();
+                                                router.push('/login/');
+                                            }}
+                                            className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all ${plan.name.toLowerCase().includes('yakka') || plan.name.toLowerCase().includes('individual') ? 'bg-aura-cyan text-black shadow-lg shadow-aura-cyan/20 hover:scale-105 active:scale-95' : 'bg-white/5 text-white hover:bg-white/10'}`}
+                                        >
+                                            {translations.footer.cta_btn}
+                                        </button>
                                     </div>
-                                    <ul className="space-y-4 mb-10 flex-1">
-                                        {plan.features.map((feat: string, fi: number) => (
-                                            <li key={fi} className="flex items-center gap-3 text-sm text-gray-300 font-light">
-                                                <svg className={`w-4 h-4 flex-shrink-0 ${plan.name === 'Expert' ? 'text-aura-cyan' : 'text-aura-cyan/40'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                {feat}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <button className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all ${plan.name === 'Expert' ? 'bg-aura-cyan text-black shadow-lg shadow-aura-cyan/20 hover:scale-105 active:scale-95' : 'bg-white/5 text-white hover:bg-white/10'}`}>Get Started</button>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 );
@@ -151,7 +196,13 @@ export default function ProductModals({ type, onClose, translations }: ProductMo
                         <h2 className="text-4xl font-display font-black text-white uppercase italic tracking-tighter">{ct.careers.title}</h2>
                         <p className="text-aura-cyan font-black uppercase tracking-[0.3em] text-xs">{ct.careers.subtitle}</p>
                         <p className="text-gray-400 font-light leading-relaxed">{ct.careers.text}</p>
-                        <button className="px-12 py-5 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-[10px] hover:bg-aura-cyan transition-all transform hover:scale-105">
+                        <button
+                            onClick={() => {
+                                onClose();
+                                router.push('/login/');
+                            }}
+                            className="px-12 py-5 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-[10px] hover:bg-aura-cyan transition-all transform hover:scale-105"
+                        >
                             {ct.careers.cta}
                         </button>
                     </div>

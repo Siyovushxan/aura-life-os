@@ -76,7 +76,7 @@ The Landing Page is not just an informational site but an interactive story told
 
 ---
 
-## 3. WEB DASHBOARD DESIGN ("God Mode")
+## 3. WEB DASHBOARD DESIGN ("Strategik Boshqaruv")
 
 The Dashboard is the command center. It uses a **Bento Grid** layout, popularized by Apple and Linear, to show maximum information in a beautiful, organized way.
 
@@ -153,4 +153,4 @@ The Dashboard is the command center. It uses a **Bento Grid** layout, popularize
 
 ---
 
-**Summary:** The AURA Web Design is built to make the user feel powerful ("God Mode"). It hides complexity behind a beautiful, unified grid but allows deep diving into data when needed.
+**Summary:** The AURA Web Design is built to make the user feel powerful ("Strategik Boshqaruv"). It hides complexity behind a beautiful, unified grid but allows deep diving into data when needed.

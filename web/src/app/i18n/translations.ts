@@ -123,7 +123,15 @@ export const translations = {
             subtitle: "Avlodlar g'amxo'rligining raqamli ko'prigi.",
             desc: "Yaqinlaringiz uchun passiv monitoring. Agar belgilangan vaqtda faollik bo'lmasa, oila a'zolari ogohlantiriladi. Keksalar xavfsizligi uchun ideal.",
             cta: "Signalni sozlash",
-            checkInPrompt: "Azamat ota, ahvolingiz yaxshimi? Iltimos, tasdiqlang."
+            checkInPrompt: "Azamat ota, ahvolingiz yaxshimi? Iltimos, tasdiqlang.",
+            stats: {
+                status: "Status",
+                active: "Faol",
+                last_check: "Oxirgi tekshiruv",
+                just_now: "Hozirgina",
+                protection: "Himoya",
+                p247: "24/7"
+            }
         },
         author: {
             title: "Loyiha Arxitektori",
@@ -170,7 +178,30 @@ export const translations = {
                 terms: "Shartlar",
                 cookies: "Kukilar"
             },
-            copyright: "© 2026 AURA Life OS. Barcha huquqlar himoyalangan."
+            copyright: "© 2026 AURA Life OS. Barcha huquqlar himoyalangan.",
+            legal: {
+                privacy_title: "Maxfiylik Siyosati",
+                privacy_content: "AURA sizning shaxsiy ma'lumotlaringizni himoya qilishga sodiqdir. Barcha ma'lumotlar Firebase serverlarida shifrlangan holatda saqlanadi. Biz sizning ma'lumotlaringizni uchinchi shaxslarga sotmaymiz va ularning xavfsizligini ta'minlaymiz.",
+                terms_title: "Foydalanish Shartlari",
+                terms_content: "AURA-dan mas'uliyat bilan foydalaning. Sun'iy intellekt tomonidan berilgan tavsiyalar faqat maslahat xarakteriga ega. Biz ushbu tavsiyalar asosida qabul qilingan qarorlar yoki vujudga kelishi mumkin bo'lgan oqibatlar uchun javobgar emasmiz.",
+                cookies_title: "Kukilar (Cookies) Haqida",
+                cookies_content: "Kukilar - bu sizning qurilmangizda saqlanadigan kichik ma'lumot fayllari. AURA ulardan sizni tizimda saqlab qolish (login), xavfsizlikni ta'minlash va til sozlamalarini eslab qolish uchun foydalanadi. Bu fayllarsiz tizim sizning shaxsingizni taniy olmaydi va ilova to'liq ishlamasligi mumkin."
+            },
+            billing: {
+                title: "To'lov va Hisob",
+                currentPlan: "Joriy Tarif",
+                upgrade: "Yangilash",
+                manage: "Boshqarish",
+                trialEnds: "Sinov muddati tugashiga",
+                activeUntil: "Amal qilish muddati",
+                daysLeft: "kun qoldi",
+                history: "To'lovlar tarixi",
+                noHistory: "To'lovlar mavjud emas",
+                selectPlan: "Tarifni tanlang",
+                perMonth: "oyiga",
+                upgradeSuccess: "Tarif muvaffaqiyatli yangilandi",
+                upgradeError: "Yangilashda xatolik yuz berdi"
+            }
         },
         home: {
             analyzing: "AURA AI tahlil qilmoqda...",
@@ -203,12 +234,12 @@ export const translations = {
                 ]
             },
             pricing: {
-                title: "Premiumga o'ting",
+                title: "Premium tariflar",
                 subtitle: "O'zingizga mos rejani tanlang va AURA-ning to'liq kuchidan foydalaning.",
                 plans: [
-                    { name: "Free", price: "0", period: "oy", features: ["The Soul (Mobile versiya)", "Asosiy ma'lumotlar", "Kunlik 1 ta AI insight"] },
-                    { name: "Expert", price: "9", period: "oy", features: ["The Brain (Web Dashboard)", "Groq AI tahlili", "Cheksiz AI insightlar", "Prioritetli qo'llab-quvvatlash"] },
-                    { name: "Family", price: "19", period: "oy", features: ["5 tagacha oila a'zosi", "Raqamli Meros (Legacy)", "Ota-ona nazorati", "Ekspert rejasining barcha imkoniyatlari"] }
+                    { name: "Sinov (Trial)", price: "0", period: "7 kun", features: ["7 kun to'liq bepul sinov", "Kunlik 1 ta AI (har modulda)", "7 kundan so'ng AI o'chadi", "Asosiy 8 ta modul"] },
+                    { name: "Yakka (Individual)", price: "2.99", period: "oy", features: ["Barcha 8 ta tizim moduli", "Kunlik 5 ta AI (har modulda)", "Ovozli kiritish (Voice Control)", "Oilaga o'tishda 30% chegirma"] },
+                    { name: "Oila (Family)", price: "4.99", period: "oydan", features: ["2-15 oila a'zosi ulanishi", "Yakka tarif imkoniyatlari ichida", "Har bir qo'shimcha a'zo +$1.99", "Maksimal 15 a'zo"] }
                 ]
             },
             enterprise: {
@@ -386,7 +417,15 @@ export const translations = {
             subtitle: "Цифровой мост заботы о близких.",
             desc: "Пассивный мониторинг ваших близких. Если активность не обнаружена в заданное окно, семья получит уведомление. Идеально для безопасности пожилых людей.",
             cta: "Настроить Пульс",
-            checkInPrompt: "Азамат ота, вы в порядке? Пожалуйста, подтвердите."
+            checkInPrompt: "Азамат ота, вы в порядке? Пожалуйста, подтвердите.",
+            stats: {
+                status: "Статус",
+                active: "Активен",
+                last_check: "Последняя проверка",
+                just_now: "Только что",
+                protection: "Защита",
+                p247: "24/7"
+            }
         },
         author: {
             title: "Архитектор Проекта",
@@ -433,7 +472,30 @@ export const translations = {
                 terms: "Условия",
                 cookies: "Куки"
             },
-            copyright: "© 2026 AURA Life OS. Все права защищены."
+            copyright: "© 2026 AURA Life OS. Все права защищены.",
+            legal: {
+                privacy_title: "Политика Конфиденциальности",
+                privacy_content: "AURA стремится защищать ваши личные данные. Все данные хранятся в зашифрованном виде на серверах Firebase. Мы не продаем ваши данные третьим лицам и обеспечиваем их полную безопасность.",
+                terms_title: "Условия Использования",
+                terms_content: "Используйте AURA ответственно. Рекомендации искусственного интеллекта носят исключительно ознакомительный характер. Мы не несем ответственности за решения или последствия, возникшие на основе этих рекомендаций.",
+                cookies_title: "Что такое Куки (Cookies)",
+                cookies_content: "Куки — это небольшие файлы данных, хранящиеся на вашем устройстве. AURA использует их для поддержания вашей сессии (входа в систему), обеспечения безопасности и запоминания языковых настроек. Без них приложение не сможет узнать вас и работать корректно."
+            },
+            billing: {
+                title: "Оплата и Подписка",
+                currentPlan: "Текущий Тариф",
+                upgrade: "Обновить",
+                manage: "Управлять",
+                trialEnds: "Пробный период закончится через",
+                activeUntil: "Активен до",
+                daysLeft: "дн.",
+                history: "История платежей",
+                noHistory: "История пуста",
+                selectPlan: "Выберите тариф",
+                perMonth: "в месяц",
+                upgradeSuccess: "Тариф успешно обновлен",
+                upgradeError: "Ошибка при обновлении"
+            }
         },
         home: {
             analyzing: "AURA AI анализирует...",
@@ -466,12 +528,12 @@ export const translations = {
                 ]
             },
             pricing: {
-                title: "Переходите на Premium",
+                title: "Premium тарифы",
                 subtitle: "Выберите подходящий план и используйте всю мощь AURA.",
                 plans: [
-                    { name: "Free", price: "0", period: "мес", features: ["The Soul (Моб. версия)", "Базовая статистика", "1 ИИ-инсайт в день"] },
-                    { name: "Expert", price: "9", period: "мес", features: ["The Brain (Web Dashboard)", "Анализ Groq AI", "Безлимитные ИИ-инсайты", "Приоритетная поддержка"] },
-                    { name: "Family", price: "19", period: "мес", features: ["До 5 членов семьи", "Цифровое наследие (Legacy)", "Родительский контроль", "Все функции плана Expert"] }
+                    { name: "Пробный (Trial)", price: "0", period: "7 дн", features: ["7 дней бесплатно", "1 ИИ-совет в день (на модуль)", "ИИ отключается через 7 дней", "Доступ к 8 модулям"] },
+                    { name: "Индивидуальный", price: "2.99", period: "мес", features: ["Все 8 модулей системы", "5 ИИ-советов в день (на модуль)", "Голосовое управление (Voice)", "Скидка 30% при переходе в Семью"] },
+                    { name: "Семейный", price: "4.99", period: "от / мес", features: ["От 2 до 15 членов семьи", "Включает Индивидуальный тариф", "Каждый доп. член семьи +$1.99", "Максимум 15 человек"] }
                 ]
             },
             enterprise: {
@@ -530,6 +592,8 @@ export const translations = {
     },
     en: {
         nav: {
+            user: "User",
+            current: "CURRENT",
             hero: "Home",
             problem: "Problem",
             solution: "Solution",
@@ -650,7 +714,15 @@ export const translations = {
             subtitle: "Bridging the legacy of care.",
             desc: "Passive monitoring for your loved ones. If no activity is detected within the set window, we'll alert the family. Ideal for senior safety.",
             cta: "Set Up Beacon",
-            checkInPrompt: "Azamat Ota, are you okay? Please confirm."
+            checkInPrompt: "Azamat Ota, are you okay? Please confirm.",
+            stats: {
+                status: "Status",
+                active: "Active",
+                last_check: "Last Check",
+                just_now: "Just now",
+                protection: "Protection",
+                p247: "24/7"
+            }
         },
         author: {
             title: "Project Architect",
@@ -697,7 +769,39 @@ export const translations = {
                 terms: "Terms",
                 cookies: "Cookies"
             },
-            copyright: "© 2026 AURA Life OS. All rights reserved."
+            copyright: "© 2026 AURA Life OS. All rights reserved.",
+            legal: {
+                privacy_title: "Privacy Policy",
+                privacy_content: "AURA is committed to protecting your personal data. All data is stored encrypted on Firebase servers. We do not sell your personal information to third parties and ensure absolute data sovereignty.",
+                terms_title: "Terms of Service",
+                terms_content: "Use AURA responsibly. AI-generated insights are for advisory and informational purposes only. We are not liable for any decisions made or outcomes based on these recommendations.",
+                cookies_title: "About Cookies",
+                cookies_content: "Cookies are small data files stored on your device. AURA uses them to keep you logged in, ensure security, and remember your language preferences. Without these, the app cannot identify you or function properly."
+            },
+            billing: {
+                title: "Billing & Account",
+                currentPlan: "Current Plan",
+                upgrade: "Upgrade",
+                switch: "Switch",
+                manage: "Manage",
+                trialEnds: "Trial ends in",
+                activeUntil: "Active until",
+                daysLeft: "days",
+                history: "Billing History",
+                noHistory: "No billing history found",
+                selectPlan: "Select a Plan",
+                perMonth: "per month",
+                upgradeSuccess: "Subscription updated successfully",
+                upgradeError: "Error updating subscription",
+                checkoutTitle: "Checkout Details",
+                cardNumber: "Card Number",
+                expiry: "Expiry",
+                cvv: "CVV",
+                payNow: "Pay Now",
+                securePayment: "Secure SSL Payment",
+                processing: "Processing...",
+                cardNumberHint: "Enter card number"
+            },
         },
         home: {
             analyzing: "AURA AI is analyzing...",
@@ -733,9 +837,9 @@ export const translations = {
                 title: "Go Premium",
                 subtitle: "Choose the plan that fits you and unlock the full power of AURA.",
                 plans: [
-                    { name: "Free", price: "0", period: "mo", features: ["The Soul (Mobile App)", "Basic Data Tracking", "1 Daily AI Insight"] },
-                    { name: "Expert", price: "9", period: "mo", features: ["The Brain (Web Dashboard)", "Groq AI Analysis", "Unlimited AI Insights", "Priority Support"] },
-                    { name: "Family", price: "19", period: "mo", features: ["Up to 5 family members", "Digital Legacy", "Parental Controls", "Everything in Expert"] }
+                    { name: "Trial", price: "0", period: "7 days", features: ["7 days free trial", "1 AI advice/day (per module)", "AI expires after 7 days", "Full access to 8 modules"] },
+                    { name: "Individual", price: "2.99", period: "mo", features: ["All 8 system modules", "5 AI advices/day (per module)", "Voice Commands enabled", "30% discount for Family upgrade"] },
+                    { name: "Family", price: "4.99", period: "start / mo", features: ["Connect 2-15 family members", "Includes Individual features", "Each extra member +$1.99", "Maximum 15 members"] }
                 ]
             },
             enterprise: {

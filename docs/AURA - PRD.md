@@ -1,4 +1,4 @@
-AURA: AI-Powered Life Operating System PRD v2.1
+# AURA: AI-Powered Life Operating System PRD v2.6
 
 **⚠️ VERSIYA YANGILANDI: v2.0 → v2.1**
 Ushbu yangilash joriy web implementatsiyasini to'liq hujjatlashtiradi va backend/mobile holatlari aniq belgilaydi.
@@ -21,7 +21,7 @@ AURA — bu insonning kundalik hayotini har tomonlama (moliya, salomatlik, ruhiy
 
 **Yangi Falsafa:** Loyiha shunchaki "Tracker" emas, balki **"Life OS"** (Hayotni Boshqarish Tizimi). U **"Kapalak Effekti"** tamoyili asosida ishlaydi: Moliya, Sog'liq va Ruhiyat bir-biriga qanday ta'sir qilishini aniqlaydi va vizualizatsiya qiladi.
 
-**Web Platform Mission:** "The Brain" - Chuqur tahlil, strategik rejalashtirish va ma'lumotlarni boshqarish markazi.
+**Web Platform Mission:** "The Brain" - Chuqur tahlil, strategik rejalashtirish va ma'lumotlarni boshqarish markazi. (Strategik Boshqaruv)
 
 --------------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ Barcha modullar va komponentlar uchun:
 
 *(Analitik Boshqaruv)*
 
-• **Maqsad:** Chuqur tahlil, strategik rejalashtirish va katta hajmdagi ma'lumotlarni ko'rish.
-• **Visual Style:** "Control Center" uslubi. Quyuq fon (dark theme), neon urg'ular, vidjetlar tizimi.
+• **Maqsad:** Chuqur tahlil, strategik rejalashtirish va katta hajmdagi ma'lumotlarni ko'rish. (Strategik Boshqaruv)
+• **Visual Style:** "Control Center" uslubi. Quyuq fon (dark theme), neon urg'ular, vidjetlar tizimi. (Strategik Boshqaruv)
 • **Technology Stack:**
 
 - Next.js 14 (App Router)
@@ -533,17 +533,49 @@ Kunlik ovqatlanish xulosasi va ertangi kun tavsiyalari.
 
 ---
 
-### 8.2. Tariflar 🚧 PENDING
+### 8.2. Tariflar ✅ UPDATED v2.4
 
 **Plans:**
-• **Trial:** 1 hafta bepul
-• **Free:** Basic features
-• **Individual:** Advanced features
-• **Family:** Shajara va Keksalar nazorati
+
+1. **Trial (Sinov):**
+    - **Davomiyligi:** 7 kun bepul.
+    - **Imkoniyat:** Har bir moduldagi AI'dan kuniga 1 marta foydalanish.
+    - **Trial tugagach:** AI imkoniyatlari butunlay yopiladi. Foydalanuvchi faqat 8 ta moduldan (AI'siz) foydalanishda davom etishi mumkin.
+
+2. **Yakka (Individual):**
+    - **Narxi:** $2.99 / oy.
+    - **Imkoniyat:** Barcha 8 ta modul. Har bir modul uchun kuniga 5 tagacha AI tavsiya.
+    - **O'ziga xoslik:** Ovozli kiritish (Voice) modullari to'liq ishlaydi.
+    - **Upgrade:** Oila tarifiga o'tmoqchi bo'lsa, 30% chegirma beriladi.
+
+3. **Oila (Family):**
+    - **Narxi:** $4.99 - $30.85 / oy.
+    - **Baza:** $4.99 (2 ta a'zo uchun).
+    - **Qo'shimcha:** Har bir keyingi a'zo uchun +$1.99.
+    - **Chegara:** Maksimal 15 ta a'zo.
+    - **Individual Integration:** Oila tarifi olinganda Yakka tarif imkoniyatlari (5 AI/kun) ham faollashadi.
 
 ---
 
-### 8.3. Data Architecture
+## 16. Monetization & Billing (TO'LOV VA TARIFLAR)
+
+### Subscription States
+
+- **Trial**: 7 days full access for new users.
+- **Individual**: $2.99/mo full access for single user.
+- **Family (Oila)**: $3.00 base + $1.99/member (up to 15 members).
+- **Expired**: Access restricted to basic dashboard view.
+
+### Firestore Schema Enhancements
+
+- `users/{uid}`:
+  - `subscription`:
+    - `planId`: "trial" | "individual" | "family"
+    - `status`: "active" | "past_due" | "canceled" | "expired"
+    - `currentPeriodEnd`: Timestamp
+    - `memberCount`: number (for Family plan)
+
+### 17. System Architecture & Tech Stack (RECURSIVE)
 
 **Google Antigravity:**
 • Tizim "Data-Driven AI" mantiqida quriladi
@@ -570,7 +602,44 @@ notifications/
 
 --------------------------------------------------------------------------------
 
-## 9. BILDIRISHNOMALAR TIZIMI (NOTIFICATION SYSTEM) ✅
+## 16. TO'LOV VA TARIFLAR (MONETIZATION & BILLING) ✅ NEW v2.6
+
+AURA loyihasi barqaror rivojlanishi uchun 3 darajali obuna tizimi amalga oshiriladi.
+
+### 16.1. Obuna Statuslari (Subscription States)
+
+| Status | Davomiyligi | Imkoniyatlar |
+|--------|-------------|--------------|
+| `trial` | 7 kun | 8 modul ochiq, 1 AI/kun (har modulda). |
+| `expired` | Cheksiz | 8 modul ochiq (Read-only yoki AI o'chirilgan). |
+| `individual` | 1 oy | To'liq kirish, 5 AI/kun, Ovozli boshqaruv. |
+| `family` | 1 oy | 2-15 a'zo, To'liq kirish, Narx a'zolar soniga bog'liq. |
+
+### 16.2. Billing Mantiqi (Billing Logic)
+
+1. **Auto-Expiration:** Trial davri tugagach, tizim avtomatik ravishda `expired` statusiga o'tadi.
+2. **Upgrade Path:** Foydalanuvchi istalgan vaqtda Yakka (Individual) yoki Oila (Family) tarifiga o'tishi mumkin.
+3. **Family Member Scaling:** Oila tarifida narx bazaviy $4.99 ($3.00 + $1.99) dan boshlanadi va har bir qo'shimcha a'zo uchun $1.99 qo'shiladi.
+4. **Grace Period:** To'lov amalga oshirilmasa, foydalanuvchiga 3 kunlik "Grace Period" beriladi, so'ngra xizmat cheklanadi.
+
+### 16.3. Firestore Ma'lumotlar Strukturasi (Billing Schema)
+
+`users/{userId}/subscription` (Sub-collection or Object):
+
+```typescript
+{
+  planId: "trial" | "individual" | "family",
+  status: "active" | "past_due" | "canceled" | "expired",
+  currentPeriodStart: Timestamp,
+  currentPeriodEnd: Timestamp,
+  cancelAtPeriodEnd: boolean,
+  memberCount: number, // Only for Family
+  amount: number, // USD
+  currency: "USD"
+}
+```
+
+--------------------------------------------------------------------------------
 
 **Implementatsiya:** `NotificationContext.tsx`
 
