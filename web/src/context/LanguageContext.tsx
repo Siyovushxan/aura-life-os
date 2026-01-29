@@ -708,6 +708,44 @@ type TranslationStructure = {
         checkInPrompt: string;
         familyAlert: (hours: number) => string;
     };
+    auth: {
+        welcomeBack: string;
+        accessLifeOS: string;
+        joinAura: string;
+        beginJourney: string;
+        email: string;
+        phone: string;
+        password: string;
+        signIn: string;
+        signUp: string;
+        createAccount: string;
+        forgotPassword: string;
+        secureAccess: string;
+        signInGoogle: string;
+        noAccount: string;
+        haveAccount: string;
+        fullName: string;
+        fullNamePlaceholder: string;
+        phonePlaceholder: string;
+        otpCode: string;
+        sendOtp: string;
+        verifyOtp: string;
+        changePhone: string;
+        processing: string;
+        back: string;
+        withPassword: string;
+        withSms: string;
+        smsNotice: string;
+        passwordPlaceholder: string;
+        setError: string;
+        phoneInputError: string;
+        secureRegistration: string;
+        countryCodeNotice: string;
+        setPass: string;
+        verifyAndJoin: string;
+        changeNumber: string;
+        signUpGoogle: string;
+    };
 };
 
 const translations: Record<Language, TranslationStructure> = {
@@ -1414,6 +1452,44 @@ const translations: Record<Language, TranslationStructure> = {
             checkInPrompt: 'Azamat Ota, are you okay? Please confirm.',
             familyAlert: (hours: number) => `Alert: Your father has not checked in for ${hours} hours!`
         },
+        auth: {
+            welcomeBack: "Welcome Back",
+            accessLifeOS: "Access your Life OS",
+            joinAura: "Join AURA",
+            beginJourney: "Begin your Life OS journey",
+            email: "EMAIL",
+            phone: "PHONE",
+            password: "Password",
+            signIn: "Sign In",
+            signUp: "Sign Up",
+            createAccount: "Create Account",
+            forgotPassword: "Forgot Password?",
+            secureAccess: "Secure Access",
+            signInGoogle: "Sign In with Google",
+            noAccount: "Don't have an account?",
+            haveAccount: "Already have an account?",
+            fullName: "Full Name",
+            fullNamePlaceholder: "John Doe",
+            phonePlaceholder: "+1 234 567 8900",
+            otpCode: "OTP Code",
+            sendOtp: "Send OTP Code",
+            verifyOtp: "Verify & Sign In",
+            changePhone: "Change Phone Number",
+            processing: "Processing...",
+            back: "Back",
+            withPassword: "WITH PASSWORD",
+            withSms: "WITH SMS (OTP)",
+            smsNotice: "SMS will be sent for verification",
+            passwordPlaceholder: "••••••••",
+            setError: "Please fill all fields",
+            phoneInputError: "Enter number with \"+\" and country code",
+            secureRegistration: "Secure Registration",
+            countryCodeNotice: "Enter number with \"+\" and country code (e.g., +44, +998, +7)",
+            setPass: "Set Password",
+            verifyAndJoin: "Verify OTP & Join",
+            changeNumber: "Change Phone Number",
+            signUpGoogle: "Sign Up with Google"
+        },
     },
     uz: {
         common: {
@@ -2117,6 +2193,44 @@ const translations: Record<Language, TranslationStructure> = {
             checkInPrompt: 'Azamat ota, ahvolingiz yaxshimi? Iltimos, tasdiqlang.',
             familyAlert: (hours: number) => `Ogohlantirish: Otangiz ${hours} soatdan beri aloqaga chiqmadi!`
         },
+        auth: {
+            welcomeBack: "Xush Kelibsiz",
+            accessLifeOS: "Life OS tizimiga kiring",
+            joinAura: "AURA ga Qo'shiling",
+            beginJourney: "Life OS sayohatini boshlang",
+            email: "EMAIL",
+            phone: "TELEFON",
+            password: "Parol",
+            signIn: "Kirish",
+            signUp: "Ro'yxatdan o'tish",
+            createAccount: "Hisob yaratish",
+            forgotPassword: "Parolni unutdingizmi?",
+            secureAccess: "Xavfsiz Kirish",
+            signInGoogle: "Google orqali kirish",
+            noAccount: "Hisobingiz yo'qmi?",
+            haveAccount: "Hisobingiz bormi?",
+            fullName: "To'liq Ism",
+            fullNamePlaceholder: "Ism Familiya",
+            phonePlaceholder: "+998 90 123 45 67",
+            otpCode: "SMS Kod",
+            sendOtp: "Kod yuborish",
+            verifyOtp: "Tasdiqlash va Kirish",
+            changePhone: "Raqamni o'zgartirish",
+            processing: "Jarayonda...",
+            back: "Orqaga",
+            withPassword: "PAROL BILAN",
+            withSms: "SMS ORQALI",
+            smsNotice: "Tasdiqlash uchun SMS yuboriladi",
+            passwordPlaceholder: "••••••••",
+            setError: "Iltimos, barcha maydonlarni to'ldiring",
+            phoneInputError: "Raqamni \"+\" va davlat kodi bilan kiriting",
+            secureRegistration: "Xavfsiz Ro'yxatdan o'tish",
+            countryCodeNotice: "\"\+\" va davlat kodi bilan kiriting (masalan, +998)",
+            setPass: "Parol o'rnatish",
+            verifyAndJoin: "Tasdiqlash va Qo'shilish",
+            changeNumber: "Raqamni o'zgartirish",
+            signUpGoogle: "Google orqali ro'yxatdan o'tish"
+        },
     },
     ru: {
         common: {
@@ -2819,6 +2933,44 @@ const translations: Record<Language, TranslationStructure> = {
             countdown_prefix: 'До проверки:',
             checkInPrompt: 'Азамат ота, вы в порядке? Пожалуйста, подтвердите.',
             familyAlert: (hours: number) => `Внимание: Ваш отец не выходил на связь ${hours} часов!`
+        },
+        auth: {
+            welcomeBack: "С Возвращением",
+            accessLifeOS: "Войдите в Life OS",
+            joinAura: "Присоединяйтесь к AURA",
+            beginJourney: "Начните свое путешествие",
+            email: "EMAIL",
+            phone: "ТЕЛЕФОН",
+            password: "Пароль",
+            signIn: "Войти",
+            signUp: "Регистрация",
+            createAccount: "Создать аккаунт",
+            forgotPassword: "Забыли пароль?",
+            secureAccess: "Безопасный вход",
+            signInGoogle: "Войти через Google",
+            noAccount: "Нет аккаунта?",
+            haveAccount: "Уже есть аккаунт?",
+            fullName: "Полное Имя",
+            fullNamePlaceholder: "Иван Иванов",
+            phonePlaceholder: "+7 900 123 45 67",
+            otpCode: "Код из SMS",
+            sendOtp: "Отправить код",
+            verifyOtp: "Подтвердить и Войти",
+            changePhone: "Изменить номер",
+            processing: "Обработка...",
+            back: "Назад",
+            withPassword: "ПО ПАРОЛЮ",
+            withSms: "ПО SMS (OTP)",
+            smsNotice: "SMS будет отправлено для подтверждения",
+            passwordPlaceholder: "••••••••",
+            setError: "Пожалуйста, заполните все поля",
+            phoneInputError: "Введите номер с \"+\" и кодом страны",
+            secureRegistration: "Безопасная регистрация",
+            countryCodeNotice: "Введите номер с \"+\" и кодом страны (напр., +7)",
+            setPass: "Задать пароль",
+            verifyAndJoin: "Подтвердить и Войти",
+            changeNumber: "Изменить номер",
+            signUpGoogle: "Регистрация через Google"
         },
     },
 };

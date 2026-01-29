@@ -5,6 +5,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ConfirmationResult } from "firebase/auth";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 
 const phoneToEmail = (phone: string) => `${phone.replace(/\+/g, '')}@phone.aura.li`;
 
@@ -72,7 +73,10 @@ export default function LoginPage() {
     }, [user, authLoading, router]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white relative overflow-hidden p-4">
+        <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white relative overflow-hidden p-4 font-sans">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+
             {/* Back Button */}
             <Link
                 href="/"
@@ -80,16 +84,18 @@ export default function LoginPage() {
                 className="absolute top-8 left-8 flex items-center gap-2 text-gray-400 hover:text-white transition-colors z-20 group"
             >
                 <span className="group-hover:-translate-x-1 transition-transform">←</span>
-                {t.common.back || 'Back'}
+                {t.auth.back}
             </Link>
 
             {/* Background Effects */}
-            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-aura-blue/20 rounded-full blur-[100px]"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-aura-purple/20 rounded-full blur-[100px]"></div>
+            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-aura-blue/20 rounded-full blur-[100px] pointer-events-none"></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-aura-purple/20 rounded-full blur-[100px] pointer-events-none"></div>
 
-            <div className="w-full max-w-md p-8 rounded-[2.5rem] bg-white/5 border border-white/10 backdrop-blur-xl z-10 shadow-2xl">
-                <h1 className="text-4xl font-display font-bold text-center mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/50">Welcome Back</h1>
-                <p className="text-gray-400 text-center mb-10">Access your Life OS</p>
+            <div className="w-full max-w-md p-8 rounded-[2.5rem] bg-white/5 border border-white/10 backdrop-blur-xl z-20 shadow-2xl relative">
+                <h1 className="text-4xl font-display font-bold text-center mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/50">
+                    {t.auth.welcomeBack}
+                </h1>
+                <p className="text-gray-400 text-center mb-10">{t.auth.accessLifeOS}</p>
 
                 {/* Login Method Toggle */}
                 <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 mb-8">
@@ -97,13 +103,13 @@ export default function LoginPage() {
                         onClick={() => { setLoginMethod('email'); setConfirmationResult(null); setError(""); }}
                         className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all ${loginMethod === 'email' ? 'bg-white text-black shadow-lg scale-105' : 'text-gray-500 hover:text-white'}`}
                     >
-                        EMAIL
+                        {t.auth.email}
                     </button>
                     <button
                         onClick={() => { setLoginMethod('phone'); setConfirmationResult(null); setError(""); }}
                         className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all ${loginMethod === 'phone' ? 'bg-white text-black shadow-lg scale-105' : 'text-gray-500 hover:text-white'}`}
                     >
-                        PHONE
+                        {t.auth.phone}
                     </button>
                 </div>
 
@@ -113,30 +119,30 @@ export default function LoginPage() {
                     {loginMethod === 'email' ? (
                         <>
                             <div>
-                                <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2 ml-1">Email Address</label>
+                                <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2 ml-1">{t.auth.email}</label>
                                 <input
                                     type="email"
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full p-4 rounded-2xl bg-black/40 border border-white/5 focus:border-aura-cyan/50 focus:outline-none transition-all placeholder:text-gray-700 font-bold"
+                                    className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-aura-cyan/50 focus:outline-none transition-all placeholder:text-gray-500 font-bold text-white"
                                     placeholder="you@example.com"
                                 />
                             </div>
                             <div className="relative">
-                                <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2 ml-1">Password</label>
+                                <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2 ml-1">{t.auth.password}</label>
                                 <input
                                     type={showPass ? "text" : "password"}
                                     required
                                     value={pass}
                                     onChange={(e) => setPass(e.target.value)}
-                                    className="w-full p-4 pr-12 rounded-2xl bg-black/40 border border-white/5 focus:border-aura-cyan/50 focus:outline-none transition-all placeholder:text-gray-700 font-bold"
-                                    placeholder="••••••••"
+                                    className="w-full p-4 pr-12 rounded-2xl bg-black/40 border border-white/10 focus:border-aura-cyan/50 focus:outline-none transition-all placeholder:text-gray-500 font-bold text-white"
+                                    placeholder={t.auth.passwordPlaceholder}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPass(!showPass)}
-                                    className="absolute right-4 bottom-4 text-gray-500 hover:text-white transition-colors"
+                                    className="absolute right-4 bottom-4 text-gray-500 hover:text-white transition-colors z-10"
                                 >
                                     {showPass ? '👁️' : '🔒'}
                                 </button>
@@ -151,44 +157,45 @@ export default function LoginPage() {
                                     onClick={() => { setPhoneMode('password'); setConfirmationResult(null); }}
                                     className={`flex-1 py-2 rounded-lg text-[10px] font-bold transition-all ${phoneMode === 'password' ? 'bg-white/10 text-white' : 'text-gray-600'}`}
                                 >
-                                    WITH PASSWORD
+                                    {t.auth.withPassword}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => { setPhoneMode('otp'); setConfirmationResult(null); }}
                                     className={`flex-1 py-2 rounded-lg text-[10px] font-bold transition-all ${phoneMode === 'otp' ? 'bg-white/10 text-white' : 'text-gray-600'}`}
                                 >
-                                    WITH SMS (OTP)
+                                    {t.auth.withSms}
                                 </button>
                             </div>
 
                             {phoneMode === 'password' ? (
                                 <>
                                     <div>
-                                        <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2 ml-1">Phone Number</label>
+                                        <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2 ml-1">{t.auth.phone}</label>
                                         <input
                                             type="tel"
                                             required
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
-                                            className="w-full p-4 rounded-2xl bg-black/40 border border-white/5 focus:border-aura-cyan/50 focus:outline-none transition-all placeholder:text-gray-700 font-bold"
-                                            placeholder="+1 234 567 8900"
+                                            className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-aura-cyan/50 focus:outline-none transition-all placeholder:text-gray-500 font-bold text-white"
+                                            placeholder={t.auth.phonePlaceholder}
                                         />
+                                        <p className="text-[10px] text-gray-500 mt-2 ml-1 italic">{t.auth.countryCodeNotice}</p>
                                     </div>
                                     <div className="relative">
-                                        <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2 ml-1">Password</label>
+                                        <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2 ml-1">{t.auth.password}</label>
                                         <input
                                             type={showPass ? "text" : "password"}
                                             required
                                             value={pass}
                                             onChange={(e) => setPass(e.target.value)}
-                                            className="w-full p-4 pr-12 rounded-2xl bg-black/40 border border-white/5 focus:border-aura-cyan/50 focus:outline-none transition-all placeholder:text-gray-700 font-bold"
-                                            placeholder="••••••••"
+                                            className="w-full p-4 pr-12 rounded-2xl bg-black/40 border border-white/10 focus:border-aura-cyan/50 focus:outline-none transition-all placeholder:text-gray-500 font-bold text-white"
+                                            placeholder={t.auth.passwordPlaceholder}
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPass(!showPass)}
-                                            className="absolute right-4 bottom-4 text-gray-500 hover:text-white transition-colors"
+                                            className="absolute right-4 bottom-4 text-gray-500 hover:text-white transition-colors z-10"
                                         >
                                             {showPass ? '👁️' : '🔒'}
                                         </button>
@@ -198,27 +205,27 @@ export default function LoginPage() {
                                 <>
                                     {!confirmationResult ? (
                                         <div>
-                                            <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2 ml-1">Phone Number</label>
+                                            <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2 ml-1">{t.auth.phone}</label>
                                             <input
                                                 type="tel"
                                                 required
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value)}
-                                                className="w-full p-4 rounded-2xl bg-black/40 border border-white/5 focus:border-aura-cyan/50 focus:outline-none transition-all placeholder:text-gray-700 font-bold"
-                                                placeholder="+1 234 567 8900"
+                                                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-aura-cyan/50 focus:outline-none transition-all placeholder:text-gray-500 font-bold text-white"
+                                                placeholder={t.auth.phonePlaceholder}
                                             />
-                                            <p className="text-[10px] text-gray-600 mt-2 ml-1 italic">SMS will be sent for verification</p>
+                                            <p className="text-[10px] text-gray-500 mt-2 ml-1 italic">{t.auth.smsNotice}</p>
                                         </div>
                                     ) : (
                                         <div>
-                                            <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2 ml-1">OTP Code</label>
+                                            <label className="block text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2 ml-1">{t.auth.otpCode}</label>
                                             <input
                                                 type="text"
                                                 required
                                                 maxLength={6}
                                                 value={otp}
                                                 onChange={(e) => setOtp(e.target.value)}
-                                                className="w-full p-4 rounded-2xl bg-black/40 border border-white/5 focus:border-aura-cyan/50 focus:outline-none transition-all text-center text-2xl tracking-[0.5em] font-black placeholder:text-gray-700"
+                                                className="w-full p-4 rounded-2xl bg-black/40 border border-white/10 focus:border-aura-cyan/50 focus:outline-none transition-all text-center text-2xl tracking-[0.5em] font-black placeholder:text-gray-700 text-white"
                                                 placeholder="000000"
                                             />
                                         </div>
@@ -234,10 +241,10 @@ export default function LoginPage() {
                         disabled={loading}
                         className="w-full py-4 rounded-2xl bg-gradient-to-r from-aura-cyan to-aura-blue text-black font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(0,240,255,0.3)] disabled:opacity-50"
                     >
-                        {loading ? 'Processing...' : (
-                            loginMethod === 'email' ? 'Sign In' : (
-                                phoneMode === 'password' ? 'Sign In' : (
-                                    confirmationResult ? 'Verify & Sign In' : 'Send OTP Code'
+                        {loading ? t.auth.processing : (
+                            loginMethod === 'email' ? t.auth.signIn : (
+                                phoneMode === 'password' ? t.auth.signIn : (
+                                    confirmationResult ? t.auth.verifyOtp : t.auth.sendOtp
                                 )
                             )
                         )}
@@ -245,17 +252,17 @@ export default function LoginPage() {
                 </form>
 
                 <div className="relative my-10 text-center">
-                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-                    <span className="relative px-6 bg-[#0a0a0a] text-[10px] uppercase tracking-widest text-gray-600">Secure Access</span>
+                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10"></div></div>
+                    <span className="relative px-6 bg-[#0a0a0a] text-[10px] uppercase tracking-widest text-gray-400 font-bold">{t.auth.secureAccess}</span>
                 </div>
 
                 <button onClick={handleGoogle} className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center gap-3 font-bold group">
                     <span className="w-6 h-6 bg-white rounded-lg flex items-center justify-center text-black text-xs font-black">G</span>
-                    <span>Sign In with Google</span>
+                    <span>{t.auth.signInGoogle}</span>
                 </button>
 
                 <p className="text-center mt-8 text-sm text-gray-500">
-                    Don't have an account? <Link href="/register" prefetch={false} className="text-aura-cyan hover:text-white transition-colors font-medium">Sign up</Link>
+                    {t.auth.noAccount} <Link href="/register" prefetch={false} className="text-aura-cyan hover:text-white transition-colors font-medium">{t.auth.signUp}</Link>
                 </p>
             </div>
         </div>
