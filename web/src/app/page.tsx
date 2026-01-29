@@ -420,7 +420,7 @@ export default function Home() {
                   <div className="relative z-10 p-12 w-full flex flex-col items-center">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="flex items-center justify-center relative"
+                      className="flex items-center justify-center relative drop-shadow-[0_0_50px_rgba(0,243,255,0.3)]"
                     >
                       <Image src="/logo_v3.png" alt="AURA" width={240} height={240} className="w-60 h-60 rounded-full" />
                     </motion.div>
