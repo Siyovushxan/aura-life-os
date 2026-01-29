@@ -28,6 +28,7 @@ import {
   Fingerprint,
   HeartHandshake,
   HeartPulse,
+  Clock,
   Shield
 } from "lucide-react";
 import { translations, Language } from "./i18n/translations";
@@ -400,33 +401,38 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent"></div>
                   <h3 className="absolute top-10 left-10 text-red-500 font-bold text-xs tracking-[0.4em] uppercase">{t.problem.comparison.old_way.title}</h3>
 
-                  <div className="relative w-full h-full p-12">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 h-full items-center">
-                      {[
-                        { icon: <Calendar key="cal" size={40} />, color: "text-red-400", glow: "drop-shadow-[0_0_15px_rgba(248,113,113,0.5)]" },
-                        { icon: <DollarSign key="dol" size={40} />, color: "text-green-400", glow: "drop-shadow-[0_0_15px_rgba(74,222,128,0.5)]" },
-                        { icon: <Utensils key="food" size={40} />, color: "text-orange-400", glow: "drop-shadow-[0_0_15px_rgba(251,146,60,0.5)]" },
-                        { icon: <HomeIcon key="home" size={40} />, color: "text-blue-400", glow: "drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]" },
-                        { icon: <TrendingUp key="trend" size={40} />, color: "text-purple-400", glow: "drop-shadow-[0_0_15px_rgba(192,132,252,0.5)]" },
-                        { icon: <Settings key="set" size={40} />, color: "text-gray-400", glow: "drop-shadow-[0_0_15px_rgba(156,163,175,0.5)]" }
-                      ].map((item, i) => (
-                        <motion.div
-                          key={i}
-                          animate={{
-                            y: [0, -20, 0],
-                            rotate: [0, i % 2 === 0 ? 10 : -10, 0],
-                            opacity: [0.5, 1, 0.5]
-                          }}
-                          transition={{ duration: 3 + i, repeat: Infinity, ease: "easeInOut" }}
-                          className={`bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl flex items-center justify-center ${item.color} ${item.glow}`}
-                        >
+                  <div className="relative w-full h-full p-12 overflow-hidden">
+                    {/* Scattered/Chaotic Icons */}
+                    {[
+                      { icon: <Calendar key="cal" size={48} />, color: "text-red-500", glow: "drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]", pos: "top-20 left-10", rot: -15, delay: 0 },
+                      { icon: <DollarSign key="dol" size={56} />, color: "text-red-400", glow: "drop-shadow-[0_0_15px_rgba(248,113,113,0.8)]", pos: "top-10 right-20", rot: 20, delay: 0.2 },
+                      { icon: <Utensils key="food" size={44} />, color: "text-orange-500", glow: "drop-shadow-[0_0_15px_rgba(249,115,22,0.8)]", pos: "bottom-32 left-20", rot: -30, delay: 0.4 },
+                      { icon: <HomeIcon key="home" size={50} />, color: "text-red-600", glow: "drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]", pos: "bottom-20 right-10", rot: 10, delay: 0.6 },
+                      { icon: <TrendingUp key="trend" size={46} />, color: "text-purple-500", glow: "drop-shadow-[0_0_15px_rgba(168,85,247,0.8)]", pos: "top-40 left-1/2 -translate-x-12", rot: 45, delay: 0.8 },
+                      { icon: <Settings key="set" size={42} />, color: "text-gray-500", glow: "drop-shadow-[0_0_15px_rgba(107,114,128,0.8)]", pos: "bottom-40 right-1/4", rot: -10, delay: 1 }
+                    ].map((item, i) => (
+                      <motion.div
+                        key={i}
+                        animate={{
+                          x: [0, 5, -5, 0],
+                          y: [0, -5, 5, 0],
+                          rotate: [item.rot, item.rot + 5, item.rot - 5, item.rot],
+                          opacity: [0.6, 0.9, 0.6]
+                        }}
+                        transition={{ duration: 2 + (i * 0.5), repeat: Infinity, ease: "linear", delay: item.delay }}
+                        className={`absolute ${item.pos} pointer-events-none`}
+                      >
+                        <div className={`p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm ${item.color} ${item.glow}`}>
                           {item.icon}
-                        </motion.div>
-                      ))}
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="text-red-500/20 text-9xl font-black italic select-none">CHAOS</div>
-                    </div>
+                        </div>
+                      </motion.div>
+                    ))}
+
+                    {/* Broken Connections */}
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
+                      <motion.path d="M 100 100 L 200 200" stroke="red" strokeWidth="2" strokeDasharray="5,5" animate={{ opacity: [0.2, 0.5, 0.2] }} transition={{ duration: 2, repeat: Infinity }} />
+                      <motion.path d="M 300 100 L 400 300" stroke="red" strokeWidth="2" strokeDasharray="5,5" animate={{ opacity: [0.2, 0.5, 0.2] }} transition={{ duration: 3, repeat: Infinity, delay: 1 }} />
+                    </svg>
                   </div>
 
                   <div className="absolute bottom-10 left-10 right-10 text-left space-y-4">
@@ -443,13 +449,33 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-b from-aura-cyan/10 to-transparent"></div>
                   <h3 className="absolute top-10 left-10 text-aura-cyan font-bold text-xs tracking-[0.4em] uppercase">{t.problem.comparison.aura_way.title}</h3>
 
-                  <div className="relative z-10 p-12 w-full flex flex-col items-center">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      className="flex items-center justify-center relative"
-                    >
-                      <Image src="/logo_v3.png" alt="AURA" width={240} height={240} className="w-60 h-60 rounded-full" />
-                    </motion.div>
+                  <div className="relative z-10 p-12 w-full flex flex-col items-center justify-center h-full">
+                    {/* Force Field Rings */}
+                    <div className="relative flex items-center justify-center">
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.3, 0.1] }}
+                        transition={{ duration: 4, repeat: Infinity }}
+                        className="absolute w-80 h-80 rounded-full border border-aura-cyan/20 bg-aura-cyan/5"
+                      />
+                      <motion.div
+                        animate={{ scale: [1, 1.4, 1], opacity: [0.1, 0.2, 0.1] }}
+                        transition={{ duration: 6, repeat: Infinity, delay: 1 }}
+                        className="absolute w-[28rem] h-[28rem] rounded-full border border-aura-cyan/10"
+                      />
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                        className="absolute w-72 h-72 rounded-full border border-dashed border-aura-cyan/30"
+                      />
+
+                      {/* Center Core */}
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        className="relative z-20 shadow-[0_0_100px_rgba(0,243,255,0.4)] rounded-full"
+                      >
+                        <Image src="/logo_v3.png" alt="AURA" width={200} height={200} className="w-52 h-52 rounded-full drop-shadow-[0_0_30px_rgba(0,0,0,0.5)]" />
+                      </motion.div>
+                    </div>
                   </div>
 
                   <div className="absolute bottom-10 left-10 right-10 text-left space-y-4">
@@ -704,8 +730,24 @@ export default function Home() {
                 viewport={{ once: true }}
                 className="mb-12 inline-flex flex-col items-center"
               >
-                <div className="w-24 h-24 rounded-full bg-aura-cyan/10 border border-aura-cyan/20 flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(0,243,255,0.2)]">
-                  <HeartPulse size={48} className="text-red-500 animate-pulse drop-shadow-[0_0_20px_rgba(239,68,68,0.8)]" />
+                <div className="relative w-32 h-32 flex items-center justify-center mb-8">
+                  {/* Rotating Clock Ring */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-0 rounded-full border-2 border-aura-cyan/30 border-dashed"
+                  />
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-2 rounded-full border border-aura-cyan/20"
+                  />
+
+                  {/* Main Icons */}
+                  <div className="relative z-10 flex flex-col items-center justify-center p-6 bg-white/5 backdrop-blur-md rounded-full border border-white/10 shadow-[0_0_50px_rgba(0,243,255,0.15)]">
+                    <Clock size={48} className="text-aura-cyan drop-shadow-[0_0_15px_rgba(0,243,255,0.6)]" />
+                    <HeartPulse size={24} className="absolute bottom-6 right-6 text-red-500 animate-pulse drop-shadow-[0_0_10px_rgba(239,68,68,0.8)] bg-black/50 rounded-full p-0.5" />
+                  </div>
                 </div>
                 <h2 className="text-4xl md:text-6xl font-display font-bold mb-6 italic tracking-tighter uppercase text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60">
                   {t.liveness_section.title}
@@ -729,9 +771,7 @@ export default function Home() {
                   {t.liveness_section.desc}
                 </p>
 
-                <button className="px-12 py-5 bg-white text-black rounded-full font-bold text-[0.7rem] uppercase tracking-widest hover:bg-aura-cyan transition-all hover:scale-105 shadow-2xl">
-                  {t.liveness_section.cta}
-                </button>
+
               </motion.div>
             </div>
           </section>
@@ -841,7 +881,7 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-12 gap-20">
 
                 {/* Brand Column */}
-                <div className="md:col-span-4">
+                <div className="md:col-span-6">
                   <div className="flex items-center gap-4 mb-10">
                     <Image src="/logo_v3.png" alt="AURA logo" width={80} height={80} className="w-20 h-20" />
                     <span className="text-3xl font-display font-bold text-white uppercase tracking-[0.2em]">AURA</span>
@@ -857,9 +897,9 @@ export default function Home() {
                 </div>
 
                 {/* Links Columns */}
-                <div className="md:col-span-2">
+                <div className="md:col-span-3">
                   <h4 className="font-bold text-white mb-10 text-[0.65rem] uppercase tracking-[0.4em] text-gray-200">{t.footer.links.product}</h4>
-                  <ul className="space-y-6 text-gray-600 font-medium text-sm">
+                  <ul className="space-y-6 text-gray-400 font-medium text-sm">
                     {[
                       { label: t.footer.links.features, type: 'features' as const },
                       { label: t.footer.links.pricing, type: 'pricing' as const },
@@ -880,9 +920,9 @@ export default function Home() {
                     ))}
                   </ul>
                 </div>
-                <div className="md:col-span-2">
+                <div className="md:col-span-3">
                   <h4 className="font-bold text-white mb-10 text-[0.65rem] uppercase tracking-[0.4em] text-gray-200">{t.footer.links.company}</h4>
-                  <ul className="space-y-6 text-gray-600 font-medium text-sm">
+                  <ul className="space-y-6 text-gray-400 font-medium text-sm">
                     {[
                       { label: t.footer.links.about, type: 'about' as const },
                       { label: t.footer.links.missions, type: 'missions' as const },
@@ -904,15 +944,7 @@ export default function Home() {
                   </ul>
                 </div>
 
-                {/* Newsletter Column */}
-                <div className="md:col-span-4 bg-white/[0.01] p-10 rounded-[3rem] border border-white/[0.05] backdrop-blur-3xl">
-                  <h4 className="text-white font-bold text-lg mb-4">{t.footer.newsletter_title}</h4>
-                  <p className="text-gray-300 text-sm mb-10 font-light">{t.footer.newsletter_desc}</p>
-                  <div className="flex flex-col gap-4">
-                    <input type="email" placeholder={t.footer.newsletter_placeholder} className="bg-white/[0.02] border border-white/[0.05] rounded-2xl px-6 py-5 text-white w-full focus:outline-none focus:border-white/20 transition-all placeholder:text-gray-700 text-sm" />
-                    <button className="bg-white text-black font-bold px-8 py-5 rounded-2xl hover:bg-aura-cyan transition-all uppercase text-[0.65rem] tracking-widest">{t.footer.newsletter_btn}</button>
-                  </div>
-                </div>
+
               </div>
 
               <div className="mt-32 pt-16 border-t border-white/[0.05] flex flex-col md:flex-row justify-between items-center text-[0.65rem] uppercase tracking-[0.2em] text-gray-600">
