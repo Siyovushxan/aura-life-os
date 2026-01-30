@@ -200,7 +200,12 @@ export const translations = {
                 selectPlan: "Tarifni tanlang",
                 perMonth: "oyiga",
                 upgradeSuccess: "Tarif muvaffaqiyatli yangilandi",
-                upgradeError: "Yangilashda xatolik yuz berdi"
+                upgradeError: "Yangilashda xatolik yuz berdi",
+                selectMethod: "To'lov usulini tanlang",
+                card: "Bank kartasi",
+                click: "Click.uz",
+                payme: "Payme",
+                stripeSecure: "Stripe orqali himoyalangan"
             }
         },
         home: {
@@ -494,7 +499,12 @@ export const translations = {
                 selectPlan: "Выберите тариф",
                 perMonth: "в месяц",
                 upgradeSuccess: "Тариф успешно обновлен",
-                upgradeError: "Ошибка при обновлении"
+                upgradeError: "Ошибка при обновлении",
+                selectMethod: "Выберите способ оплаты",
+                card: "Банковская карта",
+                click: "Click.uz",
+                payme: "Payme",
+                stripeSecure: "Защищено Stripe"
             }
         },
         home: {

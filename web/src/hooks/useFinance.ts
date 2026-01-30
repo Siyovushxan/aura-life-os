@@ -93,9 +93,11 @@ export const useFinance = (userId: string | undefined, language: string, selecte
                 monthlyIncome: financeData.monthlyIncome,
                 expenseBudget: financeData.expenseBudget,
                 incomeBudget: financeData.incomeBudget,
+                topSpendingCategory: transactions.length > 0 ? transactions[0].category : 'N/A', // Simple heuristic or improve
                 debtTotal: debts.reduce((acc, d) => acc + (d.status === 'active' ? (d.amount - (d.totalRepaid || 0)) : 0), 0),
-                creditTotal: credits.reduce((acc, c) => acc + (c.status === 'active' ? c.remainingAmount : 0), 0),
-                depositTotal: deposits.reduce((acc, d) => acc + d.currentAmount, 0)
+                creditTotal: credits.reduce((acc, c) => acc + (c.status === 'active' ? (c.remainingAmount || 0) : 0), 0),
+                depositTotal: deposits.reduce((acc, d) => acc + (d.currentAmount || 0), 0),
+                occupation: 'Advanced Protocol' // Backend will provide further enrichment if needed
             };
             const insight = await getScheduledInsight(userId, 'finance', language, context, { force: true });
             if (insight) {

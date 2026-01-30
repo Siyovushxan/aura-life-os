@@ -26,6 +26,12 @@ export default function RegisterPage() {
     const [loading, setLoading] = useState(false);
     const [showPass, setShowPass] = useState(false);
 
+    const normalizePhone = (p: string) => {
+        let clean = p.replace(/\D/g, ''); // Remove non-digits
+        if (clean.length === 9) clean = '998' + clean; // For UZ: 9 digits -> +998...
+        return clean ? '+' + clean : p;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -57,26 +63,27 @@ export default function RegisterPage() {
             } else if (registrationMethod === 'phone' && !confirmationResult) {
                 // First step: Send OTP
                 if (!pass || pass.length < 6) {
-                    setError("Iltimos, xavfsiz parol kiriting (kamida 6 ta belgi)"); // Should translate this too, but leaving for now or using general error.
-                    // Actually I'll use generic error for simplicity or t.auth.setError
+                    setError("Iltimos, xavfsiz parol kiriting (kamida 6 ta belgi)");
                     setLoading(false);
                     return;
                 }
-                const result = await signInWithPhone(phone, 'recaptcha-container');
+
+                const normalizedPhone = normalizePhone(phone);
+                console.log("[Register] Sending OTP to:", normalizedPhone);
+                const result = await signInWithPhone(normalizedPhone, 'recaptcha-container');
                 setConfirmationResult(result);
             } else if (registrationMethod === 'phone' && confirmationResult) {
-                // Second step: Verify OTP...
-                // 1. Verify SMS
+                // Second step: Verify OTP
                 await verifyOtp(confirmationResult, otp);
 
                 const { getAuth, signOut } = await import('firebase/auth');
                 const auth = getAuth();
                 const phoneUser = auth.currentUser;
-                const verifiedPhone = phoneUser?.phoneNumber || phone;
+                const verifiedPhone = phoneUser?.phoneNumber || normalizePhone(phone);
 
                 await signOut(auth);
 
-                // 3. Create the real account using virtual email + provided password
+                // Create the real account using virtual email + provided password
                 const virtualEmail = phoneToEmail(verifiedPhone);
                 await signUp(virtualEmail, pass);
 
@@ -126,7 +133,6 @@ export default function RegisterPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white relative overflow-hidden p-4 font-sans">
-            {/* Language Switcher */}
             <LanguageSwitcher />
 
             {/* Back Button */}

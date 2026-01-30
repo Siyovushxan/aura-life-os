@@ -1,6 +1,31 @@
 
 "use client";
 import React from 'react';
+import { useAiUsage } from '@/hooks/useAiUsage';
+
+const LimitIndicator = () => {
+    const { usage, limit, remaining, loading } = useAiUsage();
+
+    if (loading) return <span className="animate-pulse w-10 h-2 bg-white/10 rounded-full"></span>;
+
+    const percentage = Math.min(100, (usage / limit) * 100);
+    const isCritical = remaining <= 2 && limit > 10;
+    const isZero = remaining === 0;
+
+    return (
+        <div className="flex items-center gap-2 px-2 py-0.5 rounded-md bg-white/5 border border-white/5">
+            <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div
+                    className={`h-full rounded-full transition-all duration-500 ${isZero ? 'bg-red-500' : isCritical ? 'bg-orange-500' : 'bg-aura-cyan'}`}
+                    style={{ width: `${percentage}%` }}
+                ></div>
+            </div>
+            <span className={`text-[9px] font-mono font-bold ${isZero ? 'text-red-400' : 'text-gray-400'}`}>
+                {usage}/{limit}
+            </span>
+        </div>
+    );
+};
 
 interface AiInsightSectionProps {
     onAnalyze: () => void;
@@ -99,7 +124,10 @@ export const AiInsightSection: React.FC<AiInsightSectionProps> = ({
                     </div>
                     <div className="flex-1">
                         <div className="flex flex-col gap-1 mb-2">
-                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Asosiy Vazifa</span>
+                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                Asosiy Vazifa
+                                <LimitIndicator />
+                            </span>
                             <div className="flex items-center gap-3">
                                 <h3 className="text-2xl font-display font-black text-white tracking-tight">{title}</h3>
                                 {effectiveInsight?.status && (

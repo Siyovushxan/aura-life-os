@@ -23,8 +23,8 @@ export async function callBackend(endpoint: string, payload: any) {
                 'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
-                data: payload,
-                language: 'uz'
+                data: payload?.data || payload,
+                language: payload?.language || 'uz'
             })
         });
 
@@ -152,86 +152,52 @@ export const analyzeImage = async (
         // Compress image to save bandwidth and speed up analysis
         const compressedImage = await compressImage(base64Image);
 
-        let data;
-        // FORCE LOCAL MOCK if needed (to bypass broken backend emulator logic for this specific problematic endpoint)
-        const IS_LOCAL = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        // Call real backend (no more local mocks that mask errors)
+        const data = await callBackend('getFoodAnalysis', { base64Image: compressedImage, userContext, language });
 
-        if (IS_LOCAL) {
-            // Simulate random results to make "Tezkor Maslahat" feel dynamic during testing
-            const mocks = [
-                {
-                    name: "Tovuq va Sabzavotlar",
-                    calories: 450,
-                    protein: 35,
-                    carbs: 20,
-                    fat: 15,
-                    advice: "Oqsilga boy, muvozanatli taom. Mashg'ulotdan keyin iste'mol qilish uchun ajoyib tanlov.",
-                    insight: "Oqsilga boy, muvozanatli taom. Mashg'ulotdan keyin iste'mol qilish uchun ajoyib tanlov.",
-                    optimization: "Sabzavotlar miqdorini oshirish hazm qilishni yaxshilaydi.",
-                    vitalityScore: 92,
-                    emoji: "🍗"
-                },
-                {
-                    name: "Meva Salati",
-                    calories: 210,
-                    protein: 5,
-                    carbs: 45,
-                    fat: 2,
-                    advice: "Vitaminlarga boy yengil tamaddi. Energiyani tez tiklash uchun juda foydali.",
-                    insight: "Vitaminlarga boy yengil tamaddi. Energiyani tez tiklash uchun juda foydali.",
-                    optimization: "Biroz yong'oq qo'shish orqali to'yimlilikni oshirish mumkin.",
-                    vitalityScore: 88,
-                    emoji: "🥗"
-                },
-                {
-                    name: "Qahva va Krussan",
-                    calories: 350,
-                    protein: 8,
-                    carbs: 40,
-                    fat: 18,
-                    advice: "Tetikashtiruvchi, lekin yog' va shakar miqdori biroz yuqori. Me'yorni saqlang.",
-                    insight: "Tetikashtiruvchi, lekin yog' va shakar miqdori biroz yuqori. Me'yorni saqlang.",
-                    optimization: "Shakarsiz qahva ichish orqali kaloriya miqdorini kamaytiring.",
-                    vitalityScore: 65,
-                    emoji: "☕"
-                }
-            ];
-            const randomMock = mocks[Math.floor(Math.random() * mocks.length)];
-
-            data = {
-                success: true,
-                ...randomMock,
-                success_mock: true
+        // If backend explicitly failed (e.g. limit reached), still return the data
+        // so the UI can show the 'insight' or 'error' message from the backend.
+        if (!data.success) {
+            return {
+                ...data,
+                name: data.title || "Tahlilda Xatolik",
+                advice: data.insight || data.error || "Server tahlil qila olmadi.",
+                calories: 0,
+                protein: 0,
+                carbs: 0,
+                fat: 0,
+                status: 'error'
             };
-        } else {
-            data = await callBackend('getFoodAnalysis', { base64Image: compressedImage, userContext, language });
         }
 
         // Critical: Sanitize result. If backend returns success=true but data contains error text, handle it.
-        if (data.success) {
-            const hasErrorText =
-                (data.name && (data.name.includes("Error:") || data.name.includes("Xatolik") || data.name.includes("Invalid"))) ||
-                (data.advice && (data.advice.includes("Error:") || data.advice.includes("Xatolik") || data.advice.includes("Invalid"))) ||
-                (data.insight && (data.insight.includes("Error:") || data.insight.includes("Xatolik") || data.insight.includes("Invalid")));
+        const hasErrorText =
+            (data.name && (data.name.includes("Error:") || data.name.includes("Xatolik") || data.name.includes("Invalid"))) ||
+            (data.advice && (data.advice.includes("Error:") || data.advice.includes("Xatolik") || data.advice.includes("Invalid"))) ||
+            (data.insight && (data.insight.includes("Error:") || data.insight.includes("Xatolik") || data.insight.includes("Invalid")));
 
-            if (hasErrorText) {
-                return {
-                    ...data,
-                    name: "Aniqlanmagan Taom",
-                    advice: "Rasm sifati past yoki taom aniqlanmadi. Iltimos, qayta urinib ko'ring.",
-                    insight: "Rasm sifati past yoki taom aniqlanmadi. Iltimos, qayta urinib ko'ring.",
-                    optimization: "Keyingi safar yorug'roq joyda suratga oling.",
-                    calories: 0,
-                    vitalityScore: 0,
-                    status: 'warning'
-                };
-            }
-            return data;
+        if (hasErrorText) {
+            return {
+                ...data,
+                name: "Aniqlanmagan Taom",
+                advice: "Rasm sifati past yoki taom aniqlanmadi. Iltimos, qayta urinib ko'ring.",
+                insight: "Rasm sifati past yoki taom aniqlanmadi. Iltimos, qayta urinib ko'ring.",
+                optimization: "Keyingi safar yorug'roq joyda suratga oling.",
+                calories: 0,
+                vitalityScore: 0,
+                status: 'warning'
+            };
         }
-        return null;
+        return data;
     } catch (e) {
-        console.error("Analyze Image Local Error", e);
-        return null; // Fail gracefully
+        console.error("Analyze Image Error", e);
+        return {
+            success: false,
+            name: "Tizim Xatosi",
+            advice: "Server bilan bog'lanishda xatolik. Iltimos, internetingizni tekshiring.",
+            calories: 0,
+            status: 'error'
+        };
     }
 };
 

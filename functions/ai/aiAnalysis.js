@@ -7,7 +7,7 @@ import { analyzeWithGroq, parseGroqJSON, analyzeImage as groqAnalyzeImage } from
  * @param {string} language - Target language
  * @returns {Promise<object>} Financial insight
  */
-export async function analyzeFinance(context, language = 'uz') {
+export async function analyzeFinance(context, language = 'uz', user = {}) {
   const {
     monthlyIncome,
     monthlySpent,
@@ -21,38 +21,74 @@ export async function analyzeFinance(context, language = 'uz') {
     occupation
   } = context;
 
-  const prompt = `
-  ROLE: You are AURA, the user's personal Financial Strategist and Wealth Guardian.
-  TONE: Sharp, protective, strategically proactive, and high-performance.
-  TASK: Analyze the user's financial architecture and provide a deep-layer strategic roadmap.
-  
-  CURRENT ARCHITECTURE:
-  - Total Assets (Liquidity): ${totalBalance} (Deposits: ${depositTotal})
-  - Income Dynamics: ${monthlyIncome} (Target: ${incomeBudget || 'N/A'})
-  - Burn Rate (Expense): ${monthlySpent} (Limit: ${expenseBudget || 'N/A'})
-  - Total Liabilities: Debt ${debtTotal}, Credits ${creditTotal}
-  - Primary Leak: ${topSpendingCategory || 'Analyzing...'}
-  - User Strategy: ${occupation || 'Professional Growth'}
-  
-  STRATEGIC OBJECTIVES:
-  1. Analyze "Burn Rate" efficiency (Spent vs Budget).
-  2. Identify "Wealth Leaks" (Top Spending vs Income).
-  3. Strategic Mitigation: Propose exact steps to reduce liabilities or optimize deposits.
-  
-  Language: ${language}
-  
-  Return STRICT JSON ONLY:
-  {
-      "title": "AURA Financial Roadmap",
-      "insight": "Deep analysis (2 sentences) explaining the current wealth trajectory and core friction point.",
-      "roadmap": ["Step 1: Immediate Action", "Step 2: Structural Change", "Step 3: Long-term Growth"],
-      "potentialSavings": "Estimated monthly savings if protocol is followed (e.g. 500k UZS)",
-      "optimization": "One short sentence of holistic financial optimization (e.g. 'Diversify liquidity to hedge against inflation.')",
-      "vitalityScore": 0-100,
-      "emoji": "🛡️",
-      "priority": "high|medium|low"
+  const planId = user.subscription?.planId || 'AURA PERSONAL';
+  const isLegacy = planId === 'AURA LEGACY';
+
+  // Precision Mode: Calculate detailed metrics before prompting AI
+  const burnRate = monthlyIncome > 0 ? ((monthlySpent / monthlyIncome) * 100).toFixed(1) : 0;
+  const savingsRate = monthlyIncome > 0 ? (((monthlyIncome - monthlySpent) / monthlyIncome) * 100).toFixed(1) : 0;
+  const runway = monthlySpent > 0 ? (totalBalance / monthlySpent).toFixed(1) : 0;
+  const isZeroData = monthlyIncome === 0 && monthlySpent === 0;
+
+  let prompt;
+
+  if (isZeroData) {
+    prompt = `
+      ROLE: AURA Financial Guardian.
+      TASK: Guide the user to set up their financial baseline.
+      CONTEXT: The user has not logged any income or expenses yet.
+      Language: ${language}
+
+      OUTPUT STRICT JSON:
+      {
+          "title": "AURA Financial Base",
+          "insight": "Welcome to your Wealth Command Center. To generate a strategy, I need data.",
+          "roadmap": ["Step 1: Log your monthly income source", "Step 2: Track your first expense today", "Step 3: Define a savings goal"],
+          "potentialSavings": "N/A",
+          "optimization": "Start by logging one transaction to activate the neural financial engine.",
+          "vitalityScore": 50,
+          "emoji": "🏁",
+          "priority": "high"
+      }
+      `;
+  } else {
+    prompt = `
+      ROLE: You are AURA, the user's personal Financial Strategist and Wealth Guardian.
+      TONE: Sharp, protective, strategically proactive, and high-performance.
+      TASK: Analyze the user's financial architecture and provide a deep-layer strategic roadmap.
+      SUBSCRIPTION TIER: ${planId} ${isLegacy ? '(ULTIMATE ACCESS - Provide advanced investment & diversification logic)' : '(STANDARD ACCESS)'}
+      
+      CURRENT ARCHITECTURE:
+      - Total Assets (Liquidity): ${totalBalance} (Deposits: ${depositTotal})
+      - Income Dynamics: ${monthlyIncome} (Target: ${incomeBudget || 'N/A'})
+      - Burn Rate (Expense): ${monthlySpent} (Limit: ${expenseBudget || 'N/A'}) -> Burn Rate is ${burnRate}% of Income.
+      - Savings Rate: ${savingsRate}%
+      - Runway: ${runway} months of survival at current burn rate.
+      - Total Liabilities: Debt ${debtTotal}, Credits ${creditTotal}
+      - Primary Leak: ${topSpendingCategory || 'Analyzing...'}
+      - User Strategy: ${occupation || 'Professional Growth'}
+      
+      STRATEGIC OBJECTIVES:
+      1. Analyze "Burn Rate" efficiency (${burnRate}%). Is it sustainable (<80%)?
+      2. Identify "Wealth Leaks" (Top Spending vs Income).
+      3. Strategic Mitigation: Propose exact steps to reduce liabilities or optimize deposits.
+      4. ${isLegacy ? 'ADVANCED: Propose diversification into assets, hedging strategies, or compound interest optimization.' : 'Personal Savings: Suggest immediate behavioral shifts to increase liquidity.'}
+      
+      Language: ${language}
+      
+      Return STRICT JSON ONLY:
+      {
+          "title": "AURA Financial Roadmap",
+          "insight": "Deep analysis (2 sentences) explaining the current wealth trajectory and core friction point. Use precise numbers (e.g. 'You are burning ${burnRate}% of income').",
+          "roadmap": ["Step 1: Immediate Action (e.g. Cut 'Dining Out' by 10%)", "Step 2: Structural Change", "Step 3: Long-term Growth"],
+          "potentialSavings": "Estimated monthly savings if protocol is followed (e.g. 500k UZS)",
+          "optimization": "One short sentence of holistic financial optimization (e.g. 'Diversify liquidity to hedge against inflation.')",
+          "vitalityScore": 0-100,
+          "emoji": "🛡️",
+          "priority": "high|medium|low"
+      }
+      `;
   }
-  `;
 
   const response = await analyzeWithGroq(prompt, 'AURA Financial Strategist. Output JSON.', 'finance');
   return parseGroqJSON(response) || { title: 'Moliya Bo\'yicha Maslahat', insight: 'Xarajatlaringizni kuzatishda davom eting.', emoji: '💰', priority: 'low' };
@@ -64,39 +100,65 @@ export async function analyzeFinance(context, language = 'uz') {
  * @param {string} language - Target language
  * @returns {Promise<object>} Health feedback
  */
-export async function analyzeHealth(context, language = 'uz') {
+export async function analyzeHealth(context, language = 'uz', user = {}) {
   const { steps, sleepHours, waterMl, stress, biometrics, battery } = context;
+  const planId = user.subscription?.planId || 'trial';
 
-  const prompt = `
-  ROLE: You are AURA, a high-performance Vitality Strategist and Biological Systems Optimizer.
-  TONE: Sharp, technical, data-driven, and highly strategic.
-  TASK: Perform a deep-layer biological analysis of the user's current metrics.
-  
-  CORE BIO-METRICS:
-  - Movement Architecture: ${steps} steps (Target: 10,000 steps - Baseline for metabolic efficiency)
-  - Recovery Protocol: ${sleepHours}h sleep (Target: 7.5h-9h for CNS restoration)
-  - Hydration Level: ${waterMl}ml (Target: 2500ml+ for cognitive fluidity)
-  - Autonomic Stress Index: ${stress}/100 
-  - Calculated Body Battery: ${battery?.total || 'N/A'}% (Impact Factors: ${JSON.stringify(battery?.impacts || {})})
-  - Baseline Biometrics: ${JSON.stringify(biometrics || {})}
-  
-  ANALYSIS PARAMETERS (PERFORMANCE VS RECOVERY SYNERGY):
-  1. Evaluate "Metabolic Flux": How movement (Activity) is supported by hydration.
-  2. Evaluate "Neural Efficiency": How stress levels correlate with sleep quality.
-  3. Identify "Systemic Friction": Explain exactly where the user is leaking energy (e.g., "High cortisol detected due to dehydration-stress coupling").
-  
-  Language: ${language}
-  
-  Return STRICT JSON ONLY: 
-  { 
-    "title": "AURA Vitality Protocol",
-    "text": "2 sentences of advanced bio-logic explaining the current health trajectory (e.g., 'Metabolic lag detected due to dehydration-stress coupling. Recovery systems are currently under-optimized.').",
-    "protocol": ["Step 1: Bio-Action (e.g., 500ml water with electrolytes)", "Step 2: Movement (e.g., 5 min mobility flow)", "Step 3: Recovery (e.g., 2 min box breathing)"],
-    "vitalityScore": 0-100,
-    "emoji": "🧬",
-    "status": "ready|recovery|warning"
+  // New User Detection
+  const isNewUser = steps === 0 && sleepHours === 0 && waterMl === 0 && !battery?.total;
+
+  let prompt;
+
+  if (isNewUser) {
+    prompt = `
+      ROLE: AURA Welcome Guide.
+      TASK: Warmly welcome the new user and guide them to their first health win.
+      CONTEXT: The user has just joined and has no health data yet. Do NOT give negative feedback.
+      Language: ${language}
+
+      OUTPUT STRICT JSON:
+      {
+        "title": "AURA Activation",
+        "text": "Welcome to AURA. Your biological optimization journey starts now. Let's calibrate your baseline.",
+        "protocol": ["Action 1: Drink 200ml of water and log it", "Action 2: Take 500 steps to activate sensors", "Action 3: Set your sleep goal"],
+        "vitalityScore": 100,
+        "emoji": "🌱",
+        "status": "ready"
+      }
+      `;
+  } else {
+    prompt = `
+      ROLE: You are AURA, a high-performance Vitality Strategist and Biological Systems Optimizer.
+      TONE: Sharp, technical, data-driven, and highly strategic.
+      TASK: Perform a deep-layer biological analysis of the user's current metrics.
+      SUBSCRIPTION: ${planId}
+      
+      CORE BIO-METRICS:
+      - Movement Architecture: ${steps} steps (Target: 10,000 steps)
+      - Recovery Protocol: ${sleepHours}h sleep
+      - Hydration Level: ${waterMl}ml
+      - Autonomic Stress Index: ${stress}/100 
+      - Calculated Body Battery: ${battery?.total || 'N/A'}%
+      - Baseline Biometrics: ${JSON.stringify(biometrics || {})}
+      
+      ANALYSIS PARAMETERS (PERFORMANCE VS RECOVERY SYNERGY):
+      1. Evaluate "Metabolic Flux": How movement (Activity) is supported by hydration.
+      2. Evaluate "Neural Efficiency": How stress levels correlate with sleep quality.
+      3. Identify "Systemic Friction": Explain exactly where the user is leaking energy (e.g., "High cortisol detected due to dehydration-stress coupling").
+      
+      Language: ${language}
+      
+      Return STRICT JSON ONLY: 
+      { 
+        "title": "AURA Vitality Protocol",
+        "text": "2 sentences of advanced bio-logic explaining the current health trajectory (e.g., 'Metabolic lag detected due to dehydration-stress coupling. Recovery systems are currently under-optimized.').",
+        "protocol": ["Step 1: Bio-Action (e.g., 500ml water with electrolytes)", "Step 2: Movement (e.g., 5 min mobility flow)", "Step 3: Recovery (e.g., 2 min box breathing)"],
+        "vitalityScore": 0-100,
+        "emoji": "🧬",
+        "status": "ready|recovery|warning"
+      }
+      `;
   }
-  `;
 
   const response = await analyzeWithGroq(prompt, 'AURA Vitality Coach. Output JSON.', 'health');
   return parseGroqJSON(response) || { title: 'Salomatlik Holati', text: 'Suv ichishni unutmang va yetarlicha uxlang.', emoji: '💧', status: 'ready' };
@@ -108,7 +170,7 @@ export async function analyzeHealth(context, language = 'uz') {
  * @param {string} language - Target language
  * @returns {Promise<object>} Recommendations
  */
-export async function analyzeInterests(context, language = 'uz') {
+export async function analyzeInterests(context, language = 'uz', user = {}) {
   const { window, currentInterests, hobbies, healthGoal, habitStats } = context;
   const interests = currentInterests || hobbies || [];
   const timeLabel = window === 'morning' ? 'Ertalab (Growth/Focus)' : window === 'lunch' ? 'Tushlik (Productivity)' : 'Kechqurun (Relaxation/Reflection)';
@@ -145,13 +207,14 @@ export async function analyzeInterests(context, language = 'uz') {
  * @param {string} language - Target language
  * @returns {Promise<object>} Mind insight
  */
-export async function analyzeMind(context, language = 'uz') {
+export async function analyzeMind(context, language = 'uz', user = {}) {
   const { recentMood, moodHistory, focusMinutes } = context;
 
   const prompt = `
   ROLE: You are AURA, the user's Emotional Intelligence (EQ) guide.
   TONE: Calm, insightful, and stoic.
   TASK: Analyze the mood trajectory and provide a centering thought.
+  SUBSCRIPTION: ${user.subscription?.planId || 'trial'}
   
   PSYCHOMETRICS:
   - Current Mood: ${recentMood}/100
@@ -187,8 +250,9 @@ export async function analyzeMind(context, language = 'uz') {
  * @param {string} language - Target language
  * @returns {Promise<object>} Food analysis
  */
-export async function analyzeFoodImage(base64Image, userContext, language = 'uz') {
+export async function analyzeFoodImage(base64Image, userContext, language = 'uz', user = {}) {
   const { weight, height, goal } = userContext?.biometrics || {};
+  const planId = user.subscription?.planId || 'trial';
 
   const question = `
   ROLE: You are AURA, the user's high-performance Nutrition Logic & Biological Systems Optimizer.
@@ -199,26 +263,27 @@ export async function analyzeFoodImage(base64Image, userContext, language = 'uz'
   - Height: ${height}cm
   - Goal: ${goal}
   - Target Language: ${language}
+  - Subscription Tier: ${planId}
 
   ANALYSIS PROTOCOL:
   1. IDENTIFY: Detect precisely what food items are in the image.
-  2. ESTIMATE: Calculate Calories, Protein(g), Carbs(g), and Fat(g) with high precision.
+  2. ESTIMATE: Calculate Calories, Protein(g), Carbs(g), and Fat(g) with high precision based on portion size estimation.
   3. AURA STRATEGY: Provide 2 sentences of advanced nutritional logic. 
      - CRITICAL: Never return one-word answers like 'Go', 'Yes', or 'No'.
+     - ADVICE FOCUS: Explain the metabolic impact of this specific meal on the user's goal (${goal}).
      - FEW-SHOT EXAMPLE 1 (Goal: Weight Loss, Food: Burger): "Burgherdagi yuqori kaloriya va to'yingan yog'lar vazn yo'qotish tezligini sekinlashtirishi mumkin. Ovqatlanishni kletchatka (salat) bilan boshlash glyukemik yukni kamaytiradi."
-     - FEW-SHOT EXAMPLE 2 (Goal: Muscle Gain, Food: Chicken): "Tovuq go'shtidagi yuqori sifatli oqsil mushaklar o'sishi uchun ideal amino-kislotalar profilini ta'minlaydi. Uglevodlar miqdorini oshirish anabolik holatni kuchaytiradi."
-
+  
   Return STRICT JSON ONLY: 
   { 
-    "name": "Food Name", 
+    "name": "Exact Food Name", 
     "calories": number, 
     "protein": number, 
     "carbs": number, 
     "fat": number,
-    "advice": "Detailed AURA Strategic Advice in ${language} (2 sentences)",
-    "insight": "Same as advice",
-    "optimization": "Same as advice",
-    "vitalityScore": number,
+    "advice": "Detailed AURA Strategic Advice in ${language} (2-3 sentences)",
+    "insight": "One sentence about long-term impact on vitality.",
+    "optimization": "A quick hack to improve this specific meal (e.g., 'Add green tea to boost metabolic response').",
+    "vitalityScore": 0-100,
     "emoji": "🥗"
   }`;
 
@@ -226,18 +291,23 @@ export async function analyzeFoodImage(base64Image, userContext, language = 'uz'
     const response = await groqAnalyzeImage(base64Image, question, 'food');
     const parsed = parseGroqJSON(response);
 
-    if (parsed) return parsed;
+    if (parsed) {
+      // Ensure all required fields exist
+      return {
+        ...parsed,
+        success: true,
+        insight: parsed.insight || parsed.advice,
+        optimization: parsed.optimization || parsed.advice
+      };
+    }
     throw new Error('Failed to parse AI response');
   } catch (error) {
     console.error('Food Analysis Error:', error);
-    // Return a SAFE fallback so UI doesn't break
     return {
-      name: 'Aniqlanmagan Taom',
+      success: false,
+      name: 'Aniqlashda xatolik',
       calories: 0,
-      protein: 0,
-      carbs: 0,
-      fat: 0,
-      advice: `Xatolik yuz berdi: ${error.message}. Iltimos qo'lda kiriting.`
+      advice: `Xatolik: ${error.message}. Iltimos rasm tiniqrot ekanligini tekshiring.`
     };
   }
 }
@@ -331,22 +401,23 @@ export async function analyzeGenetics(data, language = 'uz') {
  * @param {string} language - Target language
  * @returns {Promise<object>} Family insight
  */
-export async function analyzeFamily(context, language = 'uz') {
+export async function analyzeFamily(context, language = 'uz', user = {}) {
   const { requests, memberCount, pendingApprovals, finance, health, mind } = context;
 
   const prompt = `
   ROLE: You are AURA, a wise Family Counselor and Parenting Assistant.
   TONE: Warm, firm, and harmonizing.
   TASK: Analyze the family status AND cross-module data to provide deeply personalized advice.
+  SUBSCRIPTION: ${user.subscription?.planId || 'trial'}
   
   FAMILY CONTEXT:
   - Total Members: ${memberCount}
-  - Active Requests (Screen Time/Coins): ${requests}
+  - Active Requests: ${requests}
   - Pending Member Approvals: ${pendingApprovals}
 
   CROSS-MODULE CONTEXT:
-  - Finance: ${finance ? `Balance: ${finance.balance}, Monthly Expense: ${finance.expense}` : 'No data'}
-  - Health: ${health ? `Steps: ${health.steps}, Sleep: ${health.sleep}` : 'No data'}
+  - Finance: ${finance ? `Balance: ${finance.balance}` : 'No data'}
+  - Health: ${health ? `Steps: ${health.steps}` : 'No data'}
   - Mind: ${mind ? `Recent Mood: ${mind.recentMood}` : 'No data'}
   
   Language: ${language}
@@ -372,7 +443,7 @@ export async function analyzeFamily(context, language = 'uz') {
  * @param {string} language - Target language
  * @returns {Promise<object>} Nutrition insight
  */
-export async function analyzeFoodLog(context, language = 'uz') {
+export async function analyzeFoodLog(context, language = 'uz', user = {}) {
   const { calories, protein, carbs, fat, goalCalories } = context;
 
   const prompt = `

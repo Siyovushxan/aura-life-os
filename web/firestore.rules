@@ -55,6 +55,14 @@ service cloud.firestore {
       }
     }
     
+    // Payments History (Root Collection)
+    match /payments/{paymentId} {
+      // Users can only see their own payment records
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Writing is typically handled by Backend (Firebase Admin SDK), so we keep it false for Frontend
+      allow write: if false;
+    }
+
     // Default deny for anything else
     match /{document=**} {
       allow read, write: if false;

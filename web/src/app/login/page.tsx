@@ -11,7 +11,7 @@ const phoneToEmail = (phone: string) => `${phone.replace(/\+/g, '')}@phone.aura.
 
 export default function LoginPage() {
     const { t } = useLanguage();
-    const { signIn, signInWithGoogle, signInWithPhone, verifyOtp, signInWithPhoneAndPass } = useAuth();
+    const { signIn, signInWithGoogle, signInWithPhone, verifyOtp, signInWithPhoneAndPass, user, loading: authLoading } = useAuth();
     const router = useRouter();
 
     const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
@@ -25,6 +25,12 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [showPass, setShowPass] = useState(false);
 
+    const normalizePhone = (p: string) => {
+        let clean = p.replace(/\D/g, ''); // Remove non-digits
+        if (clean.length === 9) clean = '998' + clean; // For UZ: 9 digits -> +998...
+        return clean ? '+' + clean : p;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -34,13 +40,15 @@ export default function LoginPage() {
                 await signIn(email, pass);
                 router.push("/dashboard");
             } else if (loginMethod === 'phone') {
+                const normalizedPhone = normalizePhone(phone);
                 if (phoneMode === 'password') {
-                    await signInWithPhoneAndPass(phone, pass);
+                    await signInWithPhoneAndPass(normalizedPhone, pass);
                     router.push("/dashboard");
                 } else {
                     // OTP Mode
                     if (!confirmationResult) {
-                        const result = await signInWithPhone(phone, 'recaptcha-container');
+                        console.log("[Login] Sending OTP to:", normalizedPhone);
+                        const result = await signInWithPhone(normalizedPhone, 'recaptcha-container');
                         setConfirmationResult(result);
                     } else {
                         await verifyOtp(confirmationResult, otp);
@@ -64,8 +72,6 @@ export default function LoginPage() {
         }
     };
 
-    const { user, loading: authLoading } = useAuth();
-
     React.useEffect(() => {
         if (user && !authLoading) {
             router.push("/dashboard");
@@ -74,7 +80,6 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white relative overflow-hidden p-4 font-sans">
-            {/* Language Switcher */}
             <LanguageSwitcher />
 
             {/* Back Button */}
@@ -150,7 +155,6 @@ export default function LoginPage() {
                         </>
                     ) : (
                         <>
-                            {/* Phone Mode Sub-Toggle */}
                             <div className="flex bg-black/20 p-1 rounded-xl border border-white/5 mb-4">
                                 <button
                                     type="button"

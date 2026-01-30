@@ -135,6 +135,11 @@ type TranslationStructure = {
         securePayment: string;
         processing: string;
         cardNumberHint: string;
+        selectMethod: string;
+        card: string;
+        click: string;
+        payme: string;
+        stripeSecure: string;
     };
     family: {
         title: string;
@@ -1538,7 +1543,12 @@ const translations: Record<Language, TranslationStructure> = {
             payNow: "Pay Now",
             securePayment: "Secure Payment",
             processing: "Processing...",
-            cardNumberHint: "Enter card number"
+            cardNumberHint: "Enter card number",
+            selectMethod: "Select Payment Method",
+            card: "Bank Card",
+            click: "Click.uz",
+            payme: "Payme",
+            stripeSecure: "Secured by Stripe"
         }
     },
     uz: {
@@ -2304,7 +2314,12 @@ const translations: Record<Language, TranslationStructure> = {
             payNow: "To'lash",
             securePayment: "Xavfsiz to'lov",
             processing: "Jarayon...",
-            cardNumberHint: "Karta raqamini kiriting"
+            cardNumberHint: "Karta raqamini kiriting",
+            selectMethod: "To'lov usulini tanlang",
+            card: "Bank kartasi",
+            click: "Click.uz",
+            payme: "Payme",
+            stripeSecure: "Stripe orqali himoyalangan"
         }
     },
     ru: {
@@ -3062,15 +3077,20 @@ const translations: Record<Language, TranslationStructure> = {
             selectPlan: "Viberite tarif",
             perMonth: "v mesyats",
             upgradeSuccess: "Tarif uspeshno obnovlen",
-            upgradeError: "Oshibka pri obnovlenii",
-            checkoutTitle: "Detali Oplati",
-            cardNumber: "Nomer karti",
-            expiry: "Srok",
+            upgradeError: "Ошибка при обновлении",
+            checkoutTitle: "Детали оплаты",
+            cardNumber: "Номер карты",
+            expiry: "Срок",
             cvv: "CVV",
-            payNow: "Oplatit",
-            securePayment: "Bezopasniy platej",
-            processing: "Obrabotka...",
-            cardNumberHint: "Vvedite nomer karti"
+            payNow: "Оплатить",
+            securePayment: "Безопасный платеж",
+            processing: "Обработка...",
+            cardNumberHint: "Введите номер карты",
+            selectMethod: "Выберите способ оплаты",
+            card: "Банковская карта",
+            click: "Click.uz",
+            payme: "Payme",
+            stripeSecure: "Защищено Stripe"
         }
     },
 };

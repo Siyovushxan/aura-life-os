@@ -1,5 +1,5 @@
 import { db } from "@/firebaseConfig";
-import { doc, getDoc, updateDoc, serverTimestamp, Timestamp } from "firebase/firestore";
+import { doc, getDoc, updateDoc, serverTimestamp, Timestamp, collection, query, where, getDocs, orderBy } from "firebase/firestore";
 
 export interface SubscriptionData {
     planId: "trial" | "individual" | "family";
@@ -52,7 +52,7 @@ export const billingService = {
 
             await updateDoc(userRef, {
                 subscription,
-                plan: "Individual" // Legacy support for profile.plan
+                plan: "Individual"
             });
             return true;
         } catch (error) {
@@ -71,7 +71,6 @@ export const billingService = {
             const nextMonth = new Date();
             nextMonth.setMonth(now.getMonth() + 1);
 
-            // Calculation logic: $3.00 base + $1.99 per member
             const amount = 3.00 + (memberCount * 1.99);
 
             const subscription: SubscriptionData = {
@@ -93,6 +92,40 @@ export const billingService = {
         } catch (error) {
             console.error("Error upgrading to family:", error);
             return false;
+        }
+    },
+
+    /**
+     * Fetch payment history for a user
+     */
+    async getPaymentHistory(uid: string): Promise<any[]> {
+        console.log("[billingService] Fetching history for:", uid);
+        try {
+            const paymentsRef = collection(db, "payments");
+
+            // Try without orderBy first to see if it fixes the index error
+            const q = query(
+                paymentsRef,
+                where("userId", "==", uid)
+            );
+
+            const querySnapshot = await getDocs(q);
+            console.log("[billingService] Found payments:", querySnapshot.size);
+
+            const results = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            // Sort manually on client to avoid index requirement for now
+            return results.sort((a: any, b: any) => {
+                const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+                const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+                return dateB.getTime() - dateA.getTime();
+            });
+        } catch (error) {
+            console.error("Error fetching payment history:", error);
+            return [];
         }
     }
 };

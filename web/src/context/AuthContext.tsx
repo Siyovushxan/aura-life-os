@@ -121,13 +121,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } catch (error: any) {
             console.error("Phone Auth Error:", error.code, error.message);
             if (error.code === 'auth/invalid-app-credential') {
-                throw new Error("reCAPTCHA xatosi. Iltimos sahifani yangilab qayta urinib ko'ring (Refresh).");
+                throw new Error("reCAPTCHA xatosi. Iltimos sahifani yangilab qayta urinib ko'ring.");
             } else if (error.code === 'auth/operation-not-allowed') {
                 throw new Error("Telefon orqali kirish yoqilmagan. Firebase Consolda uni yoqing.");
             } else if (error.code === 'auth/too-many-requests') {
                 throw new Error("SMS yuborish limiti oshib ketdi. Biroz kuting yoki test raqamidan foydalaning.");
             } else if (error.code === 'auth/captcha-check-failed') {
                 throw new Error("reCAPTCHA tekshiruvidan o'tib bo'lmadi. Qayta urinib ko'ring.");
+            } else if (error.code === 'auth/invalid-phone-number') {
+                throw new Error("Telefon raqami noto'g'ri formatda. Iltimos, +998... ko'rinishida to'liq kiriting.");
             }
             throw error;
         }

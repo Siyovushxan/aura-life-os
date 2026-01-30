@@ -12,8 +12,7 @@ const BASE_URL = IS_LOCAL && USE_EMULATOR
     ? `http://127.0.0.1:5001/${PROJECT_ID}/${REGION}`
     : `https://${REGION}-${PROJECT_ID}.cloudfunctions.net`;
 
-const ANALYZE_TASK_URL = `${BASE_URL}/analyzeTask`;
-const GET_DAILY_INSIGHT_URL = `${BASE_URL}/getDailyInsight`;
+import { callBackend } from "@/services/groqService";
 const HEALTH_CHECK_URL = `${BASE_URL}/healthCheck`;
 
 /**
@@ -24,25 +23,11 @@ const HEALTH_CHECK_URL = `${BASE_URL}/healthCheck`;
  */
 export async function analyzeTaskWithAI(taskTitle: string, existingTasks: string[] = []) {
     try {
-        const response = await fetch(`${ANALYZE_TASK_URL}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // Add auth token if needed
-                // 'Authorization': `Bearer ${getAuthToken()}`
-            },
-            body: JSON.stringify({
-                taskTitle,
-                existingTasks,
-            }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`AI analysis failed: ${response.statusText}`);
+        const data = await callBackend('analyzeTask', { taskTitle, existingTasks });
+        if (data.success) {
+            return data.analysis;
         }
-
-        const data = await response.json();
-        return data.analysis;
+        throw new Error(data.error || 'AI analysis failed');
     } catch (error) {
         console.error('AI Task Analysis Error:', error);
         return {
@@ -59,53 +44,13 @@ export async function analyzeTaskWithAI(taskTitle: string, existingTasks: string
  * @param {object} userData - Comprehensive user data from all modules
  * @returns {Promise<string>} Daily insight text
  */
-export async function getDailyInsight(userData: {
-    finance?: {
-        totalBalance: number;
-        monthlyIncome: number;
-        monthlySpent: number;
-        savingsRate: number;
-    };
-    health?: {
-        bodyBattery: number;
-        sleepDuration: string;
-        heartRate: number | null;
-        steps: number;
-    };
-    food?: {
-        caloriesConsumed: number;
-        caloriesGoal: number;
-        proteinConsumed: number;
-        proteinGoal: number;
-    } | null;
-    interests?: {
-        totalActive: number;
-        learningStreak: number;
-    } | null;
-    tasks?: {
-        completed: number;
-        pending: number;
-    };
-    family?: {
-        memberCount: number;
-    };
-    stressLevel?: number;
-}) {
+export async function getDailyInsight(userData: any) {
     try {
-        const response = await fetch(`${GET_DAILY_INSIGHT_URL}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userData),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Daily insight failed: ${response.statusText}`);
+        const data = await callBackend('getDailyInsight', userData);
+        if (data.success) {
+            return data.insight;
         }
-
-        const data = await response.json();
-        return data.insight;
+        throw new Error(data.error || 'Daily insight failed');
     } catch (error) {
         console.error('Daily Insight Error:', error);
         return 'Bugun ham ajoyib kun! Maqsadlaringizga erishish uchun harakat qiling.';
